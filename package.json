@@ -48,8 +48,12 @@
     "validation",
     "typescript"
   ],
+  "homepage": "https://github.com/graneet/graneet-form",
   "repository": {
     "type": "git",
-    "url": "https://github.com/graneet/graneet-form"
+    "url": "git@github.com:graneet/graneet-form.git"
+  },
+  "bugs": {
+    "url": "https://github.com/graneet/graneet-form/issues"
   }
 }
