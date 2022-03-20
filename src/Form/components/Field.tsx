@@ -148,4 +148,5 @@ export function composeEventHandlers(
 
 Field.defaultProps = {
   children: null,
+  data: undefined,
 };

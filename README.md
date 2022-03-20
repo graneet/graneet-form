@@ -11,7 +11,7 @@
 
 ## Install
 
-```
+```shell
 yarn add graneet-form
 
 # or
