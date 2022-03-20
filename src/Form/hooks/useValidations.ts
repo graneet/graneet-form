@@ -39,6 +39,7 @@ export function useValidations(names?: string[], form?: FormContextApi): Validat
   useEffect(() => {
     addValidationStatusSubscriber(setCurrentValidations, names);
     return () => removeValidationStatusSubscriber(setCurrentValidations, names);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addValidationStatusSubscriber, names?.join(), removeValidationStatusSubscriber]);
 
   return currentValidations;
