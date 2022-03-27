@@ -75,7 +75,9 @@
       {
         "namedComponents": "function-declaration"
       }
-    ]
+    ],
+    "react/prop-types": "off",
+    "react/require-default-props": "off"
   },
   "settings": {
     "import/resolver": {
