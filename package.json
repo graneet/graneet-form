@@ -17,10 +17,14 @@
   ],
   "scripts": {
     "test": "exit 0",
-    "prepare": "yarn build",
+    "prepare": "husky install",
     "build": "microbundle --jsx 'React.createElement' --jsxImportSource react --globals react/jsx-runtime=jsx",
     "dev": "microbundle watch --format modern",
-    "lint": "eslint ./"
+    "lint": "eslint ./",
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:patch": "standard-version --release-as patch",
+    "release:major": "standard-version --release-as major"
   },
   "devDependencies": {
     "react": "17.0.2",
@@ -36,7 +40,11 @@
     "@types/node": "17.0.21",
     "@types/react": "17.0.41",
     "@typescript-eslint/eslint-plugin": "5.15.0",
-    "@typescript-eslint/parser": "5.15.0"
+    "@typescript-eslint/parser": "5.15.0",
+    "@commitlint/cli": "16.2.3",
+    "@commitlint/config-conventional": "16.2.1",
+    "husky": "7.0.4",
+    "standard-version": "9.3.2"
   },
   "peerDependencies": {
     "react": "^16.8.0 || ^17"
