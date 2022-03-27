@@ -11,6 +11,7 @@ export {
   useFormContext,
   Form,
   composeEventHandlers,
+  WATCH_MODE,
 } from './Form';
 export {
   useWizard,
@@ -20,16 +21,11 @@ export {
   WizardContext,
   Placeholder,
   Step,
-} from './Wizard';
-export {
-  VALIDATION_OUTCOME,
-} from './shared';
-
-export type {
-  FieldValue,
-} from './shared';
-export type {
   WizardLabels,
   PlaceholderProps,
   StepProps,
 } from './Wizard';
+export {
+  FieldValue,
+  VALIDATION_OUTCOME,
+} from './shared';
