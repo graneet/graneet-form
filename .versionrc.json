@@ -10,5 +10,5 @@
     {"type": "test", "hidden": true}
   ],
   "commitUrlFormat": "https://github.com/graneet/graneet-form/commits/{{hash}}",
-  "compareUrlFormat": "https://github.com/graneet/graneet-form/{{previousTag}}...{{currentTag}}"
+  "compareUrlFormat": "https://github.com/graneet/graneet-form/compare/{{previousTag}}...{{currentTag}}"
 }
