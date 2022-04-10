@@ -47,7 +47,7 @@
     "standard-version": "9.3.2"
   },
   "peerDependencies": {
-    "react": "^16.8.0 || ^17"
+    "react": "^16.8.0 || ^17 || ^18"
   },
   "keywords": [
     "react",
