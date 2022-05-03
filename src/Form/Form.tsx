@@ -2,18 +2,17 @@ import React, {
   FormHTMLAttributes,
   ReactNode,
   useCallback,
+  FormEventHandler,
 } from 'react';
 import {
-  FieldValues,
   mapValidationStatusesToOutcome,
   VALIDATION_OUTCOME,
 } from '../shared';
 import { FormContext, FormContextApi } from './contexts/FormContext';
 
-interface FormProps extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
+interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
   children: ReactNode,
   form: FormContextApi,
-  onSubmit?: (formValues: FieldValues) => void | Promise<void>,
 }
 
 /**
@@ -32,24 +31,29 @@ interface FormProps extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'
 export function Form({
   children,
   form,
-  onSubmit,
   ...otherProps
 }: FormProps) {
   const {
     getFormValues,
     formInternal: {
       getFormErrorsForNames,
+      getHandleFormSubmit,
     },
   } = form;
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = useCallback((event) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(async (event) => {
     event.preventDefault();
-    if (onSubmit) {
-      const validations = getFormErrorsForNames();
-      const isFormValid = mapValidationStatusesToOutcome(validations) === VALIDATION_OUTCOME.VALID;
-      if (isFormValid) onSubmit(getFormValues());
+
+    const validations = getFormErrorsForNames();
+    const isFormValid = mapValidationStatusesToOutcome(validations) === VALIDATION_OUTCOME.VALID;
+    if (isFormValid) {
+      const handleFormSubmit = getHandleFormSubmit();
+
+      if (handleFormSubmit) {
+        await handleFormSubmit(getFormValues());
+      }
     }
-  }, [getFormErrorsForNames, getFormValues, onSubmit]);
+  }, [getFormErrorsForNames, getFormValues, getHandleFormSubmit]);
 
   return (
     <FormContext.Provider value={form}>

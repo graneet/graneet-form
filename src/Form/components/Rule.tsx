@@ -4,7 +4,7 @@ import { Validator } from '../types/Validation';
 
 interface RuleProps {
   /**
-   * Message displayed when error is true
+   * Function run for the validation
    */
   validationFn: Validator,
   /**
