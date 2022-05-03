@@ -1,1 +1,1 @@
-export type FieldValue = string | number | readonly string[] | undefined;
+export type FieldValue = string | number | readonly string[] | undefined | File;

@@ -3,7 +3,7 @@ import { FieldValue } from '../../shared';
 import { FormContextApi, useFormContext } from '../contexts/FormContext';
 import { useOnChangeValues } from './useValues';
 
-interface UseHiddenField {
+export interface UseHiddenField {
   name: string,
   value: FieldValue,
   setValue: (newValue: FieldValue) => void,
