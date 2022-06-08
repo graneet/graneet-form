@@ -56,7 +56,10 @@ export interface FieldProps<T extends AnyRecord = AnyRecord> {
  * ```
  */
 export function Field({
-  name, children, render, data,
+  name,
+  children = null,
+  render,
+  data = undefined,
 }: FieldProps) {
   const {
     formInternal: {
@@ -145,8 +148,3 @@ export function composeEventHandlers(
     }
   );
 }
-
-Field.defaultProps = {
-  children: null,
-  data: undefined,
-};

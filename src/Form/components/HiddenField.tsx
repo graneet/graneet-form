@@ -20,12 +20,13 @@ interface HiddenFieldProps {
  * )
  * ```
  */
-export function HiddenField(props: HiddenFieldProps) {
+export function HiddenField({
+  children = null,
+  ...props
+}: HiddenFieldProps) {
   return (
-    <Field {...props} render={() => null} />
+    <Field {...props} render={() => null}>
+      {children}
+    </Field>
   );
 }
-
-HiddenField.defaultProps = {
-  children: null,
-};
