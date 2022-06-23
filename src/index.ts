@@ -28,4 +28,5 @@ export {
 export {
   FieldValue,
   VALIDATION_OUTCOME,
+  mapValidationStatusesToOutcome,
 } from './shared';
