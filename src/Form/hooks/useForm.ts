@@ -50,12 +50,12 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
 
   type EachFieldCallback = (infos: FieldState) => void;
 
-  type FormSubscriber<T extends FieldValue | ValidationStatus> =
-    Record<string, Set<PublishSubscriber<T>>>;
+  type FormSubscriber<Value extends FieldValue | ValidationStatus> =
+    Record<string, Set<PublishSubscriber<Value>>>;
 
-  interface FormSubscribersScope<T extends FieldValue | ValidationStatus> {
-    global: Set<PublishSubscriber<T>>,
-    scoped: FormSubscriber<T>,
+  interface FormSubscribersScope<Value extends FieldValue | ValidationStatus> {
+    global: Set<PublishSubscriber<Value>>,
+    scoped: FormSubscriber<Value>,
   }
 
   const { current: globalTimeout } = useRef<Record<string, Record<string, NodeJS.Timeout>>>({
@@ -81,8 +81,8 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
 
   // -- SUBSCRIPTION --
 
-  type FormSubscribersRef<T extends FieldValue | ValidationStatus> =
-    Record<WATCH_MODE, FormSubscribersScope<T>>;
+  type FormSubscribersRef<Value extends FieldValue | ValidationStatus> =
+    Record<WATCH_MODE, FormSubscribersScope<Value>>;
 
   const { current: formValuesSubscribers } = useRef<FormSubscribersRef<FieldValue>>({
     [WATCH_MODE.ON_CHANGE]: {
@@ -277,10 +277,10 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param formSubscriber List of subscribers updated
    * @param names Field names
    */
-  const addSubscriber = useCallback(<T extends FieldValue | ValidationStatus>(
-    publish: PublishSubscriber<T>,
+  const addSubscriber = useCallback(<Value extends FieldValue | ValidationStatus>(
+    publish: PublishSubscriber<Value>,
     watchMode: WATCH_MODE,
-    formSubscriber: FormSubscribersRef<T>,
+    formSubscriber: FormSubscribersRef<Value>,
     names?: string[],
   ): void => {
     const formSubscriberCopy = formSubscriber;
@@ -376,10 +376,10 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param formSubscriber List of subscribers to update
    * @param names Field names
    */
-  const removeSubscriber = useCallback(<T extends FieldValue | ValidationStatus>(
-    publish: PublishSubscriber<T>,
+  const removeSubscriber = useCallback(<Value extends FieldValue | ValidationStatus>(
+    publish: PublishSubscriber<Value>,
     watchMode: WATCH_MODE,
-    formSubscriber: FormSubscribersRef<T>,
+    formSubscriber: FormSubscribersRef<Value>,
     names?: string[],
   ): void => {
     if (!names) {
