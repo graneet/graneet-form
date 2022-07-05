@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.1](https://github.com/graneet/graneet-form/compare/v1.0.0...v1.2.1) (2022-07-05)
+
+
+### Bug Fixes
+
+* on error subscriber emitting, emit a new ref in the publisher ([94f869c](https://github.com/graneet/graneet-form/commits/94f869c8c4273ea398fe1d547d50e75250469308))
+
 ## [1.2.0](https://github.com/graneet/graneet-form/compare/v1.0.0...v1.2.0) (2022-06-23)
 
 
