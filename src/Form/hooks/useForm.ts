@@ -1,4 +1,8 @@
-import { useCallback, useMemo, useRef } from 'react';
+import {
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   FieldValues,
   FieldValue,
@@ -30,16 +34,18 @@ import { VALIDATION_STATE_UNDETERMINED } from '../types/Validation';
  * ```
  */
 
-export interface UseFormOptions {
-  onUpdateAfterBlur?: (
-    name: string,
-    value: FieldValue,
+export interface UseFormOptions<T extends Record<string, FieldValue>> {
+  onUpdateAfterBlur?<K extends keyof T>(
+    name: K,
+    value: T[K],
     data: AnyRecord,
-    formPartial: Pick<FormContextApi, 'getFormValues' | 'setFormValues'>,
-  ) => Promise<void> | void,
+    formPartial: Pick<FormContextApi<T>, 'getFormValues' | 'setFormValues'>,
+  ): Promise<void> | void,
 }
 
-export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContextApi {
+export function useForm<T extends Record<string, FieldValue>>(
+  { onUpdateAfterBlur }: UseFormOptions<T> = {},
+): FormContextApi<T> {
   // -- TYPES --
   interface FieldState {
     name: string,
@@ -73,6 +79,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * Run function for every field of FormState with FormFieldState on parameters
    * @param fn
    */
+  // TODO
   const eachField = useCallback((fn: EachFieldCallback): void => {
     Object.keys(formState).forEach((fieldName) => {
       fn(formState[fieldName]);
@@ -112,6 +119,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * Get values registered for an array of field names
    * @param names Array of field names
    */
+  // TODO
   const getFormValuesForNames = useCallback((
     names?: string[],
   ): FieldValues => {
@@ -129,6 +137,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * Get values for an array of field names. Return only errors of registered fields
    * @param names Array of field names
    */
+  // TODO
   const getFormErrorsForNames = useCallback((
     names?: string[],
   ): Record<string, ValidationStatus> => {
@@ -151,6 +160,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * // {"input1": "value1", "input1": "value1",}
    * ```
    */
+  // TODO
   const getFormValues = useCallback<() => FieldValues>(
     () => getFormValuesForNames(), [getFormValuesForNames]);
   /**
@@ -158,6 +168,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param name Field name
    * @param watchMode Type of subscriber updated
    */
+  // TODO
   const updateValueSubscribers = useCallback((name: string, watchMode: WATCH_MODE): void => {
     // Update watcher for this field name
     if (formValuesSubscribers[watchMode].scoped[name]) {
@@ -200,6 +211,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param name Field name
    * @param watchMode Type of subscriber updated
    */
+  // TODO
   const updateErrorSubscribers = useCallback((name: string, watchMode: WATCH_MODE): void => {
     // Update watcher for this field name
     if (formErrorsSubscribers[watchMode].scoped[name]) {
@@ -245,6 +257,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * Update all types of value subscribers for a given field name
    * @param name nameField name
    */
+  // TODO
   const updateValueForAllTypeOfSubscribers = useCallback((name: string): void => {
     updateValueSubscribers(name, WATCH_MODE.ON_CHANGE);
     updateValueSubscribers(name, WATCH_MODE.ON_BLUR);
@@ -254,6 +267,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * Update all types of error subscribers for a given field name
    * @param name nameField name
    */
+  // TODO
   const updateErrorForAllTypeOfSubscribers = useCallback((name: string): void => {
     updateErrorSubscribers(name, WATCH_MODE.ON_CHANGE);
     updateErrorSubscribers(name, WATCH_MODE.ON_BLUR);
@@ -264,6 +278,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * but field is marked as not displayed.
    * @param name Field name
    */
+  // TODO
   const unregisterField = useCallback((name: string): void => {
     formState[name].isRegistered = false;
     updateValueForAllTypeOfSubscribers(name);
@@ -277,6 +292,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param formSubscriber List of subscribers updated
    * @param names Field names
    */
+  // TODO
   const addSubscriber = useCallback(<Value extends FieldValue | ValidationStatus>(
     publish: PublishSubscriber<Value>,
     watchMode: WATCH_MODE,
@@ -303,6 +319,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param watchMode Type of watcher
    * @param names Field names
    */
+  // TODO
   const addValueSubscriber = useCallback((
     publish: PublishSubscriber<FieldValue>,
     watchMode: WATCH_MODE,
@@ -322,6 +339,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param publish Function trigger on error change
    * @param names Field names
    */
+  // TODO
   const addValidationStatusSubscriber = useCallback((
     publish: PublishSubscriber<ValidationStatus>,
     names?: string[],
@@ -341,6 +359,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param name Field name
    * @param setValue Function to change Field value and trigger render
    */
+  // TODO
   const registerField = useCallback((name: string, setValue: (value: FieldValue) => void): void => {
     const previousValueStored = formState[name]?.value;
     if (formState[name]?.isRegistered) {
@@ -376,6 +395,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param formSubscriber List of subscribers to update
    * @param names Field names
    */
+  // TODO
   const removeSubscriber = useCallback(<Value extends FieldValue | ValidationStatus>(
     publish: PublishSubscriber<Value>,
     watchMode: WATCH_MODE,
@@ -397,6 +417,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param watchMode Type of watcher
    * @param names Field names
    */
+  // TODO
   const removeValueSubscriber = useCallback((
     publish: PublishSubscriber<FieldValue>,
     watchMode: WATCH_MODE,
@@ -415,6 +436,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param publish Function used to be triggered on value change
    * @param names Field names
    */
+  // TODO
   const removeValidationStatusSubscriber = useCallback((
     publish: PublishSubscriber<ValidationStatus>,
     names?: string[],
@@ -432,6 +454,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param newValues list of new values
    * @param eraseAll If true, reset all values associated to a registered field
    */
+  // TODO
   const setFormValues = useCallback((
     newValues: FieldValues,
     eraseAll = false,
@@ -468,6 +491,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param value New value
    * @param isUserInput Is changed is from user input
    */
+  // TODO
   const handleOnChange = useCallback((name: string, value: FieldValue, hasFocus: boolean): void => {
     if (formState[name].value === value) {
       return;
@@ -487,6 +511,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param name Field name updated
    * @param data Data injected in onUpdateAfterBlur
    */
+  // TODO
   const handleOnBlur = useCallback(async (name: string, data: AnyRecord = {}): Promise<void> => {
     updateValueSubscribers(name, WATCH_MODE.ON_BLUR);
     if (
@@ -504,6 +529,7 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * @param name Field name
    * @param validationStatus New status
    */
+  // TODO
   const updateValidationStatus = useCallback((
     name: string,
     validationStatus: ValidationStatus,
@@ -520,13 +546,15 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    * const handleChange = () => resetForm();
    * ```
    */
+  // TODO
   const resetForm = useCallback((): void => setFormValues({}, true), [setFormValues]);
 
+  // TODO
   const handleSubmit = useCallback((submitCallback: (formValues: FieldValues) => void | Promise<void>) => () => {
     handleFormSubmitRef.current = submitCallback;
   }, []);
 
-  return useMemo<FormContextApi>(() => ({
+  return useMemo<FormContextApi<T>>(() => ({
     formInternal: {
       registerField,
       unregisterField,
