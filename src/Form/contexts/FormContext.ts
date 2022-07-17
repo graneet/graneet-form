@@ -49,26 +49,26 @@ export interface FormInternal<T extends Record<string, FieldValue>> {
   ): void,
 
   removeValueSubscriber(
-    publish: Dispatch<SetStateAction<T>>,
+    publish: Dispatch<SetStateAction<Partial<T>>>,
     type: WATCH_MODE,
   ): void,
 
-  addValidationStatusSubscriber<Keys extends keyof T>(
-    publish: Dispatch<SetStateAction<Record<Keys, ValidationStatus>>>,
-    name: Keys[],
+  addValidationStatusSubscriber<K extends keyof T>(
+    publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
+    name: K[],
   ): void,
 
   addValidationStatusSubscriber(
-    publish: Dispatch<SetStateAction<Record<keyof T, ValidationStatus>>>,
+    publish: Dispatch<SetStateAction<Record<keyof T, ValidationStatus | undefined>>>,
   ): void,
 
-  removeValidationStatusSubscriber<Keys extends keyof T>(
-    publish: Dispatch<SetStateAction<Record<Keys, ValidationStatus>>>,
-    name: Keys[],
+  removeValidationStatusSubscriber<K extends keyof T>(
+    publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
+    name: K[],
   ): void,
 
   removeValidationStatusSubscriber(
-    publish: Dispatch<SetStateAction<Record<keyof T, ValidationStatus>>>,
+    publish: Dispatch<SetStateAction<Record<keyof T, ValidationStatus | undefined>>>,
   ): void,
 
   handleOnChange<K extends keyof T>(

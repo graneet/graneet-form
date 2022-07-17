@@ -13,7 +13,10 @@ import {
   AnyRecord,
 } from '../../shared';
 import {
-  FormContextApi, FormInternal, FormValidations, FormValues, PublishSubscriber,
+  FormContextApi,
+  FormInternal,
+  FormValidations,
+  FormValues,
 } from '../contexts/FormContext';
 import { WATCH_MODE } from '../types/WatchMode';
 import { VALIDATION_STATE_UNDETERMINED } from '../types/Validation';
@@ -78,7 +81,7 @@ export function useForm<T extends Record<string, FieldValue>>(
 
   type FormValueSubscribersRef = Record<WATCH_MODE, {
     global: Set<Dispatch<SetStateAction<Partial<T>>>>,
-    scoped: PartialRecord<keyof T, Set<Dispatch<SetStateAction<FormValues<T, keyof T>>>> | undefined>,
+    scoped: PartialRecord<keyof T, Set<Dispatch<SetStateAction<FormValues<T, keyof T>>>>>,
   }>;
 
   const { current: formValuesSubscribers } = useRef<FormValueSubscribersRef>({
@@ -343,10 +346,10 @@ export function useForm<T extends Record<string, FieldValue>>(
    * @param publish Function trigger on error change
    * @param names Field names
    */
-  // TODO
   const addValidationStatusSubscriber = useCallback((
-    publish: PublishSubscriber<ValidationStatus>,
-    names?: string[],
+    publish: Dispatch<SetStateAction<Record<keyof T, ValidationStatus | undefined>>>
+      | Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
+    names?: (keyof T)[],
   ): void => {
     if (!names) {
       formErrorsSubscribers[WATCH_MODE.ON_CHANGE].global.add(publish);
@@ -356,7 +359,7 @@ export function useForm<T extends Record<string, FieldValue>>(
       if (!formErrorsSubscribers[WATCH_MODE.ON_CHANGE].scoped[name]) {
         formErrorsSubscribers[WATCH_MODE.ON_CHANGE].scoped[name] = new Set();
       }
-      formErrorsSubscribers[WATCH_MODE.ON_CHANGE].scoped[name].add(publish);
+      formErrorsSubscribers[WATCH_MODE.ON_CHANGE].scoped[name]?.add(publish);
     });
 
     publish(getFormErrorsForNames(names));
@@ -401,65 +404,53 @@ export function useForm<T extends Record<string, FieldValue>>(
   }, [formState, addValueSubscriber, updateValueForAllTypeOfSubscribers]);
 
   /**
-   * Remove subscriber for given fields in the list of subscribers given
-   * @param publish Function used to be triggered on value change
-   * @param watchMode Type of watcher
-   * @param formSubscriber List of subscribers to update
-   * @param names Field names
-   */
-  // TODO
-  const removeSubscriber = useCallback(<Value extends FieldValue | ValidationStatus>(
-    publish: PublishSubscriber<Value>,
-    watchMode: WATCH_MODE,
-    formSubscriber: FormValueSubscribersRef<Value>,
-    names?: string[],
-  ): void => {
-    if (!names) {
-      formSubscriber[watchMode].global.delete(publish);
-      return;
-    }
-    names.forEach((name: string) => {
-      formSubscriber[watchMode].scoped[name].delete(publish);
-    });
-  }, []);
-
-  /**
    * Remove values subscriber for given fields
    * @param publish Function used to be triggered on value change
    * @param watchMode Type of watcher
    * @param names Field names
    */
-  // TODO
-  const removeValueSubscriber = useCallback((
-    publish: PublishSubscriber<FieldValue>,
+  const removeValueSubscriber = useCallback(<K extends keyof T>(
+    publish: Dispatch<SetStateAction<FormValues<T, K>>> | Dispatch<SetStateAction<Partial<T>>>,
     watchMode: WATCH_MODE,
-    names?: string[],
+    names?: K[],
   ): void => {
-    removeSubscriber<FieldValue>(
-      publish,
-      watchMode,
-      formValuesSubscribers,
-      names,
-    );
-  }, [formValuesSubscribers, removeSubscriber]);
+    // Global subscriber
+    if (!names) {
+      formValuesSubscribers[watchMode].global.delete(publish as Dispatch<SetStateAction<Partial<T>>>);
+      return;
+    }
+
+    // Scoped subscriber
+    names.forEach((name) => {
+      formValuesSubscribers[watchMode].scoped[name]?.delete(
+        publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>,
+      );
+    });
+  }, [formValuesSubscribers]);
 
   /**
    * Remove validation status subscriber for given fields
    * @param publish Function used to be triggered on value change
    * @param names Field names
    */
-  // TODO
-  const removeValidationStatusSubscriber = useCallback((
-    publish: PublishSubscriber<ValidationStatus>,
-    names?: string[],
+  const removeValidationStatusSubscriber = useCallback(<K extends keyof T>(
+    publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>
+      | Dispatch<SetStateAction<Record<keyof T, ValidationStatus | undefined>>>,
+    names?: K[],
   ): void => {
-    removeSubscriber<ValidationStatus>(
-      publish,
-      WATCH_MODE.ON_CHANGE,
-      formErrorsSubscribers,
-      names,
-    );
-  }, [formErrorsSubscribers, removeSubscriber]);
+    if (!names) {
+      formErrorsSubscribers[WATCH_MODE.ON_CHANGE].global.delete(
+        publish as Dispatch<SetStateAction<Record<keyof T, ValidationStatus | undefined>>>,
+      );
+      return;
+    }
+
+    names.forEach((name) => {
+      formErrorsSubscribers[WATCH_MODE.ON_CHANGE].scoped[name]?.delete(
+        publish as Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
+      );
+    });
+  }, [formErrorsSubscribers]);
 
   /**
    * Change values of the form
