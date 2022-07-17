@@ -7,41 +7,45 @@ import {
 import {
   AnyRecord,
   FieldValue,
-  FieldValues,
   ValidationStatus,
 } from '../../shared';
 import { WATCH_MODE } from '../types/WatchMode';
+import { PartialRecord } from '../../shared/types/PartialRecord';
 
 export type PublishSubscriber<T extends FieldValue | ValidationStatus> =
   Dispatch<SetStateAction<Record<string, T>>>;
 
-type FormValues<T extends Record<string, FieldValue>, Keys extends keyof T> = {
+export type FormValues<T extends Record<string, FieldValue>, Keys extends keyof T> = {
   [K in Keys]: T[K] | undefined;
+}
+
+export type FormValidations<T extends Record<string, FieldValue>, Keys extends keyof T> = {
+  [K in Keys]: ValidationStatus | undefined;
 }
 
 export interface FormInternal<T extends Record<string, FieldValue>> {
   registerField<K extends keyof T>(
     name: K,
-    setValue: (value: T[K]) => void,
+    setValue: (value: T[K] | undefined) => void,
   ): void,
 
   unregisterField(name: keyof T): void,
 
-  addValueSubscriber<Keys extends keyof T>(
-    publish: Dispatch<SetStateAction<FormValues<T, Keys>>>,
+  addValueSubscriber<K extends keyof T>(
+    publish: Dispatch<SetStateAction<FormValues<T, K>>>,
     type: WATCH_MODE,
-    name: Keys[],
+    names: K[],
   ): void,
 
   addValueSubscriber(
-    publish: Dispatch<SetStateAction<T>>,
+    publish: Dispatch<SetStateAction<Partial<T>>>,
     type: WATCH_MODE,
   ): void,
 
-  removeValueSubscriber<Keys extends keyof T>(
-    publish: Dispatch<SetStateAction<FormValues<T, Keys>>>,
+  removeValueSubscriber<K extends keyof T>(
+    publish: Dispatch<SetStateAction<FormValues<T, K>>>,
     type: WATCH_MODE,
-    name: Keys[],
+    name: K[],
   ): void,
 
   removeValueSubscriber(
@@ -78,13 +82,17 @@ export interface FormInternal<T extends Record<string, FieldValue>> {
     data: AnyRecord | undefined,
   ): void,
 
-  getFormValuesForNames(
-    names?: (keyof T)[],
-  ): FieldValues,
+  getFormValuesForNames<K extends keyof T>(
+    names: K[],
+  ): FormValues<T, K>,
+
+  getFormValuesForNames(): Partial<T>,
 
   getFormErrorsForNames<K extends keyof T>(
     names?: K[],
-  ): Record<K, ValidationStatus>,
+  ): Record<K, ValidationStatus | undefined>,
+
+  getFormErrorsForNames(): PartialRecord<keyof T, ValidationStatus>,
 
   updateValidationStatus(
     name: keyof T,
@@ -99,10 +107,10 @@ export interface FormContextApi<T extends Record<string, FieldValue>> {
    * DO NOT use outside of library components like Field, useValues, useValidations
    */
   formInternal: FormInternal<T>,
-  getFormValues(): T,
+  getFormValues(): Partial<T>,
   resetForm(): void,
   setFormValues(newValues: Partial<T>, eraseAll?: boolean): void,
-  handleSubmit(submitCallback: (formValues: T) => (void | Promise<void>)): () => void,
+  handleSubmit(submitCallback: (formValues: Partial<T>) => (void | Promise<void>)): () => void,
 }
 
 export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
@@ -114,7 +122,7 @@ export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
   removeValidationStatusSubscriber: (): void => {},
   handleOnChange: (): void => {},
   handleOnBlur: (): void => {},
-  getFormValuesForNames: (): FieldValues => ({}),
+  getFormValuesForNames: () => ({}),
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   getFormErrorsForNames: (): Record<string, ValidationStatus> => ({}),
