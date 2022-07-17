@@ -6,7 +6,6 @@ import {
   useRef,
 } from 'react';
 import {
-  FieldValues,
   FieldValue,
   VALIDATION_OUTCOME,
   ValidationStatus,
@@ -45,7 +44,7 @@ import { PartialRecord } from '../../shared/types/PartialRecord';
 export interface UseFormOptions<T extends Record<string, FieldValue>> {
   onUpdateAfterBlur?<K extends keyof T>(
     name: K,
-    value: T[K],
+    value: T[K] | undefined,
     data: AnyRecord,
     formPartial: Pick<FormContextApi<T>, 'getFormValues' | 'setFormValues'>,
   ): Promise<void> | void,
@@ -55,7 +54,6 @@ export function useForm<T extends Record<string, FieldValue>>(
   { onUpdateAfterBlur }: UseFormOptions<T> = {},
 ): FormContextApi<T> {
   // -- TYPES --
-  // TODO
   const { current: globalTimeout } = useRef<Record<string, Record<string, NodeJS.Timeout>>>({
     errors: {},
     values: {},
@@ -74,8 +72,7 @@ export function useForm<T extends Record<string, FieldValue>>(
   const { current: formState } = useRef<FormState>({});
   const fieldNameOnChangeByUserRef = useRef<keyof T | undefined>();
 
-  // TODO
-  const handleFormSubmitRef = useRef<(formValues: FieldValues) => (void | Promise<void>)>();
+  const handleFormSubmitRef = useRef<(formValues: T) => (void | Promise<void>)>();
 
   // -- SUBSCRIPTION --
 
@@ -95,7 +92,6 @@ export function useForm<T extends Record<string, FieldValue>>(
     },
   });
 
-  // TODO
   type FormErrorSubscribersRef = Record<WATCH_MODE, {
     global: Set<Dispatch<SetStateAction<Record<keyof T, ValidationStatus | undefined>>>>,
     scoped: PartialRecord<keyof T, Set<Dispatch<SetStateAction<FormValidations<T, keyof T>>>>>,
@@ -110,18 +106,6 @@ export function useForm<T extends Record<string, FieldValue>>(
       scoped: {},
     },
   });
-
-  // -- Utils
-  /**
-   * Run function for every field of FormState with FormFieldState on parameters
-   * @param fn
-   */
-  // TODO
-  const eachField = useCallback((fn: (infos: FieldState) => void): void => {
-    Object.keys(formState).forEach((fieldName) => {
-      fn(formState[fieldName]);
-    });
-  }, [formState]);
 
   // -- EXPORTS --
 
@@ -459,20 +443,24 @@ export function useForm<T extends Record<string, FieldValue>>(
    */
   // TODO
   const setFormValues = useCallback((
-    newValues: FieldValues,
+    newValues: Partial<T>,
     eraseAll = false,
   ): void => {
     if (eraseAll) {
-      eachField(({ name }) => {
-        formState[name].value = undefined;
-        updateValueForAllTypeOfSubscribers(name);
+      Object.keys(formState).forEach((fieldName) => {
+        const { name } = formState[fieldName]!;
+
+        if (formState[name]) {
+          formState[name]!.value = undefined;
+          updateValueForAllTypeOfSubscribers(name);
+        }
       });
     }
 
-    Object.keys(newValues).forEach((name) => {
+    Object.keys(newValues).forEach((name: keyof T) => {
       // If the field is already stored, only update the value
       if (formState[name]) {
-        formState[name].value = newValues[name];
+        formState[name]!.value = newValues[name];
       } else {
         // Else, save a new line in the context for the given name. When the field will be
         // registered later, he will have access to the value
@@ -485,18 +473,25 @@ export function useForm<T extends Record<string, FieldValue>>(
       }
       updateValueForAllTypeOfSubscribers(name);
     });
-  }, [eachField, formState, updateValueForAllTypeOfSubscribers]);
+  }, [formState, updateValueForAllTypeOfSubscribers]);
 
   /**
    * Handle onChange action trigger for a field
    * DO NOT use outside of field
    * @param name Field name
    * @param value New value
-   * @param isUserInput Is changed is from user input
+   * @param hasFocus If the field has user focus
    */
-  // TODO
-  const handleOnChange = useCallback((name: string, value: FieldValue, hasFocus: boolean): void => {
-    if (formState[name].value === value) {
+  const handleOnChange = useCallback(<K extends keyof T>(
+    name: K,
+    value: T[K],
+    hasFocus: boolean,
+  ): void => {
+    if (!formState[name]) {
+      throw new Error(`Field "${String(name)}" is not registered`);
+    }
+
+    if (formState[name]?.value === value) {
       return;
     }
     // Keep field name to know on blur if the field has been updated by user input
@@ -504,7 +499,7 @@ export function useForm<T extends Record<string, FieldValue>>(
       fieldNameOnChangeByUserRef.current = name;
     }
     // Update value in store
-    formState[name].value = value;
+    formState[name]!.value = value;
     updateValueSubscribers(name, WATCH_MODE.ON_CHANGE);
   }, [formState, updateValueSubscribers]);
 
@@ -514,15 +509,19 @@ export function useForm<T extends Record<string, FieldValue>>(
    * @param name Field name updated
    * @param data Data injected in onUpdateAfterBlur
    */
-  // TODO
-  const handleOnBlur = useCallback(async (name: string, data: AnyRecord = {}): Promise<void> => {
+  const handleOnBlur = useCallback(async (name: keyof T, data: AnyRecord = {}): Promise<void> => {
     updateValueSubscribers(name, WATCH_MODE.ON_BLUR);
+
+    if (!formState[name]) {
+      throw new Error(`Field "${String(name)}" is not registered`);
+    }
+
     if (
       onUpdateAfterBlur
       && fieldNameOnChangeByUserRef.current === name
-      && formState[name].validation.status === VALIDATION_OUTCOME.VALID
+      && formState[name]!.validation.status === VALIDATION_OUTCOME.VALID
     ) {
-      await onUpdateAfterBlur(name, formState[name].value, data, { getFormValues, setFormValues });
+      await onUpdateAfterBlur(name, formState[name]!.value, data, { getFormValues, setFormValues });
     }
     fieldNameOnChangeByUserRef.current = undefined;
   }, [updateValueSubscribers, onUpdateAfterBlur, formState, getFormValues, setFormValues]);
@@ -532,12 +531,15 @@ export function useForm<T extends Record<string, FieldValue>>(
    * @param name Field name
    * @param validationStatus New status
    */
-  // TODO
   const updateValidationStatus = useCallback((
-    name: string,
+    name: keyof T,
     validationStatus: ValidationStatus,
   ): void => {
-    formState[name].validation = validationStatus;
+    if (!formState[name]) {
+      throw new Error(`Field "${String(name)}" is not registered`);
+    }
+
+    formState[name]!.validation = validationStatus;
     updateErrorSubscribers(name, WATCH_MODE.ON_CHANGE);
   }, [formState, updateErrorSubscribers]);
 
@@ -549,11 +551,9 @@ export function useForm<T extends Record<string, FieldValue>>(
    * const handleChange = () => resetForm();
    * ```
    */
-  // TODO
   const resetForm = useCallback((): void => setFormValues({}, true), [setFormValues]);
 
-  // TODO
-  const handleSubmit = useCallback((submitCallback: (formValues: FieldValues) => void | Promise<void>) => () => {
+  const handleSubmit = useCallback((submitCallback: (formValues: Partial<T>) => (void | Promise<void>)) => () => {
     handleFormSubmitRef.current = submitCallback;
   }, []);
 

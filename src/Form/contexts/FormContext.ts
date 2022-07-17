@@ -77,10 +77,10 @@ export interface FormInternal<T extends Record<string, FieldValue>> {
     hasFocus: boolean,
   ): void,
 
-  handleOnBlur<K extends keyof T>(
-    name: K,
+  handleOnBlur(
+    name: keyof T,
     data: AnyRecord | undefined,
-  ): void,
+  ): Promise<void>,
 
   getFormValuesForNames<K extends keyof T>(
     names: K[],
@@ -121,7 +121,7 @@ export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
   addValidationStatusSubscriber: (): void => {},
   removeValidationStatusSubscriber: (): void => {},
   handleOnChange: (): void => {},
-  handleOnBlur: (): void => {},
+  handleOnBlur: (): Promise<void> => Promise.resolve(),
   getFormValuesForNames: () => ({}),
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
