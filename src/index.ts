@@ -1,4 +1,12 @@
 export {
+  VALIDATION_OUTCOME,
+  mapValidationStatusesToOutcome,
+} from './shared';
+export type {
+  FieldValue,
+  FieldValues,
+} from './shared';
+export {
   Field,
   HiddenField,
   Rule,
@@ -21,13 +29,9 @@ export {
   WizardContext,
   Placeholder,
   Step,
+} from './Wizard';
+export type {
   WizardLabels,
   PlaceholderProps,
   StepProps,
 } from './Wizard';
-export {
-  FieldValue,
-  FieldValues,
-  VALIDATION_OUTCOME,
-  mapValidationStatusesToOutcome,
-} from './shared';
