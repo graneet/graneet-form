@@ -58,6 +58,7 @@ export interface FormInternal {
     name: string,
     validationStatus: ValidationStatus,
   ) => void
+  getHandleFormSubmit: () => ((formValues: FieldValues) => (void | Promise<void>)) | undefined,
 }
 
 export interface FormContextApi {
@@ -68,6 +69,7 @@ export interface FormContextApi {
   getFormValues: () => FieldValues,
   resetForm: () => void,
   setFormValues: (newValues: FieldValues, eraseAll?: boolean) => void,
+  handleSubmit: (submitCallback: (formValues: FieldValues) => (void | Promise<void>)) => () => void,
 }
 
 export const FORM_INTERVAL_DEFAULT: FormInternal = {
@@ -82,6 +84,7 @@ export const FORM_INTERVAL_DEFAULT: FormInternal = {
   getFormValuesForNames: (): FieldValues => ({}),
   getFormErrorsForNames: (): Record<string, ValidationStatus> => ({}),
   updateValidationStatus: (): void => {},
+  getHandleFormSubmit: () => undefined,
 };
 
 export const CONTEXT_FORM_DEFAULT: FormContextApi = {
@@ -89,6 +92,7 @@ export const CONTEXT_FORM_DEFAULT: FormContextApi = {
   getFormValues: () => ({}),
   resetForm: () => {},
   setFormValues: () => {},
+  handleSubmit: () => () => {},
 };
 
 export const FormContext = createContext(

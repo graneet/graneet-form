@@ -1,20 +1,23 @@
-import { ReactNode, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRuleContext } from '../contexts/RuleContext';
 import { Validator } from '../types/Validation';
 
 interface RuleProps {
+  /**
+   * Function run for the validation
+   */
   validationFn: Validator,
+  /**
+   * Message displayed when error is true
+   */
   message: string,
-  children?: ReactNode,
+  /**
+   * Is validation function run with debounce
+   */
   isDebounced?: boolean,
 }
 
 /**
- *
- * @param message - Message when error is true
- * @param children -  Children
- * @param validationFn - Function run for the validation
- * @param isDebounced - Is validation function run with debounce
  * @example
  * ```
  * <TextField name="foo">
@@ -26,7 +29,9 @@ interface RuleProps {
  * ```
  */
 export function Rule({
-  message, children, validationFn, isDebounced = false,
+  message,
+  validationFn,
+  isDebounced = false,
 }: RuleProps) {
   const { registerRule, unregisterRule } = useRuleContext();
 
@@ -35,10 +40,5 @@ export function Rule({
     return () => unregisterRule(validationFn, isDebounced);
   }, [isDebounced, message, registerRule, unregisterRule, validationFn]);
 
-  return children;
+  return null;
 }
-
-Rule.defaultProps = {
-  children: null,
-  isDebounced: false,
-};

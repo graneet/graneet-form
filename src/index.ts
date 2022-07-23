@@ -27,6 +27,7 @@ export {
 } from './Wizard';
 export {
   FieldValue,
+  FieldValues,
   VALIDATION_OUTCOME,
   mapValidationStatusesToOutcome,
 } from './shared';

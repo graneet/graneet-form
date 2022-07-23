@@ -16,6 +16,7 @@ specifiers:
   husky: 8.0.1
   microbundle: 0.15.0
   standard-version: 9.5.0
+  tslib: 2.4.0
   typescript: 4.7.3
 
 devDependencies:
@@ -34,6 +35,7 @@ devDependencies:
   husky: 8.0.1
   microbundle: 0.15.0
   standard-version: 9.5.0
+  tslib: 2.4.0
   typescript: 4.7.3
 
 packages:

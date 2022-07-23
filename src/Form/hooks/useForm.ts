@@ -36,7 +36,7 @@ export interface UseFormOptions {
     value: FieldValue,
     data: AnyRecord,
     formPartial: Pick<FormContextApi, 'getFormValues' | 'setFormValues'>,
-  ) => Promise<void> | void
+  ) => Promise<void> | void,
 }
 
 export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContextApi {
@@ -66,6 +66,8 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
   // -- FORM STATE --
   const { current: formState } = useRef<Record<string, FieldState>>({});
   const fieldNameOnChangeByUserRef = useRef<string | undefined>();
+
+  const handleFormSubmitRef = useRef<(formValues: FieldValues) => (void | Promise<void>)>();
 
   /**
    * Run function for every field of FormState with FormFieldState on parameters
@@ -520,6 +522,10 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
    */
   const resetForm = useCallback((): void => setFormValues({}, true), [setFormValues]);
 
+  const handleSubmit = useCallback((submitCallback: (formValues: FieldValues) => void | Promise<void>) => () => {
+    handleFormSubmitRef.current = submitCallback;
+  }, []);
+
   return useMemo<FormContextApi>(() => ({
     formInternal: {
       registerField,
@@ -533,10 +539,14 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
       getFormValuesForNames,
       getFormErrorsForNames,
       updateValidationStatus,
+      get getHandleFormSubmit() {
+        return () => handleFormSubmitRef.current;
+      },
     },
     getFormValues,
     resetForm,
     setFormValues,
+    handleSubmit,
   }), [
     registerField,
     unregisterField,
@@ -552,5 +562,6 @@ export function useForm({ onUpdateAfterBlur }: UseFormOptions = {}): FormContext
     getFormValues,
     resetForm,
     setFormValues,
+    handleSubmit,
   ]);
 }
