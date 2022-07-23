@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "allowJs": false,
-    "module": "es2015",
-    "target": "es2015",
+    "module": "commonjs",
+    "target": "es6",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -13,6 +13,8 @@
     "importHelpers": true,
     "noImplicitReturns": true,
     "strict": true,
+    "types": ["node"],
+    "isolatedModules": true,
   },
   "exclude": [
     "node_modules",
