@@ -5,14 +5,15 @@ import React, {
   FormEventHandler,
 } from 'react';
 import {
+  FieldValue,
   mapValidationStatusesToOutcome,
   VALIDATION_OUTCOME,
 } from '../shared';
 import { FormContext, FormContextApi } from './contexts/FormContext';
 
-interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
+interface FormProps<T extends Record<string, FieldValue>> extends FormHTMLAttributes<HTMLFormElement> {
   children: ReactNode,
-  form: FormContextApi,
+  form: FormContextApi<T>,
 }
 
 /**
@@ -28,11 +29,11 @@ interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
  * )
  * ```
  */
-export function Form({
+export function Form<T extends Record<string, FieldValue>>({
   children,
   form,
   ...otherProps
-}: FormProps) {
+}: FormProps<T>) {
   const {
     getFormValues,
     formInternal: {
@@ -45,7 +46,7 @@ export function Form({
     event.preventDefault();
 
     const validations = getFormErrorsForNames();
-    const isFormValid = mapValidationStatusesToOutcome(validations) === VALIDATION_OUTCOME.VALID;
+    const isFormValid = mapValidationStatusesToOutcome<T>(validations) === VALIDATION_OUTCOME.VALID;
     if (isFormValid) {
       const handleFormSubmit = getHandleFormSubmit();
 

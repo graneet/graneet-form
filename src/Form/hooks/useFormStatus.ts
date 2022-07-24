@@ -4,6 +4,7 @@ import {
   useState,
 } from 'react';
 import {
+  FieldValue,
   mapValidationStatusesToOutcome,
   VALIDATION_OUTCOME,
 } from '../../shared';
@@ -19,7 +20,7 @@ interface FormStatus {
  * Hook to watch form status.
  * @param form (optional) form to use. If it's not given, form context is used.
  */
-export function useFormStatus(form?: FormContextApi): FormStatus {
+export function useFormStatus<T extends Record<string, FieldValue>>(form?: FormContextApi<T>): FormStatus {
   const validations = useValidations(undefined, form);
   const [status, setStatus] = useState(VALIDATION_OUTCOME.UNDETERMINED);
 
