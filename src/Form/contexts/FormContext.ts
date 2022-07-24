@@ -99,7 +99,7 @@ export interface FormInternal<T extends Record<string, FieldValue>> {
     validationStatus: ValidationStatus,
   ): void
 
-  getHandleFormSubmit(): ((formValues: T) => (void | Promise<void>)) | undefined,
+  getHandleFormSubmit(): ((formValues: Partial<T>) => (void | Promise<void>)) | undefined,
 }
 
 export interface FormContextApi<T extends Record<string, FieldValue>> {

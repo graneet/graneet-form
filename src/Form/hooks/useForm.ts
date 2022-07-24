@@ -72,7 +72,7 @@ export function useForm<T extends Record<string, FieldValue>>(
   const { current: formState } = useRef<FormState>({});
   const fieldNameOnChangeByUserRef = useRef<keyof T | undefined>();
 
-  const handleFormSubmitRef = useRef<(formValues: T) => (void | Promise<void>)>();
+  const handleFormSubmitRef = useRef<(formValues: Partial<T>) => (void | Promise<void>)>();
 
   // -- SUBSCRIPTION --
 
@@ -441,7 +441,6 @@ export function useForm<T extends Record<string, FieldValue>>(
    * @param newValues list of new values
    * @param eraseAll If true, reset all values associated to a registered field
    */
-  // TODO
   const setFormValues = useCallback((
     newValues: Partial<T>,
     eraseAll = false,

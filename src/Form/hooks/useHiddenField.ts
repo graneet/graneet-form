@@ -3,10 +3,10 @@ import { FieldValue } from '../../shared';
 import { FormContextApi, useFormContext } from '../contexts/FormContext';
 import { useOnChangeValues } from './useValues';
 
-export interface UseHiddenField {
-  name: string,
-  value: FieldValue,
-  setValue: (newValue: FieldValue) => void,
+export interface UseHiddenField<T extends Record<string, FieldValue>, K extends keyof T> {
+  name: K,
+  value: T[K] | undefined,
+  setValue: (newValue: T[K]) => void,
 }
 
 /**
@@ -21,17 +21,19 @@ export interface UseHiddenField {
  * )
  * ```
  */
-export function useHiddenField(name: string, form?: FormContextApi): UseHiddenField {
-  const { setFormValues } = useFormContext();
+export function useHiddenField<T extends Record<string, FieldValue>, K extends keyof T>(
+  name: K,
+  form?: FormContextApi<T>,
+): UseHiddenField<T, K> {
+  const { setFormValues } = useFormContext<T>();
   const { [name]: value } = useOnChangeValues([name], form);
 
   return useMemo(() => ({
     name,
     value,
-    setValue: (newValue) => (
-      form
-        ? form.setFormValues({ [name]: newValue })
-        : setFormValues({ [name]: newValue })
-    ),
+    setValue: (newValue) => {
+      const objectValue = { [name]: newValue } as unknown as Partial<T>;
+      return form ? form.setFormValues(objectValue) : setFormValues(objectValue);
+    },
   }), [name, value, form, setFormValues]);
 }

@@ -1,3 +1,5 @@
+import { FieldValue } from './FieldValue';
+
 export enum VALIDATION_OUTCOME {
   VALID = 'VALID',
   INVALID = 'INVALID',
@@ -9,4 +11,4 @@ export interface ValidationStatus {
   message: string | undefined
 }
 
-export type ValidationStatuses = Record<string, ValidationStatus>;
+export type ValidationStatuses<T extends Record<string, FieldValue>> = Record<keyof T, ValidationStatus | undefined>;
