@@ -2,7 +2,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { FieldValue, FieldValues } from '../../shared';
+import { FieldValue } from '../../shared';
 import {
   CONTEXT_FORM_DEFAULT,
   FormContextApi,
@@ -127,7 +127,7 @@ export function useOnBlurValues<T extends Record<string, FieldValue>>(
 export function useOnBlurValues<T extends Record<string, FieldValue>, K extends keyof T>(
   names?: K[],
   form?: FormContextApi<T>,
-): FieldValues {
+): FormValues<T, K> | Partial<T> {
   return useValues(
     WATCH_MODE.ON_BLUR,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

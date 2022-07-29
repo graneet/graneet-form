@@ -21,7 +21,7 @@ interface FormStatus {
  * @param form (optional) form to use. If it's not given, form context is used.
  */
 export function useFormStatus<T extends Record<string, FieldValue>>(form?: FormContextApi<T>): FormStatus {
-  const validations = useValidations(undefined, form);
+  const validations = useValidations<T>(undefined, form);
   const [status, setStatus] = useState(VALIDATION_OUTCOME.UNDETERMINED);
 
   useEffect(() => {

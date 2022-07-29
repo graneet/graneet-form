@@ -54,12 +54,12 @@ export interface FormInternal<T extends Record<string, FieldValue>> {
   ): void,
 
   addValidationStatusSubscriber<K extends keyof T>(
-    publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
+    publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
     name: K[],
   ): void,
 
   addValidationStatusSubscriber(
-    publish: Dispatch<SetStateAction<Record<keyof T, ValidationStatus | undefined>>>,
+    publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
   ): void,
 
   removeValidationStatusSubscriber<K extends keyof T>(
@@ -68,12 +68,12 @@ export interface FormInternal<T extends Record<string, FieldValue>> {
   ): void,
 
   removeValidationStatusSubscriber(
-    publish: Dispatch<SetStateAction<Record<keyof T, ValidationStatus | undefined>>>,
+    publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
   ): void,
 
   handleOnChange<K extends keyof T>(
     name: K,
-    value: T[K],
+    value: T[K] | undefined,
     hasFocus: boolean,
   ): void,
 
