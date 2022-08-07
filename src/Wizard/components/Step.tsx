@@ -2,16 +2,21 @@ import {
   ReactNode,
   useEffect,
 } from 'react';
+import { FieldValue } from '../../shared/types/FieldValue';
 import {
   CONTEXT_WIZARD_DEFAULT,
   useWizardContext,
 } from '../contexts/WizardContext';
 import { StepValidator } from '../types';
 
-export interface StepProps {
+export interface StepProps<
+  Steps extends string,
+  WizardValues extends Record<Steps, Record<string, FieldValue>>,
+  Step extends Steps,
+  >{
   children: ReactNode,
-  name: string,
-  onNext?: StepValidator,
+  name: Step,
+  onNext?: StepValidator<Steps, WizardValues, Step>,
   noFooter?: boolean,
   title?: string,
 }
@@ -35,14 +40,18 @@ export interface StepProps {
  * </Wizard
  * ``
  */
-export function Step({
+export function Step<
+  Steps extends string,
+  WizardValues extends Record<Steps, Record<string, FieldValue>>,
+  Step extends Steps,
+  >({
   children,
   name,
   onNext,
   noFooter,
   title,
-}: StepProps) {
-  const wizard = useWizardContext();
+}: StepProps<Steps, WizardValues, Step>) {
+  const wizard = useWizardContext<Steps, WizardValues>();
 
   const {
     registerStep,
@@ -51,6 +60,9 @@ export function Step({
     setIsStepReady,
   } = wizard;
 
+  // When Step is used outside of wizard context, it will throw an error
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   if (wizard === CONTEXT_WIZARD_DEFAULT) {
     throw new Error('Step not in wizard');
   }

@@ -10,5 +10,5 @@ export default defineConfig((options) => ({
   watch: !isProduction(options),
   sourcemap: !isProduction(options),
   minify: isProduction(options),
-  dts: isProduction(options),
+  dts: true,
 }));

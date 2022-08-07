@@ -6,7 +6,7 @@ import {
   useContext,
 } from 'react';
 import {
-  FieldValues,
+  FieldValue,
   VALIDATION_OUTCOME,
 } from '../../shared';
 import {
@@ -16,44 +16,47 @@ import {
 
 export type ValidationStatusesSetter = Dispatch<SetStateAction<VALIDATION_OUTCOME>>;
 
-export interface WizardContextApi {
-  steps: string[],
-  currentStep: string | undefined,
-  registerStep: (
-    name: string,
-    validationFn?: StepValidator,
+export interface WizardContextApi<
+  Steps extends string,
+  WizardValues extends Record<Steps, Record<string, FieldValue>>
+  > {
+  steps: Steps[],
+  currentStep: Steps | undefined,
+  registerStep<Step extends Steps>(
+    name: Step,
+    validationFn?: StepValidator<Steps, WizardValues, Step>,
     noFooter?: boolean,
     title?: string,
-  ) => void,
-  unregisterStep: (name: string) => void,
-  handleOnNext: () => Promise<void>,
-  handleOnPrevious: () => void,
-  updatePlaceholderContent: (placement: string, children: ReactNode) => void,
-  resetPlaceholderContent: (placement?: string) => void,
-  registerPlaceholder: (
+  ): void,
+  unregisterStep(name: Steps): void,
+  handleOnNext(): Promise<void>,
+  handleOnPrevious(): void,
+  updatePlaceholderContent(placement: string, children: ReactNode): void,
+  resetPlaceholderContent(placement?: string): void,
+  registerPlaceholder(
     placeholderContentSetter: PlaceholderContentSetter,
     stepStatusSetter: ValidationStatusesSetter,
-  ) => void,
-  unregisterPlaceholder: (
+  ): void,
+  unregisterPlaceholder(
     placeholderContentSetter: PlaceholderContentSetter,
     stepStatusSetter: ValidationStatusesSetter,
-  ) => void,
+  ): void,
   isLastStep: boolean,
   isFirstStep: boolean,
   hasNoFooter: boolean,
   stepStatusSetter: ValidationStatusesSetter,
   isStepReady: boolean,
-  stepsTitles: {name: string, title: string | undefined}[],
+  stepsTitles: { name: Steps, title: string | undefined }[],
   setIsStepReady: Dispatch<SetStateAction<boolean>>,
-  setValuesGetterForCurrentStep: (
-    stepValuesGetter: () => FieldValues | undefined
-  ) => void,
-  getValuesOfCurrentStep: () => FieldValues | undefined,
-  getValuesOfStep: (stepName: string) => FieldValues | undefined,
-  getValuesOfSteps: () => Record<string, FieldValues | undefined>
+  setValuesGetterForCurrentStep(
+    stepValuesGetter: () => Record<string, FieldValue> | undefined
+  ): void,
+  getValuesOfCurrentStep<Step extends Steps>(): WizardValues[Step] | undefined,
+  getValuesOfStep<Step extends Steps>(stepName: Step): WizardValues[Step] | undefined,
+  getValuesOfSteps(): WizardValues
 }
 
-export const CONTEXT_WIZARD_DEFAULT: WizardContextApi = {
+export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<string, Record<string, never>> = {
   steps: [],
   currentStep: undefined,
   registerStep: () => {},
@@ -77,9 +80,12 @@ export const CONTEXT_WIZARD_DEFAULT: WizardContextApi = {
   getValuesOfSteps: () => ({}),
 };
 
-export const WizardContext = createContext(
+export const WizardContext = createContext<WizardContextApi<any, any>>(
   CONTEXT_WIZARD_DEFAULT,
 );
-export function useWizardContext(): WizardContextApi {
+export function useWizardContext<
+  Steps extends string,
+  WizardValues extends Record<Steps, Record<string, FieldValue>>
+  >(): WizardContextApi<Steps, WizardValues> {
   return useContext(WizardContext);
 }
