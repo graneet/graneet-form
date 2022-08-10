@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/graneet/graneet-form/compare/v1.2.1...v1.3.0) (2022-08-10)
+
+
+### Features
+
+* add `handleSubmit` to pass function ran on form submission ([f4deb0d](https://github.com/graneet/graneet-form/commits/f4deb0dace2cdc546918fa7493dd0daea0fd7f9b))
+* expose `FieldValues` ([1d07548](https://github.com/graneet/graneet-form/commits/1d075486202ba14e4aef18d9370a018e6d42aa03))
+* implements `form` in `Form` and use `onSubmit` ([bbaf8e6](https://github.com/graneet/graneet-form/commits/bbaf8e6f85ebf1f26a30e8c5ae682f2e12c0e132))
+
+
+### Bug Fixes
+
+* remove children from Rule props, it's fix the return of the Rule that as to be a `React.Element` ([8457a3a](https://github.com/graneet/graneet-form/commits/8457a3a970e57730b2e73e8fc206e0b29b7f7677))
+
 ## [1.2.1](https://github.com/graneet/graneet-form/compare/v1.0.0...v1.2.1) (2022-07-05)
 
 
