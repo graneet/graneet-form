@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import { FieldValue } from '../../shared';
+import { FieldValues } from '../../shared';
 import { FormContextApi, useFormContext } from '../contexts/FormContext';
 import { useOnChangeValues } from './useValues';
 
-export interface UseHiddenField<T extends Record<string, FieldValue>, K extends keyof T> {
+export interface UseHiddenField<T extends FieldValues, K extends keyof T> {
   name: K,
   value: T[K] | undefined,
   setValue: (newValue: T[K]) => void,
@@ -21,7 +21,7 @@ export interface UseHiddenField<T extends Record<string, FieldValue>, K extends 
  * )
  * ```
  */
-export function useHiddenField<T extends Record<string, FieldValue>, K extends keyof T>(
+export function useHiddenField<T extends FieldValues, K extends keyof T>(
   name: K,
   form?: FormContextApi<T>,
 ): UseHiddenField<T, K> {

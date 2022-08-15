@@ -1,7 +1,7 @@
-import { FieldValue } from '../types/FieldValue';
+import { FieldValues } from '../types/FieldValue';
 import { VALIDATION_OUTCOME, ValidationStatuses } from '../types/Validation';
 
-export function mapValidationStatusesToOutcome<T extends Record<string, FieldValue>>(
+export function mapValidationStatusesToOutcome<T extends FieldValues>(
   validationStatuses: ValidationStatuses<T>,
 ): VALIDATION_OUTCOME {
   let hasInvalid = false;

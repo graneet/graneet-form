@@ -3,7 +3,7 @@ import {
   useState,
 } from 'react';
 import {
-  FieldValue,
+  FieldValues,
 } from '../../shared';
 import {
   CONTEXT_FORM_DEFAULT,
@@ -12,11 +12,11 @@ import {
   useFormContext,
 } from '../contexts/FormContext';
 
-export function useValidations<T extends Record<string, FieldValue>>(
+export function useValidations<T extends FieldValues>(
   names: undefined,
   form?: FormContextApi<T>,
 ): FormValidations<T, keyof T>
-export function useValidations<T extends Record<string, FieldValue>, K extends keyof T>(
+export function useValidations<T extends FieldValues, K extends keyof T>(
   names: K[],
   form?: FormContextApi<T>,
 ): FormValidations<T, K>
@@ -34,7 +34,7 @@ export function useValidations<T extends Record<string, FieldValue>, K extends k
  *   },[])
  * ```
  */
-export function useValidations<T extends Record<string, FieldValue>, K extends keyof T>(
+export function useValidations<T extends FieldValues, K extends keyof T>(
   names?: K[],
   form?: FormContextApi<T>,
 ): FormValidations<T, keyof T> | FormValidations<T, K> {

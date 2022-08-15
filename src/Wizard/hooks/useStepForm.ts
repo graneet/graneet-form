@@ -6,7 +6,7 @@ import {
   useRef,
 } from 'react';
 import {
-  FieldValue,
+  FieldValues,
   mapValidationStatusesToOutcome,
   VALIDATION_OUTCOME,
   ValidationStatuses,
@@ -19,7 +19,7 @@ import {
 } from '../../Form';
 import { useWizardContext } from '../contexts/WizardContext';
 
-interface UseStepFormApi<T extends Record<string, FieldValue>> {
+interface UseStepFormApi<T extends FieldValues> {
   form: FormContextApi<T>,
   initFormValues: (initialValues: Partial<T>) => void,
 }
@@ -43,7 +43,7 @@ interface UseStepFormApi<T extends Record<string, FieldValue>> {
  * )
  * ```
  */
-export function useStepForm<T extends Record<string, FieldValue>>(props: UseFormOptions<T>): UseStepFormApi<T> {
+export function useStepForm<T extends FieldValues>(props: UseFormOptions<T>): UseStepFormApi<T> {
   const form = useForm(props);
   const {
     stepStatusSetter,

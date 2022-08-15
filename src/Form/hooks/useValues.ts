@@ -2,7 +2,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { FieldValue } from '../../shared';
+import { FieldValues } from '../../shared';
 import {
   CONTEXT_FORM_DEFAULT,
   FormContextApi,
@@ -11,20 +11,20 @@ import {
 } from '../contexts/FormContext';
 import { WATCH_MODE } from '../types/WatchMode';
 
-function useValues<T extends Record<string, FieldValue>, K extends keyof T>(
+function useValues<T extends FieldValues, K extends keyof T>(
   watchMode: WATCH_MODE,
   names: K[],
   ): FormValues<T, K>;
-function useValues<T extends Record<string, FieldValue>, K extends keyof T>(
+function useValues<T extends FieldValues, K extends keyof T>(
   watchMode: WATCH_MODE,
   names: K[],
   form: FormContextApi<T>,
 ): FormValues<T, K>;
 
-function useValues<T extends Record<string, FieldValue>>(
+function useValues<T extends FieldValues>(
   watchMode: WATCH_MODE,
 ): Partial<T>;
-function useValues<T extends Record<string, FieldValue>>(
+function useValues<T extends FieldValues>(
   watchMode: WATCH_MODE,
   names: undefined,
   form: FormContextApi<T>,
@@ -37,7 +37,7 @@ function useValues<T extends Record<string, FieldValue>>(
  * @param names (optional) Field names
  * @param form (optional) form to use. If it's not given, form context is used.
  */
-function useValues<T extends Record<string, FieldValue>, K extends keyof T>(
+function useValues<T extends FieldValues, K extends keyof T>(
   watchMode: WATCH_MODE,
   names?: K[],
   form?: FormContextApi<T>,
@@ -65,12 +65,12 @@ function useValues<T extends Record<string, FieldValue>, K extends keyof T>(
   return currentValues;
 }
 
-export function useOnChangeValues<T extends Record<string, FieldValue>, K extends keyof T>(
+export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
   names: K[],
   form?: FormContextApi<T>,
 ): FormValues<T, K>;
-export function useOnChangeValues<T extends Record<string, FieldValue>>(): Partial<T>;
-export function useOnChangeValues<T extends Record<string, FieldValue>>(
+export function useOnChangeValues<T extends FieldValues>(): Partial<T>;
+export function useOnChangeValues<T extends FieldValues>(
   names: undefined,
   form: FormContextApi<T>,
 ): Partial<T>;
@@ -88,7 +88,7 @@ export function useOnChangeValues<T extends Record<string, FieldValue>>(
  *   },[])
  * ```
  */
-export function useOnChangeValues<T extends Record<string, FieldValue>, K extends keyof T>(
+export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
   names?: K[],
   form?: FormContextApi<T>,
 ): FormValues<T, K> | Partial<T> {
@@ -101,12 +101,12 @@ export function useOnChangeValues<T extends Record<string, FieldValue>, K extend
   );
 }
 
-export function useOnBlurValues<T extends Record<string, FieldValue>, K extends keyof T>(
+export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
   names: K[],
   form?: FormContextApi<T>,
 ): FormValues<T, K>;
-export function useOnBlurValues<T extends Record<string, FieldValue>>(): Partial<T>;
-export function useOnBlurValues<T extends Record<string, FieldValue>>(
+export function useOnBlurValues<T extends FieldValues>(): Partial<T>;
+export function useOnBlurValues<T extends FieldValues>(
   names: undefined,
   form: FormContextApi<T>,
 ): Partial<T>;
@@ -124,7 +124,7 @@ export function useOnBlurValues<T extends Record<string, FieldValue>>(
  *   },[])
  * ```
  */
-export function useOnBlurValues<T extends Record<string, FieldValue>, K extends keyof T>(
+export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
   names?: K[],
   form?: FormContextApi<T>,
 ): FormValues<T, K> | Partial<T> {

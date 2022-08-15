@@ -1,10 +1,10 @@
 import React, {
   ReactNode,
 } from 'react';
-import { FieldValue } from '../../shared';
+import { FieldValues } from '../../shared';
 import { Field } from './Field';
 
-interface HiddenFieldProps<T extends Record<string, FieldValue>, K extends keyof T> {
+interface HiddenFieldProps<T extends FieldValues, K extends keyof T> {
   name: K & string,
   children?: ReactNode,
 }
@@ -21,7 +21,7 @@ interface HiddenFieldProps<T extends Record<string, FieldValue>, K extends keyof
  * )
  * ```
  */
-export function HiddenField<T extends Record<string, FieldValue>, K extends keyof T>({
+export function HiddenField<T extends FieldValues, K extends keyof T>({
   children = null,
   ...props
 }: HiddenFieldProps<T, K>) {

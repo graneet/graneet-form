@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import {
   AnyRecord,
-  FieldValue,
+  FieldValues,
   ValidationStatus,
 } from '../../shared';
 import { useFormContext } from '../contexts/FormContext';
@@ -15,7 +15,7 @@ import { useFieldValidation } from '../hooks/useFieldValidation';
 import { useRules } from '../hooks/useRules';
 import { RuleContext } from '../contexts/RuleContext';
 
-export interface FieldRenderProps<T extends Record<string, FieldValue>, K extends keyof T> {
+export interface FieldRenderProps<T extends FieldValues, K extends keyof T> {
   name: K,
   value: T[K] | undefined,
   onFocus: () => void,
@@ -28,7 +28,7 @@ export interface FieldRenderState {
   validationStatus: ValidationStatus,
 }
 
-export interface FieldProps<T extends Record<string, FieldValue>, K extends keyof T> {
+export interface FieldProps<T extends FieldValues, K extends keyof T> {
   name: K,
   children?: ReactNode,
   render: (fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState) => JSX.Element | null,
@@ -55,7 +55,7 @@ export interface FieldProps<T extends Record<string, FieldValue>, K extends keyo
  * </Field>
  * ```
  */
-export function Field<T extends Record<string, FieldValue>, K extends keyof T>({
+export function Field<T extends FieldValues, K extends keyof T>({
   name,
   children = null,
   render,

@@ -6,7 +6,7 @@ import {
   useContext,
 } from 'react';
 import {
-  FieldValue,
+  FieldValues,
   VALIDATION_OUTCOME,
 } from '../../shared';
 import {
@@ -18,7 +18,7 @@ export type ValidationStatusesSetter = Dispatch<SetStateAction<VALIDATION_OUTCOM
 
 export interface WizardContextApi<
   Steps extends string,
-  WizardValues extends Record<Steps, Record<string, FieldValue>>
+  WizardValues extends Record<Steps, FieldValues>
   > {
   steps: Steps[],
   currentStep: Steps | undefined,
@@ -49,7 +49,7 @@ export interface WizardContextApi<
   stepsTitles: { name: Steps, title: string | undefined }[],
   setIsStepReady: Dispatch<SetStateAction<boolean>>,
   setValuesGetterForCurrentStep(
-    stepValuesGetter: () => Record<string, FieldValue> | undefined
+    stepValuesGetter: () => FieldValues | undefined
   ): void,
   getValuesOfCurrentStep<Step extends Steps>(): WizardValues[Step] | undefined,
   getValuesOfStep<Step extends Steps>(stepName: Step): WizardValues[Step] | undefined,
@@ -85,7 +85,7 @@ export const WizardContext = createContext<WizardContextApi<any, any>>(
 );
 export function useWizardContext<
   Steps extends string,
-  WizardValues extends Record<Steps, Record<string, FieldValue>>
+  WizardValues extends Record<Steps, FieldValues>
   >(): WizardContextApi<Steps, WizardValues> {
   return useContext(WizardContext);
 }

@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 import {
-  FieldValue,
+  FieldValues,
   VALIDATION_OUTCOME,
 } from '../../shared';
 import {
@@ -22,14 +22,14 @@ import { PartialRecord } from '../../shared/types/PartialRecord';
 
 export function useWizard<
   Steps extends string,
-  WizardValues extends Record<Steps, Record<string, FieldValue>>
+  WizardValues extends Record<Steps, FieldValues>
   >(
   onFinish: (wizardValues: WizardValues) => void,
   onQuit: () => void,
 ): WizardContextApi<Steps, WizardValues> {
   // -- VALUES --
   const wizardValuesRef = useRef<WizardValues>({} as WizardValues);
-  const valuesStepGetter = useRef<() => Record<string, FieldValue> | undefined>(() => undefined);
+  const valuesStepGetter = useRef<() => FieldValues | undefined>(() => undefined);
 
   // -- STEP --
   const [currentStep, setCurrentStep] = useState<Steps>();

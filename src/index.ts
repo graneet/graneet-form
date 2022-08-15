@@ -4,6 +4,7 @@ export {
 } from './shared';
 export type {
   FieldValue,
+  FieldValues,
 } from './shared';
 export {
   Field,

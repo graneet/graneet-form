@@ -2,7 +2,7 @@ import {
   ReactNode,
   useEffect,
 } from 'react';
-import { FieldValue } from '../../shared/types/FieldValue';
+import { FieldValues } from '../../shared/types/FieldValue';
 import {
   CONTEXT_WIZARD_DEFAULT,
   useWizardContext,
@@ -11,7 +11,7 @@ import { StepValidator } from '../types';
 
 export interface StepProps<
   Steps extends string,
-  WizardValues extends Record<Steps, Record<string, FieldValue>>,
+  WizardValues extends Record<Steps, FieldValues>,
   Step extends Steps,
   >{
   children: ReactNode,
@@ -42,7 +42,7 @@ export interface StepProps<
  */
 export function Step<
   Steps extends string,
-  WizardValues extends Record<Steps, Record<string, FieldValue>>,
+  WizardValues extends Record<Steps, FieldValues>,
   Step extends Steps,
   >({
   children,

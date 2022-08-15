@@ -7,6 +7,7 @@ import {
 import {
   AnyRecord,
   FieldValue,
+  FieldValues,
   ValidationStatus,
 } from '../../shared';
 import { WATCH_MODE } from '../types/WatchMode';
@@ -15,15 +16,15 @@ import { PartialRecord } from '../../shared/types/PartialRecord';
 export type PublishSubscriber<T extends FieldValue | ValidationStatus> =
   Dispatch<SetStateAction<Record<string, T>>>;
 
-export type FormValues<T extends Record<string, FieldValue>, Keys extends keyof T> = {
+export type FormValues<T extends FieldValues, Keys extends keyof T> = {
   [K in Keys]: T[K] | undefined;
 }
 
-export type FormValidations<T extends Record<string, FieldValue>, Keys extends keyof T> = {
+export type FormValidations<T extends FieldValues, Keys extends keyof T> = {
   [K in Keys]: ValidationStatus | undefined;
 }
 
-export interface FormInternal<T extends Record<string, FieldValue>> {
+export interface FormInternal<T extends FieldValues> {
   registerField<K extends keyof T>(
     name: K,
     setValue: (value: T[K] | undefined) => void,
@@ -102,7 +103,7 @@ export interface FormInternal<T extends Record<string, FieldValue>> {
   getHandleFormSubmit(): ((formValues: Partial<T>) => (void | Promise<void>)) | undefined,
 }
 
-export interface FormContextApi<T extends Record<string, FieldValue>> {
+export interface FormContextApi<T extends FieldValues> {
   /**
    * DO NOT use outside of library components like Field, useValues, useValidations
    */
@@ -145,6 +146,6 @@ export const FormContext = createContext<FormContextApi<any>>(CONTEXT_FORM_DEFAU
 /**
  * Get React Context for form
  */
-export function useFormContext<T extends Record<string, FieldValue>>(): FormContextApi<T> {
+export function useFormContext<T extends FieldValues>(): FormContextApi<T> {
   return useContext(FormContext);
 }

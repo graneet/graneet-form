@@ -5,13 +5,13 @@ import React, {
   FormEventHandler,
 } from 'react';
 import {
-  FieldValue,
+  FieldValues,
   mapValidationStatusesToOutcome,
   VALIDATION_OUTCOME,
 } from '../shared';
 import { FormContext, FormContextApi } from './contexts/FormContext';
 
-interface FormProps<T extends Record<string, FieldValue>> extends FormHTMLAttributes<HTMLFormElement> {
+interface FormProps<T extends FieldValues> extends FormHTMLAttributes<HTMLFormElement> {
   children: ReactNode,
   form: FormContextApi<T>,
 }
@@ -29,7 +29,7 @@ interface FormProps<T extends Record<string, FieldValue>> extends FormHTMLAttrib
  * )
  * ```
  */
-export function Form<T extends Record<string, FieldValue>>({
+export function Form<T extends FieldValues>({
   children,
   form,
   ...otherProps

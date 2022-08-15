@@ -6,10 +6,10 @@ import {
   useRef,
 } from 'react';
 import {
-  FieldValue,
   VALIDATION_OUTCOME,
   ValidationStatus,
   AnyRecord,
+  FieldValues,
 } from '../../shared';
 import {
   FormContextApi,
@@ -41,7 +41,7 @@ import { PartialRecord } from '../../shared/types/PartialRecord';
  * ```
  */
 
-export interface UseFormOptions<T extends Record<string, FieldValue>> {
+export interface UseFormOptions<T extends FieldValues> {
   onUpdateAfterBlur?<K extends keyof T>(
     name: K,
     value: T[K] | undefined,
@@ -50,7 +50,7 @@ export interface UseFormOptions<T extends Record<string, FieldValue>> {
   ): Promise<void> | void,
 }
 
-export function useForm<T extends Record<string, FieldValue>>(
+export function useForm<T extends FieldValues>(
   { onUpdateAfterBlur }: UseFormOptions<T> = {},
 ): FormContextApi<T> {
   // -- TYPES --
