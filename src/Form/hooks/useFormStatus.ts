@@ -1,19 +1,11 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-import {
-  FieldValues,
-  mapValidationStatusesToOutcome,
-  VALIDATION_OUTCOME,
-} from '../../shared';
+import { useEffect, useMemo, useState } from 'react';
+import { FieldValues, mapValidationStatusesToOutcome, VALIDATION_OUTCOME } from '../../shared';
 import { useValidations } from './useValidations';
 import { FormContextApi } from '../contexts/FormContext';
 
 interface FormStatus {
-  formStatus : VALIDATION_OUTCOME,
-  isFormValid: boolean,
+  formStatus: VALIDATION_OUTCOME;
+  isFormValid: boolean;
 }
 
 /**
@@ -28,8 +20,11 @@ export function useFormStatus<T extends FieldValues>(form?: FormContextApi<T>): 
     setStatus(mapValidationStatusesToOutcome(validations));
   }, [validations]);
 
-  return useMemo(() => ({
-    formStatus: status,
-    isFormValid: status === VALIDATION_OUTCOME.VALID,
-  }), [status]);
+  return useMemo(
+    () => ({
+      formStatus: status,
+      isFormValid: status === VALIDATION_OUTCOME.VALID,
+    }),
+    [status],
+  );
 }

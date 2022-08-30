@@ -1,22 +1,13 @@
-import {
-  ReactNode,
-  useEffect,
-} from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useWizardContext } from '../contexts/WizardContext';
 
 export interface PlaceholderProps {
-  placement: string,
-  children: ReactNode,
+  placement: string;
+  children: ReactNode;
 }
 
-export function Placeholder({
-  placement,
-  children,
-}: PlaceholderProps) {
-  const {
-    updatePlaceholderContent,
-    resetPlaceholderContent,
-  } = useWizardContext();
+export function Placeholder({ placement, children }: PlaceholderProps) {
+  const { updatePlaceholderContent, resetPlaceholderContent } = useWizardContext();
 
   useEffect(() => {
     updatePlaceholderContent(placement, children);

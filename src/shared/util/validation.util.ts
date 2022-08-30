@@ -17,7 +17,8 @@ export function mapValidationStatusesToOutcome<T extends FieldValues>(
 
   if (hasInvalid) {
     return VALIDATION_OUTCOME.INVALID;
-  } if (hasUndetermined) {
+  }
+  if (hasUndetermined) {
     return VALIDATION_OUTCOME.UNDETERMINED;
   }
   return VALIDATION_OUTCOME.VALID;

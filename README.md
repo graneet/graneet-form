@@ -3,6 +3,7 @@
 # Performant forms and wizard library for React
 
 ## Features 🚀
+
 - Performant and easy to use
 - System of wizard integrated with integration of form
 - Small bundle size
@@ -24,41 +25,27 @@ npm install graneet-form
 ```tsx
 import { Field, useForm } from 'graneet-form';
 
-function Input({name}) {
+function Input({ name }) {
   return (
     <Field
       name={name}
-      render={({
-        value,
-        onChange,
-        onBlur,
-        onFocus,
-      }, state) => {
-        
-        return (
-          <input
-            value={value}
-            onChange={onChange}
-            onBlur={onBlur}
-            onFocus={onFocus}
-          />
-        );
+      render={({ value, onChange, onBlur, onFocus }, state) => {
+        return <input value={value} onChange={onChange} onBlur={onBlur} onFocus={onFocus} />;
       }}
     />
-  )
+  );
 }
-
 
 function App() {
   const form = useForm();
-  
+
   const handleClick = () => form.getFormValues();
-  
+
   return (
     <Form form={form}>
-      <Input name="firstName" /> 
+      <Input name="firstName" />
       <button onClick={handleClick} />
     </Form>
-  )
+  );
 }
 ```

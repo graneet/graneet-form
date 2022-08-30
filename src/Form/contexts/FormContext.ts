@@ -1,117 +1,77 @@
-import {
-  createContext,
-  Dispatch,
-  SetStateAction,
-  useContext,
-} from 'react';
-import {
-  AnyRecord,
-  FieldValue,
-  FieldValues,
-  ValidationStatus,
-} from '../../shared';
+import { createContext, Dispatch, SetStateAction, useContext } from 'react';
+import { AnyRecord, FieldValues, ValidationStatus } from '../../shared';
 import { WATCH_MODE } from '../types/WatchMode';
 import { PartialRecord } from '../../shared/types/PartialRecord';
 
-export type PublishSubscriber<T extends FieldValue | ValidationStatus> =
-  Dispatch<SetStateAction<Record<string, T>>>;
-
 export type FormValues<T extends FieldValues, Keys extends keyof T> = {
   [K in Keys]: T[K] | undefined;
-}
+};
 
 export type FormValidations<T extends FieldValues, Keys extends keyof T> = {
   [K in Keys]: ValidationStatus | undefined;
-}
+};
 
 export interface FormInternal<T extends FieldValues> {
-  registerField<K extends keyof T>(
-    name: K,
-    setValue: (value: T[K] | undefined) => void,
-  ): void,
+  registerField<K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): void;
 
-  unregisterField(name: keyof T): void,
+  unregisterField(name: keyof T): void;
 
   addValueSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
     type: WATCH_MODE,
     names: K[],
-  ): void,
+  ): void;
 
-  addValueSubscriber(
-    publish: Dispatch<SetStateAction<Partial<T>>>,
-    type: WATCH_MODE,
-  ): void,
+  addValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
 
   removeValueSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
     type: WATCH_MODE,
     name: K[],
-  ): void,
+  ): void;
 
-  removeValueSubscriber(
-    publish: Dispatch<SetStateAction<Partial<T>>>,
-    type: WATCH_MODE,
-  ): void,
+  removeValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
 
   addValidationStatusSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
     name: K[],
-  ): void,
+  ): void;
 
-  addValidationStatusSubscriber(
-    publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
-  ): void,
+  addValidationStatusSubscriber(publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>): void;
 
   removeValidationStatusSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
     name: K[],
-  ): void,
+  ): void;
 
-  removeValidationStatusSubscriber(
-    publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
-  ): void,
+  removeValidationStatusSubscriber(publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>): void;
 
-  handleOnChange<K extends keyof T>(
-    name: K,
-    value: T[K] | undefined,
-    hasFocus: boolean,
-  ): void,
+  handleOnChange<K extends keyof T>(name: K, value: T[K] | undefined, hasFocus: boolean): void;
 
-  handleOnBlur(
-    name: keyof T,
-    data: AnyRecord | undefined,
-  ): Promise<void>,
+  handleOnBlur(name: keyof T, data: AnyRecord | undefined): Promise<void>;
 
-  getFormValuesForNames<K extends keyof T>(
-    names: K[],
-  ): FormValues<T, K>,
+  getFormValuesForNames<K extends keyof T>(names: K[]): FormValues<T, K>;
 
-  getFormValuesForNames(): Partial<T>,
+  getFormValuesForNames(): Partial<T>;
 
-  getFormErrorsForNames<K extends keyof T>(
-    names?: K[],
-  ): Record<K, ValidationStatus | undefined>,
+  getFormErrorsForNames<K extends keyof T>(names?: K[]): Record<K, ValidationStatus | undefined>;
 
-  getFormErrorsForNames(): PartialRecord<keyof T, ValidationStatus>,
+  getFormErrorsForNames(): PartialRecord<keyof T, ValidationStatus>;
 
-  updateValidationStatus(
-    name: keyof T,
-    validationStatus: ValidationStatus,
-  ): void
+  updateValidationStatus(name: keyof T, validationStatus: ValidationStatus): void;
 
-  getHandleFormSubmit(): ((formValues: Partial<T>) => (void | Promise<void>)) | undefined,
+  getHandleFormSubmit(): ((formValues: Partial<T>) => void | Promise<void>) | undefined;
 }
 
 export interface FormContextApi<T extends FieldValues> {
   /**
    * DO NOT use outside of library components like Field, useValues, useValidations
    */
-  formInternal: FormInternal<T>,
-  getFormValues(): Partial<T>,
-  resetForm(): void,
-  setFormValues(newValues: Partial<T>, eraseAll?: boolean): void,
-  handleSubmit(submitCallback: (formValues: Partial<T>) => (void | Promise<void>)): () => void,
+  formInternal: FormInternal<T>;
+  getFormValues(): Partial<T>;
+  resetForm(): void;
+  setFormValues(newValues: Partial<T>, eraseAll?: boolean): void;
+  handleSubmit(submitCallback: (formValues: Partial<T>) => void | Promise<void>): () => void;
 }
 
 export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {

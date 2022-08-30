@@ -1,8 +1,4 @@
-import {
-  FieldValue,
-  VALIDATION_OUTCOME,
-  ValidationStatus,
-} from '../../shared';
+import { FieldValue, VALIDATION_OUTCOME, ValidationStatus } from '../../shared';
 
 export const VALIDATION_STATE_VALID: ValidationStatus = {
   status: VALIDATION_OUTCOME.VALID,
@@ -13,4 +9,4 @@ export const VALIDATION_STATE_UNDETERMINED: ValidationStatus = {
   message: undefined,
 };
 
-export type Validator = (value: FieldValue) => (boolean | Promise<boolean>);
+export type Validator = (value: FieldValue) => boolean | Promise<boolean>;

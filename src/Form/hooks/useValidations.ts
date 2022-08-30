@@ -1,25 +1,15 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
-import {
-  FieldValues,
-} from '../../shared';
-import {
-  CONTEXT_FORM_DEFAULT,
-  FormContextApi,
-  FormValidations,
-  useFormContext,
-} from '../contexts/FormContext';
+import { useEffect, useState } from 'react';
+import { FieldValues } from '../../shared';
+import { CONTEXT_FORM_DEFAULT, FormContextApi, FormValidations, useFormContext } from '../contexts/FormContext';
 
 export function useValidations<T extends FieldValues>(
   names: undefined,
   form?: FormContextApi<T>,
-): FormValidations<T, keyof T>
+): FormValidations<T, keyof T>;
 export function useValidations<T extends FieldValues, K extends keyof T>(
   names: K[],
   form?: FormContextApi<T>,
-): FormValidations<T, K>
+): FormValidations<T, K>;
 
 /**
  * Build hook to watch values.
@@ -40,15 +30,9 @@ export function useValidations<T extends FieldValues, K extends keyof T>(
 ): FormValidations<T, keyof T> | FormValidations<T, K> {
   const formContext = useFormContext<T>();
   const {
-    formInternal: {
-      addValidationStatusSubscriber,
-      removeValidationStatusSubscriber,
-    },
+    formInternal: { addValidationStatusSubscriber, removeValidationStatusSubscriber },
   } = form || formContext;
-  const [
-    currentValidations,
-    setCurrentValidations,
-  ] = useState<FormValidations<T, keyof T> | FormValidations<T, K>>(
+  const [currentValidations, setCurrentValidations] = useState<FormValidations<T, keyof T> | FormValidations<T, K>>(
     {} as FormValidations<T, keyof T> | FormValidations<T, K>,
   );
 

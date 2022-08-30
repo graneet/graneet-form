@@ -1,12 +1,10 @@
-import React, {
-  ReactNode,
-} from 'react';
+import React, { ReactNode } from 'react';
 import { FieldValues } from '../../shared';
 import { Field } from './Field';
 
 interface HiddenFieldProps<T extends FieldValues, K extends keyof T> {
-  name: K & string,
-  children?: ReactNode,
+  name: K & string;
+  children?: ReactNode;
 }
 
 /**
