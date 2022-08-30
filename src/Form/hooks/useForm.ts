@@ -237,7 +237,7 @@ export function useForm<T extends FieldValues>(
            * and we change value with key [name] with the new value
            */
           publish((previous) => {
-            const previousCopy = previous;
+            const previousCopy = { ...previous };
             if (!formState[name]?.isRegistered) {
               delete previousCopy[name];
             } else {
