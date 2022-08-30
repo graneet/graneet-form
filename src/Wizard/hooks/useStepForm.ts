@@ -1,27 +1,11 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-} from 'react';
-import {
-  FieldValues,
-  mapValidationStatusesToOutcome,
-  VALIDATION_OUTCOME,
-  ValidationStatuses,
-} from '../../shared';
-import {
-  FormContextApi,
-  FormValidations,
-  useForm,
-  UseFormOptions,
-} from '../../Form';
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef } from 'react';
+import { FieldValues, mapValidationStatusesToOutcome, VALIDATION_OUTCOME, ValidationStatuses } from '../../shared';
+import { FormContextApi, FormValidations, useForm, UseFormOptions } from '../../Form';
 import { useWizardContext } from '../contexts/WizardContext';
 
 interface UseStepFormApi<T extends FieldValues> {
-  form: FormContextApi<T>,
-  initFormValues: (initialValues: Partial<T>) => void,
+  form: FormContextApi<T>;
+  initFormValues: (initialValues: Partial<T>) => void;
 }
 
 /**
@@ -45,14 +29,14 @@ interface UseStepFormApi<T extends FieldValues> {
  */
 export function useStepForm<T extends FieldValues>(props: UseFormOptions<T>): UseStepFormApi<T> {
   const form = useForm(props);
-  const {
-    stepStatusSetter,
-    setValuesGetterForCurrentStep,
-    getValuesOfCurrentStep,
-  } = useWizardContext();
+  const { stepStatusSetter, setValuesGetterForCurrentStep, getValuesOfCurrentStep } = useWizardContext();
   const valuesHasBeenInitializedRef = useRef(false);
 
-  const { formInternal: { addValidationStatusSubscriber }, getFormValues, setFormValues } = form;
+  const {
+    formInternal: { addValidationStatusSubscriber },
+    getFormValues,
+    setFormValues,
+  } = form;
 
   useEffect(() => {
     // Form validation is async.
@@ -90,12 +74,15 @@ export function useStepForm<T extends FieldValues>(props: UseFormOptions<T>): Us
     }
   }, [getValuesOfCurrentStep, setFormValues]);
 
-  const initFormValues = useCallback((initialValues: Partial<T>) : void => {
-    // when values from the wizard has been gotten, the function do nothing
-    if (!valuesHasBeenInitializedRef.current) {
-      setFormValues(initialValues);
-    }
-  }, [setFormValues]);
+  const initFormValues = useCallback(
+    (initialValues: Partial<T>): void => {
+      // when values from the wizard has been gotten, the function do nothing
+      if (!valuesHasBeenInitializedRef.current) {
+        setFormValues(initialValues);
+      }
+    },
+    [setFormValues],
+  );
 
   return { initFormValues, form };
 }

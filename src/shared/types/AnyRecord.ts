@@ -1,1 +1,1 @@
-export type AnyRecord = Record<string, unknown>
+export type AnyRecord = Record<string, unknown>;

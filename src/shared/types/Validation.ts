@@ -7,8 +7,8 @@ export enum VALIDATION_OUTCOME {
 }
 
 export interface ValidationStatus {
-  status: VALIDATION_OUTCOME,
-  message: string | undefined
+  status: VALIDATION_OUTCOME;
+  message: string | undefined;
 }
 
 export type ValidationStatuses<T extends FieldValues> = Record<keyof T, ValidationStatus | undefined>;

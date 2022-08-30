@@ -1,7 +1,7 @@
 export interface WizardLabels {
-  next: string,
-  previous: string,
-  quit: string,
-  save: string,
-  saving: string,
+  next: string;
+  previous: string;
+  quit: string;
+  save: string;
+  saving: string;
 }

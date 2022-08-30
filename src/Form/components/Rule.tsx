@@ -6,15 +6,15 @@ interface RuleProps {
   /**
    * Function run for the validation
    */
-  validationFn: Validator,
+  validationFn: Validator;
   /**
    * Message displayed when error is true
    */
-  message: string,
+  message: string;
   /**
    * Is validation function run with debounce
    */
-  isDebounced?: boolean,
+  isDebounced?: boolean;
 }
 
 /**
@@ -28,11 +28,7 @@ interface RuleProps {
  * </TextField>
  * ```
  */
-export function Rule({
-  message,
-  validationFn,
-  isDebounced = false,
-}: RuleProps) {
+export function Rule({ message, validationFn, isDebounced = false }: RuleProps) {
   const { registerRule, unregisterRule } = useRuleContext();
 
   useEffect(() => {
