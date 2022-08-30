@@ -86,7 +86,7 @@ export function useFieldValidation(
 
     const { current } = metaState;
     // On each render, we increment phaseId,
-    // doing so we ensure actions are done on right value
+    // doing, so we ensure actions are done on right value
     current.phaseId += 1;
     current.countRulesResolved = 0;
     current.hasError = false;

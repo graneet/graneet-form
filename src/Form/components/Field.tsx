@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import {
   AnyRecord,
-  FieldValue,
+  FieldValues,
   ValidationStatus,
 } from '../../shared';
 import { useFormContext } from '../contexts/FormContext';
@@ -15,12 +15,12 @@ import { useFieldValidation } from '../hooks/useFieldValidation';
 import { useRules } from '../hooks/useRules';
 import { RuleContext } from '../contexts/RuleContext';
 
-export interface FieldRenderProps {
-  name: string,
-  value: FieldValue,
+export interface FieldRenderProps<T extends FieldValues, K extends keyof T> {
+  name: K,
+  value: T[K] | undefined,
   onFocus: () => void,
   onBlur: () => void,
-  onChange: (e: FieldValue) => void,
+  onChange: (e: T[K] | undefined) => void,
 }
 
 export interface FieldRenderState {
@@ -28,11 +28,11 @@ export interface FieldRenderState {
   validationStatus: ValidationStatus,
 }
 
-export interface FieldProps<T extends AnyRecord = AnyRecord> {
-  name: string,
+export interface FieldProps<T extends FieldValues, K extends keyof T> {
+  name: K,
   children?: ReactNode,
-  render: (fieldProps: FieldRenderProps, fieldState: FieldRenderState) => JSX.Element | null,
-  data?: T,
+  render: (fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState) => JSX.Element | null,
+  data?: AnyRecord,
 }
 
 /**
@@ -55,12 +55,12 @@ export interface FieldProps<T extends AnyRecord = AnyRecord> {
  * </Field>
  * ```
  */
-export function Field({
+export function Field<T extends FieldValues, K extends keyof T>({
   name,
   children = null,
   render,
   data = undefined,
-}: FieldProps) {
+}: FieldProps<T, K>) {
   const {
     formInternal: {
       registerField,
@@ -69,14 +69,14 @@ export function Field({
       handleOnBlur: handleBlur,
       updateValidationStatus,
     },
-  } = useFormContext();
+  } = useFormContext<T>();
   const {
     ruleContext,
     rules,
     debouncedRules,
   } = useRules();
 
-  const [value, setValue] = useState<FieldValue>(undefined);
+  const [value, setValue] = useState<T[K] | undefined>(undefined);
   const [isPristine, setIsPristine] = useState<boolean>(true);
   const validationStatus = useFieldValidation(
     rules,
@@ -101,7 +101,7 @@ export function Field({
     updateValidationStatus(name, validationStatus);
   }, [name, updateValidationStatus, validationStatus]);
 
-  const onChange = useCallback((newValue: FieldValue): void => {
+  const onChange = useCallback((newValue: T[K] | undefined): void => {
     handleChange(name, newValue, hasFocusRef.current);
   }, [handleChange, name]);
 

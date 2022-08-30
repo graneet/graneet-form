@@ -2,12 +2,24 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { ValidationStatuses } from '../../shared';
+import {
+  FieldValues,
+} from '../../shared';
 import {
   CONTEXT_FORM_DEFAULT,
   FormContextApi,
+  FormValidations,
   useFormContext,
 } from '../contexts/FormContext';
+
+export function useValidations<T extends FieldValues>(
+  names: undefined,
+  form?: FormContextApi<T>,
+): FormValidations<T, keyof T>
+export function useValidations<T extends FieldValues, K extends keyof T>(
+  names: K[],
+  form?: FormContextApi<T>,
+): FormValidations<T, K>
 
 /**
  * Build hook to watch values.
@@ -22,23 +34,31 @@ import {
  *   },[])
  * ```
  */
-export function useValidations(names?: string[], form?: FormContextApi): ValidationStatuses {
-  const formContext = useFormContext();
+export function useValidations<T extends FieldValues, K extends keyof T>(
+  names?: K[],
+  form?: FormContextApi<T>,
+): FormValidations<T, keyof T> | FormValidations<T, K> {
+  const formContext = useFormContext<T>();
   const {
     formInternal: {
       addValidationStatusSubscriber,
       removeValidationStatusSubscriber,
     },
   } = form || formContext;
-  const [currentValidations, setCurrentValidations] = useState<ValidationStatuses>({});
+  const [
+    currentValidations,
+    setCurrentValidations,
+  ] = useState<FormValidations<T, keyof T> | FormValidations<T, K>>(
+    {} as FormValidations<T, keyof T> | FormValidations<T, K>,
+  );
 
   if (!form && formContext === CONTEXT_FORM_DEFAULT) {
     throw new Error('No form context could be found while calling "useValidations".');
   }
 
   useEffect(() => {
-    addValidationStatusSubscriber(setCurrentValidations, names);
-    return () => removeValidationStatusSubscriber(setCurrentValidations, names);
+    addValidationStatusSubscriber<K>(setCurrentValidations, names as K[]);
+    return () => removeValidationStatusSubscriber<K>(setCurrentValidations, names as K[]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addValidationStatusSubscriber, names?.join(), removeValidationStatusSubscriber]);
 
