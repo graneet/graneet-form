@@ -1,5 +1,5 @@
 export { VALIDATION_OUTCOME, mapValidationStatusesToOutcome } from './shared';
-export type { FieldValue, FieldValues } from './shared';
+export type { FieldValue, FieldValues, AnyRecord } from './shared';
 export {
   Field,
   HiddenField,
