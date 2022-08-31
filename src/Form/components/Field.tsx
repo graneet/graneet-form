@@ -26,7 +26,7 @@ export interface FieldProps<T extends FieldValues, K extends keyof T> {
 }
 
 /**
- * Component to integrate a form content in the form system. Every components like input,
+ * Component to integrate a form content in the form system. Every component like input,
  * checkbox has to be rendered by this component
  * @param name - Name of the field, used as identifier
  * @param children Rules (optional)
@@ -90,9 +90,9 @@ export function Field<T extends FieldValues, K extends keyof T>({
     [handleChange, name],
   );
 
-  const onBlur = useCallback((): void => {
+  const onBlur = useCallback(async (): Promise<void> => {
     hasFocusRef.current = false;
-    handleBlur(name, data);
+    await handleBlur(name, data);
   }, [handleBlur, name, data]);
 
   const onFocus = useCallback(() => {
@@ -119,15 +119,15 @@ export function Field<T extends FieldValues, K extends keyof T>({
   );
 }
 
-export function composeEventHandlers(
-  originalEventHandler: (...args: unknown[]) => void,
-  formEventHandler: (...args: unknown[]) => void,
+export function composeEventHandlers<Args extends any[]>(
+  originalEventHandler: (...args: Args) => void | Promise<void>,
+  formEventHandler: (...args: Args) => void | Promise<void>,
 ) {
-  return (...args: unknown[]): void => {
+  return async (...args: Args): Promise<void> => {
     if (originalEventHandler) {
-      originalEventHandler(...args);
+      await originalEventHandler(...args);
     }
 
-    formEventHandler(...args);
+    await formEventHandler(...args);
   };
 }
