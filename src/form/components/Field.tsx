@@ -120,7 +120,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
 }
 
 export function composeEventHandlers<Args extends any[]>(
-  originalEventHandler: (...args: Args) => void | Promise<void>,
+  originalEventHandler: ((...args: Args) => void | Promise<void>) | undefined,
   formEventHandler: (...args: Args) => void | Promise<void>,
 ) {
   return async (...args: Args): Promise<void> => {
