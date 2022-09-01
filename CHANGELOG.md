@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.2](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2022-09-01)
+
+### Bug Fixes
+
+- change `originalEventHandler`of `composeEventHandlers` to allow `undefined` ([787d811](https://github.com/graneet/graneet-form/commits/787d811de579ae7f7700eab91e004df37ae12a99))
+
 ## [2.0.0-beta.1](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.0...v2.0.0-beta.1) (2022-09-01)
 
 ### Bug Fixes
