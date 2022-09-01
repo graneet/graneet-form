@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.1](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.0...v2.0.0-beta.1) (2022-09-01)
+
+### Bug Fixes
+
+- `composeEventHandlers` type ([fb216e3](https://github.com/graneet/graneet-form/commits/fb216e3015a3eed90fc0dd606989b236f0c32550))
+- expose `AnyRecord` ([c74e196](https://github.com/graneet/graneet-form/commits/c74e1965808cac53d2bf6ecaede6b4b93b8a4098))
+
 ## [2.0.0-beta.0](https://github.com/graneet/graneet-form/compare/v1.3.0...v2.0.0-beta.0) (2022-08-30)
 
 ## [1.3.0](https://github.com/graneet/graneet-form/compare/v1.2.1...v1.3.0) (2022-08-10)
