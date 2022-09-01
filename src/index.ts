@@ -14,6 +14,6 @@ export {
   Form,
   composeEventHandlers,
   WATCH_MODE,
-} from './Form';
-export { useWizard, useStepForm, usePlaceholder, useWizardContext, WizardContext, Placeholder, Step } from './Wizard';
-export type { WizardLabels, PlaceholderProps, StepProps } from './Wizard';
+} from './form';
+export { useWizard, useStepForm, usePlaceholder, useWizardContext, WizardContext, Placeholder, Step } from './wizard';
+export type { WizardLabels, PlaceholderProps, StepProps } from './wizard';
