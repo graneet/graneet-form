@@ -5,59 +5,83 @@ import { PlaceholderContentSetter, StepValidator } from '../types';
 export type ValidationStatusesSetter = Dispatch<SetStateAction<VALIDATION_OUTCOME>>;
 
 export interface WizardContextApi<Steps extends string, WizardValues extends Record<Steps, FieldValues>> {
+  wizardInternal: {
+    updatePlaceholderContent(placement: string, children: ReactNode): void;
+
+    resetPlaceholderContent(placement?: string): void;
+
+    registerPlaceholder(
+      placeholderContentSetter: PlaceholderContentSetter,
+      stepStatusSetter: ValidationStatusesSetter,
+    ): void;
+
+    unregisterPlaceholder(
+      placeholderContentSetter: PlaceholderContentSetter,
+      stepStatusSetter: ValidationStatusesSetter,
+    ): void;
+
+    registerStep<Step extends Steps>(
+      name: Step,
+      validationFn?: StepValidator<Steps, WizardValues, Step>,
+      noFooter?: boolean,
+      title?: string,
+    ): void;
+
+    unregisterStep(name: Steps): void;
+
+    setIsStepReady: Dispatch<SetStateAction<boolean>>;
+
+    stepStatusSetter: ValidationStatusesSetter;
+
+    setValuesGetterForCurrentStep(stepValuesGetter: () => FieldValues | undefined): void;
+  };
+
   steps: Steps[];
+
   currentStep: Steps | undefined;
-  registerStep<Step extends Steps>(
-    name: Step,
-    validationFn?: StepValidator<Steps, WizardValues, Step>,
-    noFooter?: boolean,
-    title?: string,
-  ): void;
-  unregisterStep(name: Steps): void;
+
   handleOnNext(): Promise<void>;
+
   handleOnPrevious(): void;
-  updatePlaceholderContent(placement: string, children: ReactNode): void;
-  resetPlaceholderContent(placement?: string): void;
-  registerPlaceholder(
-    placeholderContentSetter: PlaceholderContentSetter,
-    stepStatusSetter: ValidationStatusesSetter,
-  ): void;
-  unregisterPlaceholder(
-    placeholderContentSetter: PlaceholderContentSetter,
-    stepStatusSetter: ValidationStatusesSetter,
-  ): void;
+
   isLastStep: boolean;
+
   isFirstStep: boolean;
+
   hasNoFooter: boolean;
-  stepStatusSetter: ValidationStatusesSetter;
+
   isStepReady: boolean;
+
   stepsTitles: { name: Steps; title: string | undefined }[];
-  setIsStepReady: Dispatch<SetStateAction<boolean>>;
-  setValuesGetterForCurrentStep(stepValuesGetter: () => FieldValues | undefined): void;
+
   getValuesOfCurrentStep<Step extends Steps>(): WizardValues[Step] | undefined;
+
   getValuesOfStep<Step extends Steps>(stepName: Step): WizardValues[Step] | undefined;
+
   getValuesOfSteps(): WizardValues;
 }
 
 export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<string, Record<string, never>> = {
+  wizardInternal: {
+    updatePlaceholderContent: () => {},
+    resetPlaceholderContent: () => {},
+    registerStep: () => {},
+    unregisterStep: () => {},
+    registerPlaceholder: () => {},
+    unregisterPlaceholder: () => {},
+    stepStatusSetter: () => {},
+    setIsStepReady: () => {},
+    setValuesGetterForCurrentStep: () => {},
+  },
   steps: [],
   currentStep: undefined,
-  registerStep: () => {},
-  unregisterStep: () => {},
   handleOnNext: async () => {},
   handleOnPrevious: () => {},
-  updatePlaceholderContent: () => {},
-  resetPlaceholderContent: () => {},
-  registerPlaceholder: () => {},
-  unregisterPlaceholder: () => {},
   isLastStep: false,
   isFirstStep: false,
   hasNoFooter: true,
-  stepStatusSetter: () => {},
   isStepReady: false,
   stepsTitles: [],
-  setIsStepReady: () => {},
-  setValuesGetterForCurrentStep: () => {},
   getValuesOfCurrentStep: () => undefined,
   getValuesOfStep: () => undefined,
   getValuesOfSteps: () => ({}),

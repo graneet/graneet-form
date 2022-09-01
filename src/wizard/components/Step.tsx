@@ -39,7 +39,10 @@ export function Step<Steps extends string, WizardValues extends Record<Steps, Fi
 }: StepProps<Steps, WizardValues, Step>) {
   const wizard = useWizardContext<Steps, WizardValues>();
 
-  const { registerStep, unregisterStep, currentStep, setIsStepReady } = wizard;
+  const {
+    currentStep,
+    wizardInternal: { registerStep, unregisterStep, setIsStepReady },
+  } = wizard;
 
   // When Step is used outside of wizard context, it will throw an error
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
