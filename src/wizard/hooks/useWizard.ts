@@ -155,7 +155,7 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
     saveValuesOfCurrentStepInWizardValues();
 
     const index = steps.indexOf(currentStep);
-    // If has next step, go to next step
+    // If it has next step, go to next step
     if (hasNextStep(index, steps)) {
       setIsStepReady(false);
       // Ensure that current step change is done after isStepReady
@@ -264,20 +264,22 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
     () =>
       Object.defineProperties(
         {
+          wizardInternal: {
+            updatePlaceholderContent,
+            resetPlaceholderContent,
+            registerStep,
+            unregisterStep,
+            registerPlaceholder,
+            unregisterPlaceholder,
+            stepStatusSetter,
+            setIsStepReady,
+            setValuesGetterForCurrentStep,
+          },
           steps,
           currentStep,
-          registerStep,
-          unregisterStep,
           handleOnNext,
           handleOnPrevious,
-          updatePlaceholderContent,
-          resetPlaceholderContent,
-          registerPlaceholder,
-          unregisterPlaceholder,
-          stepStatusSetter,
           isStepReady,
-          setIsStepReady,
-          setValuesGetterForCurrentStep,
           getValuesOfCurrentStep,
           getValuesOfStep,
           getValuesOfSteps,

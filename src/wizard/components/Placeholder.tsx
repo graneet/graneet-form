@@ -7,7 +7,9 @@ export interface PlaceholderProps {
 }
 
 export function Placeholder({ placement, children }: PlaceholderProps) {
-  const { updatePlaceholderContent, resetPlaceholderContent } = useWizardContext();
+  const {
+    wizardInternal: { updatePlaceholderContent, resetPlaceholderContent },
+  } = useWizardContext();
 
   useEffect(() => {
     updatePlaceholderContent(placement, children);

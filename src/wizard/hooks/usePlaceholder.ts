@@ -11,9 +11,13 @@ interface UsePlaceholder {
   stepStatus: VALIDATION_OUTCOME;
 }
 export function usePlaceholder(): UsePlaceholder {
-  const { handleOnNext, handleOnPrevious, registerPlaceholder, unregisterPlaceholder } = useWizardContext();
+  const {
+    handleOnNext,
+    handleOnPrevious,
+    wizardInternal: { registerPlaceholder, unregisterPlaceholder },
+  } = useWizardContext();
 
-  const [placeholderContent, setPlaceholderContent] = useState<PlaceholderContent>({} as PlaceholderContent);
+  const [placeholderContent, setPlaceholderContent] = useState<PlaceholderContent>({});
   const [isLoading, setIsLoading] = useState(false);
   const [stepStatus, setStepStatus] = useState<VALIDATION_OUTCOME>(VALIDATION_OUTCOME.VALID);
 
