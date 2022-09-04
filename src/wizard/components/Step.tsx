@@ -66,5 +66,6 @@ export function Step<Steps extends string, WizardValues extends Record<Steps, Fi
     return null;
   }
 
-  return children;
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <>{children}</>;
 }
