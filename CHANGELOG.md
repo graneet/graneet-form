@@ -2,6 +2,70 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.3](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2022-09-04)
+
+### ⚠ BREAKING CHANGES
+
+- move internal logic of `useWizard` inside `wizardInternal` ([#23](https://github.com/graneet/graneet-form/issues/23)) ([3a30a45](https://github.com/graneet/graneet-form/commits/3a30a456557cfaecf399716deb3a02e0731aee86))
+
+Before:
+
+```tsx
+const CONTEXT_WIZARD_DEFAULT = {
+  steps: [],
+  currentStep: undefined,
+  registerStep: () => {},
+  unregisterStep: () => {},
+  handleOnNext: async () => {},
+  handleOnPrevious: () => {},
+  updatePlaceholderContent: () => {},
+  resetPlaceholderContent: () => {},
+  registerPlaceholder: () => {},
+  unregisterPlaceholder: () => {},
+  isLastStep: false,
+  isFirstStep: false,
+  hasNoFooter: true,
+  stepStatusSetter: () => {},
+  isStepReady: false,
+  stepsTitles: [],
+  setIsStepReady: () => {},
+  setValuesGetterForCurrentStep: () => {},
+  getValuesOfCurrentStep: () => undefined,
+  getValuesOfStep: () => undefined,
+  getValuesOfSteps: () => ({}),
+};
+```
+
+After:
+
+```tsx
+const CONTEXT_WIZARD_DEFAULT = {
+  wizardInternal: {
+    updatePlaceholderContent: () => {},
+    resetPlaceholderContent: () => {},
+    registerStep: () => {},
+    unregisterStep: () => {},
+    registerPlaceholder: () => {},
+    unregisterPlaceholder: () => {},
+    stepStatusSetter: () => {},
+    setIsStepReady: () => {},
+    setValuesGetterForCurrentStep: () => {},
+  },
+  steps: [],
+  currentStep: undefined,
+  handleOnNext: async () => {},
+  handleOnPrevious: () => {},
+  isLastStep: false,
+  isFirstStep: false,
+  hasNoFooter: true,
+  isStepReady: false,
+  stepsTitles: [],
+  getValuesOfCurrentStep: () => undefined,
+  getValuesOfStep: () => undefined,
+  getValuesOfSteps: () => ({}),
+};
+```
+
 ## [2.0.0-beta.2](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2022-09-01)
 
 ### Bug Fixes
@@ -16,6 +80,46 @@ All notable changes to this project will be documented in this file. See [standa
 - expose `AnyRecord` ([c74e196](https://github.com/graneet/graneet-form/commits/c74e1965808cac53d2bf6ecaede6b4b93b8a4098))
 
 ## [2.0.0-beta.0](https://github.com/graneet/graneet-form/compare/v1.3.0...v2.0.0-beta.0) (2022-08-30)
+
+### ⚠ BREAKING CHANGES
+
+- Refactoring all types to have a greater Typescript experience
+
+```tsx
+type IMyForm = {
+  firstName: string;
+
+  lastName: string;
+};
+
+const MyComponent = () => {
+  const form = useForm<IMyForm>();
+
+  const handleSomething = () => {
+    const values = form.getFormValues();
+
+    /*
+Here `values` will have the following type
+{
+firstName: string | undefined | null,
+lastName: string  | undefined | null,
+}
+*/
+  };
+
+  const setSomething = () => {
+    form.setFormValues({
+      firstName: 'Jean',
+      lastName: 'Bonbeurre',
+    }); // valid
+
+    form.setFormValues({
+      firstName: 42,
+      lastName: 'Bonbeurre',
+    }); // invalid
+  };
+};
+```
 
 ## [1.3.0](https://github.com/graneet/graneet-form/compare/v1.2.1...v1.3.0) (2022-08-10)
 
