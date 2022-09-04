@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.4](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.2...v2.0.0-beta.4) (2022-09-04)
+
+### Features
+
+- exposes `StepValidator` ([9a8baed](https://github.com/graneet/graneet-form/commits/9a8baedf6c1483af6e49c76353908b633ec90850))
+
+### Bug Fixes
+
+- `Step` return now a ReactElement ([96f4446](https://github.com/graneet/graneet-form/commits/96f4446a0b11c850132e8a918ec900058faab7a5))
+
 ## [2.0.0-beta.3](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2022-09-04)
 
 ### ⚠ BREAKING CHANGES
