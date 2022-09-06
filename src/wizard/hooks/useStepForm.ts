@@ -27,7 +27,7 @@ interface UseStepFormApi<T extends FieldValues> {
  * )
  * ```
  */
-export function useStepForm<T extends FieldValues>(props: UseFormOptions<T>): UseStepFormApi<T> {
+export function useStepForm<T extends FieldValues>(props?: UseFormOptions<T>): UseStepFormApi<T> {
   const form = useForm(props);
   const {
     wizardInternal: { stepStatusSetter, setValuesGetterForCurrentStep },
