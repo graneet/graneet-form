@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.5](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.2...v2.0.0-beta.5) (2022-09-09)
+
+### Bug Fixes
+
+- `useStepForm` type can be undefined like intended ([25032a4](https://github.com/graneet/graneet-form/commits/25032a4ca829a437d73072882996c4ed4692cb98))
+- fix FormProps type by omitting `onSubmit` ([52af382](https://github.com/graneet/graneet-form/commits/52af38252243a1685f23784c1a5937338924a1d2))
+
 ## [2.0.0-beta.4](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.2...v2.0.0-beta.4) (2022-09-04)
 
 ### Features
