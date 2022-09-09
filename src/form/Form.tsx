@@ -2,7 +2,7 @@ import React, { FormHTMLAttributes, ReactNode, useCallback, FormEventHandler } f
 import { FieldValues, mapValidationStatusesToOutcome, VALIDATION_OUTCOME } from '../shared';
 import { FormContext, FormContextApi } from './contexts/FormContext';
 
-interface FormProps<T extends FieldValues> extends FormHTMLAttributes<HTMLFormElement> {
+interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
   children: ReactNode;
   form: FormContextApi<T>;
 }
