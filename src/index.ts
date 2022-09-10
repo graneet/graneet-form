@@ -15,5 +15,6 @@ export {
   composeEventHandlers,
   WATCH_MODE,
 } from './form';
+export type { FieldRenderProps, FieldRenderState } from './form';
 export { useWizard, useStepForm, usePlaceholder, useWizardContext, WizardContext, Placeholder, Step } from './wizard';
 export type { WizardLabels, PlaceholderProps, StepProps, StepValidator } from './wizard';
