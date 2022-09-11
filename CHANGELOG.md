@@ -2,19 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.7](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2022-09-11)
+
+### Features
+
+- exposes `UseHiddenField` ([2398bb2](https://github.com/graneet/graneet-form/commits/2398bb23b24585c84e61ca67331c9bc4ad2adce2))
+
 ## [2.0.0-beta.6](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.2...v2.0.0-beta.6) (2022-09-11)
 
 ### Features
 
 - exposes `FieldRenderProps`, `FieldRenderState` ([28d0d17](https://github.com/graneet/graneet-form/commits/28d0d17f161b949d0a53db9297e598ceb6ba9e72))
-- exposes `StepValidator` ([9a8baed](https://github.com/graneet/graneet-form/commits/9a8baedf6c1483af6e49c76353908b633ec90850))
-- move internal logic of `useWizard` inside `wizardInternal` ([#23](https://github.com/graneet/graneet-form/issues/23)) ([3a30a45](https://github.com/graneet/graneet-form/commits/3a30a456557cfaecf399716deb3a02e0731aee86))
-
-### Bug Fixes
-
-- `Step` return now a ReactElement ([96f4446](https://github.com/graneet/graneet-form/commits/96f4446a0b11c850132e8a918ec900058faab7a5))
-- `useStepForm` type can be undefined like intended ([25032a4](https://github.com/graneet/graneet-form/commits/25032a4ca829a437d73072882996c4ed4692cb98))
-- fix FormProps type by omitting `onSubmit` ([52af382](https://github.com/graneet/graneet-form/commits/52af38252243a1685f23784c1a5937338924a1d2))
 
 ## [2.0.0-beta.5](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.2...v2.0.0-beta.5) (2022-09-09)
 
