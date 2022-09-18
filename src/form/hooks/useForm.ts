@@ -66,7 +66,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     }
   >;
 
-  const { current: formValuesSubscribers } = useRef<FormValueSubscribersRef>({
+  const formValuesSubscribersRef = useRef<FormValueSubscribersRef>({
     [WATCH_MODE.ON_CHANGE]: {
       global: new Set<Dispatch<SetStateAction<Partial<T>>>>(),
       scoped: {},
@@ -84,7 +84,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       scoped: PartialRecord<keyof T, Set<Dispatch<SetStateAction<FormValidations<T, keyof T>>>>>;
     }
   >;
-  const { current: formErrorsSubscribers } = useRef<FormErrorSubscribersRef>({
+  const formErrorsSubscribersRef = useRef<FormErrorSubscribersRef>({
     [WATCH_MODE.ON_CHANGE]: {
       global: new Set<Dispatch<SetStateAction<Record<keyof T, ValidationStatus | undefined>>>>(),
       scoped: {},
@@ -174,8 +174,8 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
   const updateValueSubscribers = useCallback(
     (name: keyof T, watchMode: WATCH_MODE): void => {
       // Update watcher for this field name
-      if (formValuesSubscribers[watchMode].scoped[name]) {
-        formValuesSubscribers[watchMode].scoped[name]!.forEach((publish) => {
+      if (formValuesSubscribersRef.current[watchMode].scoped[name]) {
+        formValuesSubscribersRef.current[watchMode].scoped[name]!.forEach((publish) => {
           /*
            * publish is the function given by react hook useState:
            * `const [example, setExample] = useState(() => {})` It's `example`
@@ -191,7 +191,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         });
       }
 
-      if (formValuesSubscribers[watchMode].global.size) {
+      if (formValuesSubscribersRef.current[watchMode].global.size) {
         /*
         If there is a global subscriber and a lot of fields are render, avoid
         spam of refresh on this subscriber
@@ -200,14 +200,14 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         globalTimeout.values[watchMode] = setTimeout(() => {
           const formValues = getFormValues();
           // Update global watcher
-          formValuesSubscribers[watchMode].global.forEach((publish) => {
+          formValuesSubscribersRef.current[watchMode].global.forEach((publish) => {
             // To be simpler, send value returned by getFormValues method
             publish(formValues);
           });
         }, 0);
       }
     },
-    [formValuesSubscribers, formState, getFormValues, globalTimeout],
+    [formState, getFormValues, globalTimeout],
   );
 
   /**
@@ -218,8 +218,8 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
   const updateErrorSubscribers = useCallback(
     (name: keyof T, watchMode: WATCH_MODE): void => {
       // Update watcher for this field name
-      if (formErrorsSubscribers[watchMode].scoped[name]) {
-        formErrorsSubscribers[watchMode].scoped[name]!.forEach((publish) => {
+      if (formErrorsSubscribersRef.current[watchMode].scoped[name]) {
+        formErrorsSubscribersRef.current[watchMode].scoped[name]!.forEach((publish) => {
           /*
            * publish is the function given by react hook useState:
            * `const [example, setExample] = useState(() => {})` It's `example`
@@ -239,7 +239,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
           });
         });
       }
-      if (formErrorsSubscribers[watchMode].global.size) {
+      if (formErrorsSubscribersRef.current[watchMode].global.size) {
         /*
         If there is a global subscriber and a lot of fields are render, avoid
         spam of refresh on this subscriber
@@ -248,14 +248,14 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         globalTimeout.errors[watchMode] = setTimeout(() => {
           const formValues = getFormErrorsForNames();
           // Update global watcher
-          formErrorsSubscribers[watchMode].global.forEach((publish) => {
+          formErrorsSubscribersRef.current[watchMode].global.forEach((publish) => {
             // To be simpler, send value returned by getFormValues method
-            publish(formValues);
+            publish({ ...formValues });
           });
         }, 0);
       }
     },
-    [formErrorsSubscribers, formState, getFormErrorsForNames, globalTimeout],
+    [formState, getFormErrorsForNames, globalTimeout],
   );
 
   /**
@@ -313,22 +313,24 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       names?: (keyof T)[],
     ) => {
       if (!names) {
-        formValuesSubscribers[watchMode].global.add(publish as Dispatch<SetStateAction<Partial<T>>>);
+        formValuesSubscribersRef.current[watchMode].global.add(publish as Dispatch<SetStateAction<Partial<T>>>);
         return;
       }
 
       names.forEach((name) => {
-        if (!formValuesSubscribers[watchMode].scoped[name]) {
-          formValuesSubscribers[watchMode].scoped[name] = new Set();
+        if (!formValuesSubscribersRef.current[watchMode].scoped[name]) {
+          formValuesSubscribersRef.current[watchMode].scoped[name] = new Set();
         }
-        formValuesSubscribers[watchMode].scoped[name]!.add(publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>);
+        formValuesSubscribersRef.current[watchMode].scoped[name]!.add(
+          publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>,
+        );
       });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       publish(getFormValuesForNames(names) as FormValues<T, K>);
     },
-    [formValuesSubscribers, getFormValuesForNames],
+    [getFormValuesForNames],
   );
 
   /**
@@ -344,19 +346,19 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       names?: (keyof T)[],
     ): void => {
       if (!names) {
-        formErrorsSubscribers[WATCH_MODE.ON_CHANGE].global.add(publish);
+        formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.add(publish);
         return;
       }
       names.forEach((name) => {
-        if (!formErrorsSubscribers[WATCH_MODE.ON_CHANGE].scoped[name]) {
-          formErrorsSubscribers[WATCH_MODE.ON_CHANGE].scoped[name] = new Set();
+        if (!formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]) {
+          formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name] = new Set();
         }
-        formErrorsSubscribers[WATCH_MODE.ON_CHANGE].scoped[name]?.add(publish);
+        formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]?.add(publish);
       });
 
-      publish(getFormErrorsForNames(names));
+      publish({ ...getFormErrorsForNames(names) });
     },
-    [formErrorsSubscribers, getFormErrorsForNames],
+    [getFormErrorsForNames],
   );
 
   /**
@@ -411,18 +413,18 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     ): void => {
       // Global subscriber
       if (!names) {
-        formValuesSubscribers[watchMode].global.delete(publish as Dispatch<SetStateAction<Partial<T>>>);
+        formValuesSubscribersRef.current[watchMode].global.delete(publish as Dispatch<SetStateAction<Partial<T>>>);
         return;
       }
 
       // Scoped subscriber
       names.forEach((name) => {
-        formValuesSubscribers[watchMode].scoped[name]?.delete(
+        formValuesSubscribersRef.current[watchMode].scoped[name]?.delete(
           publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>,
         );
       });
     },
-    [formValuesSubscribers],
+    [],
   );
 
   /**
@@ -438,19 +440,19 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       names?: K[],
     ): void => {
       if (!names) {
-        formErrorsSubscribers[WATCH_MODE.ON_CHANGE].global.delete(
+        formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.delete(
           publish as Dispatch<SetStateAction<Record<keyof T, ValidationStatus | undefined>>>,
         );
         return;
       }
 
       names.forEach((name) => {
-        formErrorsSubscribers[WATCH_MODE.ON_CHANGE].scoped[name]?.delete(
+        formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]?.delete(
           publish as Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
         );
       });
     },
-    [formErrorsSubscribers],
+    [],
   );
 
   /**
