@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.8](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.8) (2022-09-18)
+
+### Bug Fixes
+
+- wizard with form were stuck in loading state ([#24](https://github.com/graneet/graneet-form/issues/24)) ([b732f59](https://github.com/graneet/graneet-form/commits/b732f59556b3192e011ca0ab18b7b08074e91d7d))
+
 ## [2.0.0-beta.7](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2022-09-11)
 
 ### Features
