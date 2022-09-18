@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.9](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.9) (2022-09-18)
+
+### Bug Fixes
+
+- regression where new global subscriber do not have their initial value given ([#25](https://github.com/graneet/graneet-form/issues/25)) ([7d9de7d](https://github.com/graneet/graneet-form/commits/7d9de7dbc4a43f522efbb6e9ba42cac9c63eacbc))
+
 ## [2.0.0-beta.8](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.8) (2022-09-18)
 
 ### Bug Fixes
