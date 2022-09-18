@@ -314,17 +314,16 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     ) => {
       if (!names) {
         formValuesSubscribersRef.current[watchMode].global.add(publish as Dispatch<SetStateAction<Partial<T>>>);
-        return;
+      } else {
+        names.forEach((name) => {
+          if (!formValuesSubscribersRef.current[watchMode].scoped[name]) {
+            formValuesSubscribersRef.current[watchMode].scoped[name] = new Set();
+          }
+          formValuesSubscribersRef.current[watchMode].scoped[name]!.add(
+            publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>,
+          );
+        });
       }
-
-      names.forEach((name) => {
-        if (!formValuesSubscribersRef.current[watchMode].scoped[name]) {
-          formValuesSubscribersRef.current[watchMode].scoped[name] = new Set();
-        }
-        formValuesSubscribersRef.current[watchMode].scoped[name]!.add(
-          publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>,
-        );
-      });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -347,16 +346,16 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     ): void => {
       if (!names) {
         formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.add(publish);
-        return;
+      } else {
+        names.forEach((name) => {
+          if (!formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]) {
+            formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name] = new Set();
+          }
+          formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]?.add(publish);
+        });
       }
-      names.forEach((name) => {
-        if (!formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]) {
-          formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name] = new Set();
-        }
-        formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]?.add(publish);
-      });
 
-      publish({ ...getFormErrorsForNames(names) });
+      publish(getFormErrorsForNames(names));
     },
     [getFormErrorsForNames],
   );

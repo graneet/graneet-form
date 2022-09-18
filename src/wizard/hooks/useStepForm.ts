@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef } from 'react';
 import { FieldValues, mapValidationStatusesToOutcome, VALIDATION_OUTCOME, ValidationStatuses } from '../../shared';
 import { FormContextApi, FormValidations, useForm, UseFormOptions } from '../../form';
 import { useWizardContext } from '../contexts/WizardContext';
@@ -9,7 +9,7 @@ interface UseStepFormApi<T extends FieldValues> {
 }
 
 /**
- * Using Form in Wizard context. Data will be save and get on step change.
+ * Using Form in Wizard context. Data will be saved and get on step change.
  * @return UseStepFormApi
  * @example
  * ```
@@ -87,5 +87,11 @@ export function useStepForm<T extends FieldValues>(props?: UseFormOptions<T>): U
     [setFormValues],
   );
 
-  return { initFormValues, form };
+  return useMemo(
+    () => ({
+      initFormValues,
+      form,
+    }),
+    [form, initFormValues],
+  );
 }

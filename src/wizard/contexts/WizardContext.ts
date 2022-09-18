@@ -31,7 +31,7 @@ export interface WizardContextApi<Steps extends string, WizardValues extends Rec
 
     setIsStepReady: Dispatch<SetStateAction<boolean>>;
 
-    stepStatusSetter: ValidationStatusesSetter;
+    stepStatusSetter: (status: VALIDATION_OUTCOME) => void;
 
     setValuesGetterForCurrentStep(stepValuesGetter: () => FieldValues | undefined): void;
   };
