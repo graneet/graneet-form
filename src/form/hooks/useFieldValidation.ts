@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FieldValue, VALIDATION_OUTCOME, ValidationStatus } from '../../shared';
 import { VALIDATION_STATE_UNDETERMINED, VALIDATION_STATE_VALID } from '../types/Validation';
-import { Rule } from './useRules';
+import { IRule } from './useRules';
 
 const DEBOUNCE_TIME = 500;
 
-export function useFieldValidation(rules: Rule[], debouncedRules: Rule[], value: FieldValue): ValidationStatus {
+export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], value: FieldValue): ValidationStatus {
   const numberOfRules = rules.length + debouncedRules.length;
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>(
     numberOfRules ? VALIDATION_STATE_UNDETERMINED : VALIDATION_STATE_VALID,
@@ -17,7 +17,7 @@ export function useFieldValidation(rules: Rule[], debouncedRules: Rule[], value:
   });
 
   const testRules = useCallback(
-    (rulesToTest: Rule[], fieldValue: FieldValue, phaseId: number) => {
+    (rulesToTest: IRule[], fieldValue: FieldValue, phaseId: number) => {
       rulesToTest.forEach(({ validatorFn, errorMessage }) => {
         if (metaState.current.hasError) {
           return;

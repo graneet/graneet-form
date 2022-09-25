@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FieldValues } from '../../shared';
-import { CONTEXT_FORM_DEFAULT, FormContextApi, FormValues, useFormContext } from '../contexts/FormContext';
+import { CONTEXT_FORM_DEFAULT, FormContextApi, useFormContext } from '../contexts/FormContext';
+import { FormValues } from '../types/FormValues';
 import { WATCH_MODE } from '../types/WatchMode';
 
 function useValues<T extends FieldValues, K extends keyof T>(watchMode: WATCH_MODE, names: K[]): FormValues<T, K>;

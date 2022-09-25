@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FieldValues } from '../../shared';
-import { CONTEXT_FORM_DEFAULT, FormContextApi, FormValidations, useFormContext } from '../contexts/FormContext';
+import { CONTEXT_FORM_DEFAULT, FormContextApi, useFormContext } from '../contexts/FormContext';
+import { FormValidations } from '../types/FormValidations';
 
 export function useValidations<T extends FieldValues>(
   names: undefined,

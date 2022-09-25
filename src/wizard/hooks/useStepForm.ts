@@ -1,7 +1,8 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef } from 'react';
 import { FieldValues, mapValidationStatusesToOutcome, VALIDATION_OUTCOME, ValidationStatuses } from '../../shared';
-import { FormContextApi, FormValidations, useForm, UseFormOptions } from '../../form';
+import { FormContextApi, useForm, UseFormOptions } from '../../form';
 import { useWizardContext } from '../contexts/WizardContext';
+import { FormValidations } from '../../form/types/FormValidations';
 
 interface UseStepFormApi<T extends FieldValues> {
   form: FormContextApi<T>;

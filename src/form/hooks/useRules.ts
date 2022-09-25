@@ -2,20 +2,20 @@ import { useCallback, useMemo, useState } from 'react';
 import { RuleContextApi } from '../contexts/RuleContext';
 import { Validator } from '../types/Validation';
 
-export interface Rule {
+export interface IRule {
   validatorFn: Validator;
   errorMessage: string;
 }
 
 type UseRules = {
   ruleContext: RuleContextApi;
-  rules: Rule[];
-  debouncedRules: Rule[];
+  rules: IRule[];
+  debouncedRules: IRule[];
 };
 
 export function useRules(): UseRules {
-  const [rules, setRules] = useState<Rule[]>([]);
-  const [debouncedRules, setDebouncedRules] = useState<Rule[]>([]);
+  const [rules, setRules] = useState<IRule[]>([]);
+  const [debouncedRules, setDebouncedRules] = useState<IRule[]>([]);
 
   const registerRule = useCallback((testFn: Validator, errorMessage: string, isDebounced: boolean): void => {
     if (isDebounced) {

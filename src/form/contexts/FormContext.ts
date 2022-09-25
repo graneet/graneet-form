@@ -2,14 +2,7 @@ import { createContext, Dispatch, SetStateAction, useContext } from 'react';
 import { AnyRecord, FieldValues, ValidationStatus } from '../../shared';
 import { WATCH_MODE } from '../types/WatchMode';
 import { PartialRecord } from '../../shared/types/PartialRecord';
-
-export type FormValues<T extends FieldValues, Keys extends keyof T> = {
-  [K in Keys]: T[K] | undefined;
-};
-
-export type FormValidations<T extends FieldValues, Keys extends keyof T> = {
-  [K in Keys]: ValidationStatus | undefined;
-};
+import { FormValues, FormValidations } from '../types';
 
 export interface FormInternal<T extends FieldValues> {
   registerField<K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): void;
