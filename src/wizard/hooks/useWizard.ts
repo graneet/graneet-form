@@ -4,19 +4,19 @@ import { ValidationStatusesSetter, WizardContextApi } from '../contexts/WizardCo
 import { PlaceholderContent, PlaceholderContentSetter, StepValidator } from '../types';
 import { PartialRecord } from '../../shared/types/PartialRecord';
 
-export function useWizard<Steps extends string, WizardValues extends Record<Steps, FieldValues>>(
+export function useWizard<WizardValues extends Record<string, FieldValues>>(
   onFinish: (wizardValues: WizardValues) => void,
   onQuit: () => void,
-): WizardContextApi<Steps, WizardValues> {
+): WizardContextApi<WizardValues> {
   // -- VALUES --
   const wizardValuesRef = useRef<WizardValues>({} as WizardValues);
   const valuesStepGetter = useRef<() => FieldValues | undefined>(() => undefined);
 
   // -- STEP --
-  const [currentStep, setCurrentStep] = useState<Steps>();
-  const [steps, setSteps] = useState<Steps[]>([]);
-  const validationFns = useRef<PartialRecord<Steps, StepValidator<Steps, WizardValues, any>>>({});
-  const stepsWithoutFooter = useRef<Set<Steps>>(new Set());
+  const [currentStep, setCurrentStep] = useState<keyof WizardValues>();
+  const [steps, setSteps] = useState<Array<keyof WizardValues>>([]);
+  const validationFns = useRef<PartialRecord<keyof WizardValues, StepValidator<WizardValues, any>>>({});
+  const stepsWithoutFooter = useRef<Set<keyof WizardValues>>(new Set());
   const [isStepReady, setIsStepReady] = useState(false);
 
   // -- PLACEHOLDER --
@@ -24,18 +24,21 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
   const stepStatusSetterRef = useRef<Set<ValidationStatusesSetter>>(new Set());
 
   // -- TITLE --
-  const titlesRef = useRef<{ name: Steps; title: string | undefined }[]>([]);
+  const titlesRef = useRef<{ name: keyof WizardValues; title: string | undefined }[]>([]);
 
-  // -- Utils --
+  // -- UTILS --
   const hasPreviousStep = (index: number) => index - 1 >= 0;
-  const hasNextStep = useCallback((index: number, listOfSteps: Steps[]) => index + 1 <= listOfSteps.length - 1, []);
+  const hasNextStep = useCallback(
+    (index: number, listOfSteps: Array<keyof WizardValues>) => index + 1 <= listOfSteps.length - 1,
+    [],
+  );
   const saveValuesOfCurrentStepInWizardValues = useCallback(() => {
     // Add form values to values stored in wizard
     if (currentStep) {
       // add values only if getter returns values
       const stepValues = valuesStepGetter.current();
       if (stepValues) {
-        wizardValuesRef.current[currentStep] = stepValues as WizardValues[Steps];
+        wizardValuesRef.current[currentStep] = stepValues as WizardValues[keyof WizardValues];
       }
     }
   }, [currentStep]);
@@ -46,7 +49,7 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
    * Get values for specified step
    */
   const getValuesOfStep = useCallback(
-    <Step extends Steps>(step: Step): WizardValues[Step] | undefined => wizardValuesRef.current[step],
+    <Step extends keyof WizardValues>(step: Step): WizardValues[Step] | undefined => wizardValuesRef.current[step],
     [],
   );
 
@@ -54,7 +57,7 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
    * Get values for the current step
    */
   const getValuesOfCurrentStep = useCallback(
-    <Step extends Steps>(): WizardValues[Step] | undefined =>
+    <Step extends keyof WizardValues>(): WizardValues[Step] | undefined =>
       currentStep ? (getValuesOfStep(currentStep) as WizardValues[Step]) : undefined,
     [currentStep, getValuesOfStep],
   );
@@ -71,16 +74,16 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
    * @param noFooter If not specified, footer is displayed
    */
   const registerStep = useCallback(
-    <Step extends Steps>(
+    <Step extends keyof WizardValues>(
       name: Step,
-      validationFn?: StepValidator<Steps, WizardValues, Step>,
+      validationFn?: StepValidator<WizardValues, Step>,
       noFooter?: boolean,
       title?: string,
     ): void => {
       // Current step is the first step registered
       setSteps((previous) => {
         if (previous.indexOf(name) !== -1) {
-          throw new Error(`Attempting to register step "${name}" a second time`);
+          throw new Error(`Attempting to register step "${String(name)}" a second time`);
         }
 
         if (previous.length === 0) {
@@ -106,11 +109,11 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
    * @param name Step name
    */
   const unregisterStep = useCallback(
-    (name: Steps): void => {
+    (name: keyof WizardValues): void => {
       setSteps((previous) => {
         const index = previous.indexOf(name);
         if (index === -1) {
-          throw new Error(`No step ${name} to be unregistered was found.`);
+          throw new Error(`No step ${String(name)} to be unregistered was found.`);
         }
 
         /*
@@ -119,7 +122,7 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
         - Else is there is a next step: this step is the new current
         - Else, current step is undefined
        */
-        let newCurrentStep;
+        let newCurrentStep: keyof WizardValues;
         // There is a previous step, the current step is index - 1
         if (hasPreviousStep(index)) {
           newCurrentStep = previous[index - 1];
@@ -127,6 +130,8 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
         } else if (hasNextStep(index, previous)) {
           newCurrentStep = previous[index + 1];
         }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         setCurrentStep(newCurrentStep);
         return [...previous.slice(0, index), ...previous.slice(index + 1)];
       });
@@ -245,7 +250,7 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
    * @param key Label key
    */
   const setValuesGetterForCurrentStep = useCallback(
-    <Step extends Steps>(stepValuesGetter: () => WizardValues[Step] | undefined): void => {
+    <Step extends keyof WizardValues>(stepValuesGetter: () => WizardValues[Step] | undefined): void => {
       valuesStepGetter.current = stepValuesGetter;
     },
     [],
@@ -260,7 +265,7 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
     });
   }, []);
 
-  return useMemo<WizardContextApi<Steps, WizardValues>>(
+  return useMemo<WizardContextApi<WizardValues>>(
     () =>
       Object.defineProperties(
         {
@@ -283,7 +288,7 @@ export function useWizard<Steps extends string, WizardValues extends Record<Step
           getValuesOfCurrentStep,
           getValuesOfStep,
           getValuesOfSteps,
-        } as WizardContextApi<Steps, WizardValues>,
+        } as WizardContextApi<WizardValues>,
         {
           isLastStep: {
             get() {

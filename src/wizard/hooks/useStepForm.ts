@@ -27,7 +27,9 @@ interface UseStepFormApi<T extends FieldValues> {
  * )
  * ```
  */
-export function useStepForm<T extends FieldValues>(props?: UseFormOptions<T>): UseStepFormApi<T> {
+export function useStepForm<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues>(
+  props?: UseFormOptions<WizardValues[Step]>,
+): UseStepFormApi<WizardValues[Step]> {
   const form = useForm(props);
   const {
     wizardInternal: { stepStatusSetter, setValuesGetterForCurrentStep },
@@ -46,9 +48,9 @@ export function useStepForm<T extends FieldValues>(props?: UseFormOptions<T>): U
     // So by then, set step status to undefined, the user will not be able to go to next step
     stepStatusSetter(VALIDATION_OUTCOME.UNDETERMINED);
 
-    const setFormStatusFromValidationStatuses = ((validationStatuses: ValidationStatuses<T>) => {
+    const setFormStatusFromValidationStatuses = ((validationStatuses: ValidationStatuses<WizardValues[Step]>) => {
       stepStatusSetter(mapValidationStatusesToOutcome(validationStatuses));
-    }) as Dispatch<SetStateAction<FormValidations<T, keyof T>>>;
+    }) as Dispatch<SetStateAction<FormValidations<WizardValues[Step], keyof WizardValues[Step]>>>;
     /*
       Put function onto the queue. The action will be done only pending render is done
       In case of big step with many inputs, stepStatus will stay UNDETERMINED until that the render
@@ -68,7 +70,7 @@ export function useStepForm<T extends FieldValues>(props?: UseFormOptions<T>): U
   }, [getFormValues, setValuesGetterForCurrentStep]);
 
   useEffect(() => {
-    const valuesOfCurrentStep = getValuesOfCurrentStep() as Partial<T>;
+    const valuesOfCurrentStep = getValuesOfCurrentStep() as Partial<WizardValues[Step]>;
     // If values for the current step are stored in the wizard context, we update values of the form
     // and set valuesHasBeenInitialized to true to detect if values getting has been done
     if (valuesOfCurrentStep) {
@@ -78,7 +80,7 @@ export function useStepForm<T extends FieldValues>(props?: UseFormOptions<T>): U
   }, [getValuesOfCurrentStep, setFormValues]);
 
   const initFormValues = useCallback(
-    (initialValues: Partial<T>): void => {
+    (initialValues: Partial<WizardValues[Step]>): void => {
       // when values from the wizard has been gotten, the function do nothing
       if (!valuesHasBeenInitializedRef.current) {
         setFormValues(initialValues);
