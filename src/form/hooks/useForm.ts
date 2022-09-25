@@ -53,7 +53,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
   type FormState = {
     [K in keyof T]?: FieldState<K>;
   };
-  const { current: formState } = useRef<FormState>({});
+  const formStateRef = useRef<FormState>({});
   const fieldNameOnChangeByUserRef = useRef<keyof T | undefined>();
 
   const handleFormSubmitRef = useRef<(formValues: Partial<T>) => void | Promise<void>>();
@@ -108,9 +108,9 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       // Get all values of form
       if (!names) {
         const values: Partial<T> = {};
-        (Object.keys(formState) as K[]).forEach((name) => {
-          if (formState[name]?.isRegistered) {
-            values[name] = formState[name]?.value;
+        (Object.keys(formStateRef.current) as K[]).forEach((name) => {
+          if (formStateRef.current[name]?.isRegistered) {
+            values[name] = formStateRef.current[name]?.value;
           }
         });
         return values;
@@ -119,13 +119,13 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       // Get values for specific fields
       const values = {} as FormValues<T, K>;
       names.forEach((name) => {
-        if (formState[name]?.isRegistered) {
-          values[name] = formState[name]?.value;
+        if (formStateRef.current[name]?.isRegistered) {
+          values[name] = formStateRef.current[name]?.value;
         }
       });
       return values;
     },
-    [formState],
+    [],
   );
 
   /**
@@ -137,9 +137,9 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       // Get all errors of form
       if (!names) {
         const validations: PartialRecord<keyof T, ValidationStatus> = {};
-        (Object.keys(formState) as K[]).forEach((name) => {
-          if (formState[name]?.isRegistered) {
-            validations[name] = formState[name]?.validation;
+        (Object.keys(formStateRef.current) as K[]).forEach((name) => {
+          if (formStateRef.current[name]?.isRegistered) {
+            validations[name] = formStateRef.current[name]?.validation;
           }
         });
         return validations;
@@ -148,13 +148,13 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       // Get errors for specific fields
       const validations = {} as Record<K, ValidationStatus | undefined>;
       names.forEach((name) => {
-        if (formState[name]?.isRegistered) {
-          validations[name] = formState[name]?.validation;
+        if (formStateRef.current[name]?.isRegistered) {
+          validations[name] = formStateRef.current[name]?.validation;
         }
       });
       return validations;
     },
-    [formState],
+    [],
   );
 
   /**
@@ -188,7 +188,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
            */
           publish((previous) => ({
             ...previous,
-            [name]: formState[name]?.isRegistered ? formState[name]?.value : undefined,
+            [name]: formStateRef.current[name]?.isRegistered ? formStateRef.current[name]?.value : undefined,
           }));
         });
       }
@@ -209,7 +209,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         }, 0);
       }
     },
-    [formState, getFormValues, globalTimeout],
+    [getFormValues, globalTimeout],
   );
 
   /**
@@ -232,10 +232,10 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
            */
           publish((previous) => {
             const previousCopy = { ...previous };
-            if (!formState[name]?.isRegistered) {
+            if (!formStateRef.current[name]?.isRegistered) {
               delete previousCopy[name];
             } else {
-              previousCopy[name] = formState[name]?.validation;
+              previousCopy[name] = formStateRef.current[name]?.validation;
             }
             return previousCopy;
           });
@@ -257,7 +257,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         }, 0);
       }
     },
-    [formState, getFormErrorsForNames, globalTimeout],
+    [getFormErrorsForNames, globalTimeout],
   );
 
   /**
@@ -291,15 +291,15 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
    */
   const unregisterField = useCallback(
     (name: keyof T): void => {
-      if (!formState[name]) {
+      if (!formStateRef.current[name]) {
         throw new Error(`Field ${String(name)} is not registered`);
       }
 
-      formState[name]!.isRegistered = false;
+      formStateRef.current[name]!.isRegistered = false;
       updateValueForAllTypeOfSubscribers(name);
       updateErrorForAllTypeOfSubscribers(name);
     },
-    [formState, updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers],
+    [updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers],
   );
 
   /**
@@ -370,12 +370,12 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
    */
   const registerField = useCallback(
     <K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): void => {
-      const previousValueStored = formState[name]?.value;
-      if (formState[name]?.isRegistered) {
+      const previousValueStored = formStateRef.current[name]?.value;
+      if (formStateRef.current[name]?.isRegistered) {
         throw new Error(`Attempting to register field "${String(name)}" a second time`);
       }
 
-      formState[name] = {
+      formStateRef.current[name] = {
         name,
         isRegistered: true,
         value: previousValueStored,
@@ -397,7 +397,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       );
       updateValueForAllTypeOfSubscribers(name);
     },
-    [formState, addValueSubscriber, updateValueForAllTypeOfSubscribers],
+    [addValueSubscriber, updateValueForAllTypeOfSubscribers],
   );
 
   /**
@@ -464,11 +464,11 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
   const setFormValues = useCallback(
     (newValues: Partial<T>, eraseAll = false): void => {
       if (eraseAll) {
-        Object.keys(formState).forEach((fieldName) => {
-          const { name } = formState[fieldName]!;
+        Object.keys(formStateRef.current).forEach((fieldName) => {
+          const { name } = formStateRef.current[fieldName]!;
 
-          if (formState[name]) {
-            formState[name]!.value = undefined;
+          if (formStateRef.current[name]) {
+            formStateRef.current[name]!.value = undefined;
             updateValueForAllTypeOfSubscribers(name);
           }
         });
@@ -476,12 +476,12 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
 
       Object.keys(newValues).forEach((name: keyof T) => {
         // If the field is already stored, only update the value
-        if (formState[name]) {
-          formState[name]!.value = newValues[name];
+        if (formStateRef.current[name]) {
+          formStateRef.current[name]!.value = newValues[name];
         } else {
           // Else, save a new line in the context for the given name. When the field will be
           // registered later, he will have access to the value
-          formState[name] = {
+          formStateRef.current[name] = {
             name,
             isRegistered: false,
             value: newValues[name],
@@ -491,7 +491,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         updateValueForAllTypeOfSubscribers(name);
       });
     },
-    [formState, updateValueForAllTypeOfSubscribers],
+    [updateValueForAllTypeOfSubscribers],
   );
 
   /**
@@ -503,11 +503,11 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
    */
   const handleOnChange = useCallback(
     <K extends keyof T>(name: K, value: T[K], hasFocus: boolean): void => {
-      if (!formState[name]) {
+      if (!formStateRef.current[name]) {
         throw new Error(`Field "${String(name)}" is not registered`);
       }
 
-      if (formState[name]?.value === value) {
+      if (formStateRef.current[name]?.value === value) {
         return;
       }
       // Keep field name to know on blur if the field has been updated by user input
@@ -515,10 +515,10 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         fieldNameOnChangeByUserRef.current = name;
       }
       // Update value in store
-      formState[name]!.value = value;
+      formStateRef.current[name]!.value = value;
       updateValueSubscribers(name, WATCH_MODE.ON_CHANGE);
     },
-    [formState, updateValueSubscribers],
+    [updateValueSubscribers],
   );
 
   /**
@@ -531,20 +531,20 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     async (name: keyof T, data: AnyRecord = {}): Promise<void> => {
       updateValueSubscribers(name, WATCH_MODE.ON_BLUR);
 
-      if (!formState[name]) {
+      if (!formStateRef.current[name]) {
         throw new Error(`Field "${String(name)}" is not registered`);
       }
 
       if (
         onUpdateAfterBlur &&
         fieldNameOnChangeByUserRef.current === name &&
-        formState[name]!.validation.status === VALIDATION_OUTCOME.VALID
+        formStateRef.current[name]!.validation.status === VALIDATION_OUTCOME.VALID
       ) {
-        await onUpdateAfterBlur(name, formState[name]!.value, data, { getFormValues, setFormValues });
+        await onUpdateAfterBlur(name, formStateRef.current[name]!.value, data, { getFormValues, setFormValues });
       }
       fieldNameOnChangeByUserRef.current = undefined;
     },
-    [updateValueSubscribers, onUpdateAfterBlur, formState, getFormValues, setFormValues],
+    [updateValueSubscribers, onUpdateAfterBlur, getFormValues, setFormValues],
   );
 
   /**
@@ -554,14 +554,14 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
    */
   const updateValidationStatus = useCallback(
     (name: keyof T, validationStatus: ValidationStatus): void => {
-      if (!formState[name]) {
+      if (!formStateRef.current[name]) {
         throw new Error(`Field "${String(name)}" is not registered`);
       }
 
-      formState[name]!.validation = validationStatus;
+      formStateRef.current[name]!.validation = validationStatus;
       updateErrorSubscribers(name, WATCH_MODE.ON_CHANGE);
     },
-    [formState, updateErrorSubscribers],
+    [updateErrorSubscribers],
   );
 
   /**

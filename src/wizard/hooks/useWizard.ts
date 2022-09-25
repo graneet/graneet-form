@@ -10,13 +10,13 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
 ): WizardContextApi<WizardValues> {
   // -- VALUES --
   const wizardValuesRef = useRef<WizardValues>({} as WizardValues);
-  const valuesStepGetter = useRef<() => FieldValues | undefined>(() => undefined);
+  const valuesStepGetterRef = useRef<() => FieldValues | undefined>(() => undefined);
 
   // -- STEP --
   const [currentStep, setCurrentStep] = useState<keyof WizardValues>();
   const [steps, setSteps] = useState<Array<keyof WizardValues>>([]);
-  const validationFns = useRef<PartialRecord<keyof WizardValues, StepValidator<WizardValues, any>>>({});
-  const stepsWithoutFooter = useRef<Set<keyof WizardValues>>(new Set());
+  const validationFnsRef = useRef<PartialRecord<keyof WizardValues, StepValidator<WizardValues, any>>>({});
+  const stepsWithoutFooterRef = useRef<Set<keyof WizardValues>>(new Set());
   const [isStepReady, setIsStepReady] = useState(false);
 
   // -- PLACEHOLDER --
@@ -36,7 +36,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
     // Add form values to values stored in wizard
     if (currentStep) {
       // add values only if getter returns values
-      const stepValues = valuesStepGetter.current();
+      const stepValues = valuesStepGetterRef.current();
       if (stepValues) {
         wizardValuesRef.current[currentStep] = stepValues as WizardValues[keyof WizardValues];
       }
@@ -94,14 +94,14 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
 
       // Add validation function
       if (validationFn) {
-        validationFns.current[name] = validationFn;
+        validationFnsRef.current[name] = validationFn;
       }
       if (noFooter) {
-        stepsWithoutFooter.current.add(name);
+        stepsWithoutFooterRef.current.add(name);
       }
       titlesRef.current = [...titlesRef.current, { name, title }];
     },
-    [setCurrentStep],
+    [],
   );
 
   /**
@@ -136,8 +136,8 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
         return [...previous.slice(0, index), ...previous.slice(index + 1)];
       });
 
-      delete validationFns.current[name];
-      stepsWithoutFooter.current.delete(name);
+      delete validationFnsRef.current[name];
+      stepsWithoutFooterRef.current.delete(name);
       titlesRef.current = titlesRef.current.filter(({ name: currentName }) => currentName !== name);
     },
     [hasNextStep],
@@ -151,8 +151,8 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
       return;
     }
     // Make validation for the step if one is declared
-    if (validationFns.current[currentStep]) {
-      const isStepValid = await validationFns.current[currentStep]!(getValuesOfCurrentStep());
+    if (validationFnsRef.current[currentStep]) {
+      const isStepValid = await validationFnsRef.current[currentStep]!(getValuesOfCurrentStep());
       if (!isStepValid) {
         return;
       }
@@ -200,7 +200,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
       placeholderContentSetterRef.current.add(placeholderContentSetter);
       stepStatusSetterRef.current.add(stepStatusSetter);
     },
-    [placeholderContentSetterRef, stepStatusSetterRef],
+    [],
   );
 
   /**
@@ -211,7 +211,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
       placeholderContentSetterRef.current.delete(placeholderContentSetter);
       stepStatusSetterRef.current.delete(stepStatusSetter);
     },
-    [placeholderContentSetterRef, stepStatusSetterRef],
+    [],
   );
 
   /**
@@ -219,14 +219,11 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
    * @param placement Placement of the element added
    * @param children Component to add
    */
-  const updatePlaceholderContent = useCallback(
-    (placement: string, children: ReactNode): void => {
-      placeholderContentSetterRef.current.forEach((placeholderContentSetter) => {
-        placeholderContentSetter((previous: PlaceholderContent) => ({ ...previous, [placement]: children }));
-      });
-    },
-    [placeholderContentSetterRef],
-  );
+  const updatePlaceholderContent = useCallback((placement: string, children: ReactNode): void => {
+    placeholderContentSetterRef.current.forEach((placeholderContentSetter) => {
+      placeholderContentSetter((previous: PlaceholderContent) => ({ ...previous, [placement]: children }));
+    });
+  }, []);
 
   /**
    * Reset content of placeholder
@@ -242,7 +239,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
         });
       }
     },
-    [updatePlaceholderContent, placeholderContentSetterRef],
+    [updatePlaceholderContent],
   );
 
   /**
@@ -251,7 +248,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
    */
   const setValuesGetterForCurrentStep = useCallback(
     <Step extends keyof WizardValues>(stepValuesGetter: () => WizardValues[Step] | undefined): void => {
-      valuesStepGetter.current = stepValuesGetter;
+      valuesStepGetterRef.current = stepValuesGetter;
     },
     [],
   );
@@ -302,7 +299,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
           },
           hasNoFooter: {
             get() {
-              return currentStep && stepsWithoutFooter.current.has(currentStep);
+              return currentStep && stepsWithoutFooterRef.current.has(currentStep);
             },
           },
           stepsTitles: {

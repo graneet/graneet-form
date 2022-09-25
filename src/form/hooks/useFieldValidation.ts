@@ -10,7 +10,7 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>(
     numberOfRules ? VALIDATION_STATE_UNDETERMINED : VALIDATION_STATE_VALID,
   );
-  const metaState = useRef({
+  const metaStateRef = useRef({
     countRulesResolved: 0,
     phaseId: 0,
     hasError: false,
@@ -19,7 +19,7 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
   const testRules = useCallback(
     (rulesToTest: IRule[], fieldValue: FieldValue, phaseId: number) => {
       rulesToTest.forEach(({ validatorFn, errorMessage }) => {
-        if (metaState.current.hasError) {
+        if (metaStateRef.current.hasError) {
           return;
         }
         Promise.resolve(validatorFn(fieldValue))
@@ -30,25 +30,25 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
           For example, if this loop is still running but phaseId has changed
           since, we do not update setValidationStatus
          */
-            if (phaseId !== metaState.current.phaseId) {
+            if (phaseId !== metaStateRef.current.phaseId) {
               return;
             }
-            metaState.current.countRulesResolved += 1;
+            metaStateRef.current.countRulesResolved += 1;
 
-            if (!isValid && !metaState.current.hasError) {
+            if (!isValid && !metaStateRef.current.hasError) {
               throw new Error(errorMessage);
             }
             /*
           If we run the last rule, and no error was thrown,
           update status to VALIDATION_STATE_VALID
          */
-            if (isValid && metaState.current.countRulesResolved === numberOfRules) {
+            if (isValid && metaStateRef.current.countRulesResolved === numberOfRules) {
               setValidationStatus(VALIDATION_STATE_VALID);
             }
           })
           .catch(({ message }) => {
             const status: ValidationStatus = { status: VALIDATION_OUTCOME.INVALID, message };
-            metaState.current.hasError = true;
+            metaStateRef.current.hasError = true;
             setValidationStatus(status);
           });
       });
@@ -64,7 +64,7 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
     }
     setValidationStatus(VALIDATION_STATE_UNDETERMINED);
 
-    const { current } = metaState;
+    const { current } = metaStateRef;
     // On each render, we increment phaseId,
     // doing, so we ensure actions are done on right value
     current.phaseId += 1;
