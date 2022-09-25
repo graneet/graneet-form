@@ -4,7 +4,7 @@ import { PlaceholderContentSetter, StepValidator } from '../types';
 
 export type ValidationStatusesSetter = Dispatch<SetStateAction<VALIDATION_OUTCOME>>;
 
-export interface WizardContextApi<Steps extends string, WizardValues extends Record<Steps, FieldValues>> {
+export interface WizardContextApi<WizardValues extends Record<string, FieldValues>> {
   wizardInternal: {
     updatePlaceholderContent(placement: string, children: ReactNode): void;
 
@@ -20,14 +20,14 @@ export interface WizardContextApi<Steps extends string, WizardValues extends Rec
       stepStatusSetter: ValidationStatusesSetter,
     ): void;
 
-    registerStep<Step extends Steps>(
+    registerStep<Step extends keyof WizardValues>(
       name: Step,
-      validationFn?: StepValidator<Steps, WizardValues, Step>,
+      validationFn?: StepValidator<WizardValues, Step>,
       noFooter?: boolean,
       title?: string,
     ): void;
 
-    unregisterStep(name: Steps): void;
+    unregisterStep(name: keyof WizardValues): void;
 
     setIsStepReady: Dispatch<SetStateAction<boolean>>;
 
@@ -36,9 +36,9 @@ export interface WizardContextApi<Steps extends string, WizardValues extends Rec
     setValuesGetterForCurrentStep(stepValuesGetter: () => FieldValues | undefined): void;
   };
 
-  steps: Steps[];
+  steps: (keyof WizardValues)[];
 
-  currentStep: Steps | undefined;
+  currentStep: keyof WizardValues | undefined;
 
   handleOnNext(): Promise<void>;
 
@@ -52,16 +52,16 @@ export interface WizardContextApi<Steps extends string, WizardValues extends Rec
 
   isStepReady: boolean;
 
-  stepsTitles: { name: Steps; title: string | undefined }[];
+  stepsTitles: { name: keyof WizardValues; title: string | undefined }[];
 
-  getValuesOfCurrentStep<Step extends Steps>(): WizardValues[Step] | undefined;
+  getValuesOfCurrentStep<Step extends keyof WizardValues>(): WizardValues[Step] | undefined;
 
-  getValuesOfStep<Step extends Steps>(stepName: Step): WizardValues[Step] | undefined;
+  getValuesOfStep<Step extends keyof WizardValues>(stepName: Step): WizardValues[Step] | undefined;
 
   getValuesOfSteps(): WizardValues;
 }
 
-export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<string, Record<string, never>> = {
+export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
   wizardInternal: {
     updatePlaceholderContent: () => {},
     resetPlaceholderContent: () => {},
@@ -87,10 +87,7 @@ export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<string, Record<string, nev
   getValuesOfSteps: () => ({}),
 };
 
-export const WizardContext = createContext<WizardContextApi<any, any>>(CONTEXT_WIZARD_DEFAULT);
-export function useWizardContext<
-  Steps extends string,
-  WizardValues extends Record<Steps, FieldValues>,
->(): WizardContextApi<Steps, WizardValues> {
+export const WizardContext = createContext<WizardContextApi<any>>(CONTEXT_WIZARD_DEFAULT);
+export function useWizardContext<WizardValues extends Record<string, FieldValues>>(): WizardContextApi<WizardValues> {
   return useContext(WizardContext);
 }

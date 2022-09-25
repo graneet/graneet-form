@@ -10,6 +10,7 @@ interface UsePlaceholder {
   isLoading: boolean;
   stepStatus: VALIDATION_OUTCOME;
 }
+
 export function usePlaceholder(): UsePlaceholder {
   const {
     handleOnNext,

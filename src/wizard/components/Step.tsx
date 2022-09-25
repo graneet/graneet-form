@@ -3,10 +3,10 @@ import { FieldValues } from '../../shared/types/FieldValue';
 import { CONTEXT_WIZARD_DEFAULT, useWizardContext } from '../contexts/WizardContext';
 import { StepValidator } from '../types';
 
-export interface StepProps<Steps extends string, WizardValues extends Record<Steps, FieldValues>, Step extends Steps> {
+export interface StepProps<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues> {
   children: ReactNode;
   name: Step;
-  onNext?: StepValidator<Steps, WizardValues, Step>;
+  onNext?: StepValidator<WizardValues, Step>;
   noFooter?: boolean;
   title?: string;
 }
@@ -30,14 +30,14 @@ export interface StepProps<Steps extends string, WizardValues extends Record<Ste
  * </Wizard
  * ``
  */
-export function Step<Steps extends string, WizardValues extends Record<Steps, FieldValues>, Step extends Steps>({
+export function Step<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues>({
   children,
   name,
   onNext,
   noFooter,
   title,
-}: StepProps<Steps, WizardValues, Step>) {
-  const wizard = useWizardContext<Steps, WizardValues>();
+}: StepProps<WizardValues, Step>) {
+  const wizard = useWizardContext<WizardValues>();
 
   const {
     currentStep,
