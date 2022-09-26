@@ -45,11 +45,9 @@ export interface FormInternal<T extends FieldValues> {
 
   getFormValuesForNames<K extends keyof T>(names: K[]): FormValues<T, K>;
 
-  getFormValuesForNames(): Partial<T>;
+  getFormErrors(): PartialRecord<keyof T, ValidationStatus>;
 
-  getFormErrorsForNames<K extends keyof T>(names?: K[]): Record<K, ValidationStatus | undefined>;
-
-  getFormErrorsForNames(): PartialRecord<keyof T, ValidationStatus>;
+  getFormErrorsForNames<K extends keyof T>(names: K[]): Record<K, ValidationStatus | undefined>;
 
   updateValidationStatus(name: keyof T, validationStatus: ValidationStatus): void;
 
@@ -76,7 +74,8 @@ export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
   removeValidationStatusSubscriber: (): void => {},
   handleOnChange: (): void => {},
   handleOnBlur: (): Promise<void> => Promise.resolve(),
-  getFormValuesForNames: () => ({}),
+  getFormErrors: () => ({}),
+  getFormValuesForNames: () => ({} as FormValues<any, any>),
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   getFormErrorsForNames: (): Record<string, ValidationStatus> => ({}),
