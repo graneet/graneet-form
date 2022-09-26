@@ -1,31 +1,11 @@
 import { Dispatch, SetStateAction, useCallback, useMemo, useRef } from 'react';
 import { VALIDATION_OUTCOME, ValidationStatus, AnyRecord, FieldValues } from '../../shared';
-import { FormContextApi, FormInternal } from '../contexts/FormContext';
+import { FormContextApi } from '../contexts/FormContext';
 import { WATCH_MODE } from '../types/WatchMode';
 import { VALIDATION_STATE_UNDETERMINED } from '../types/Validation';
 import { PartialRecord } from '../../shared/types/PartialRecord';
 import { FormValues } from '../types/FormValues';
 import { FormValidations } from '../types/FormValidations';
-
-/**
- * Generate methods for form
- * @return {FormContextApi}
- * @example
- * ```
- * const form = useForm();
- * const { setFormValues } = form;
- *
- * useEffect(() => {
- *   setFormValues({"foo": "foo", "bar": "bar"})
- * },[])
- *
- * return(
- *   <Form form={form}>
- *     <TextInput name="name" />
- *   </Form>
- * )
- * ```
- */
 
 export interface UseFormOptions<T extends FieldValues> {
   onUpdateAfterBlur?<K extends keyof T>(
@@ -36,6 +16,19 @@ export interface UseFormOptions<T extends FieldValues> {
   ): Promise<void> | void;
 }
 
+/**
+ * Generate form object used by `Form`
+ * @example
+ * ```
+ * const form = useForm();
+ *
+ * return(
+ *   <Form form={form}>
+ *     <TextInput name="name" />
+ *   </Form>
+ * )
+ * ```
+ */
 export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOptions<T> = {}): FormContextApi<T> {
   // -- TYPES --
   const globalTimeoutRef = useRef<Record<string, Record<string, NodeJS.Timeout>>>({
@@ -64,7 +57,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     WATCH_MODE,
     {
       global: Set<Dispatch<SetStateAction<Partial<T>>>>;
-      scoped: PartialRecord<keyof T, Set<Dispatch<SetStateAction<FormValues<T, keyof T>>>>>;
+      scoped: PartialRecord<keyof T, Set<Dispatch<SetStateAction<FormValues<T, any>>>>>;
     }
   >;
   const formValuesSubscribersRef = useRef<FormValueSubscribersRef>({
@@ -292,33 +285,32 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
   );
 
   /**
-   * Add new subscriber of values for given fields
-   * @param publish Function trigger on value change
-   * @param watchMode Type of watcher
-   * @param names Field names
+   * Add new subscriber watching all registered field values
    */
-  const addValueSubscriber = useCallback<FormInternal<T>['addValueSubscriber']>(
-    <K extends keyof T>(
-      publish: Dispatch<SetStateAction<FormValues<T, K>>> | Dispatch<SetStateAction<Partial<T>>>,
-      watchMode: WATCH_MODE,
-      names?: (keyof T)[],
-    ) => {
-      if (!names) {
-        formValuesSubscribersRef.current[watchMode].global.add(publish as Dispatch<SetStateAction<Partial<T>>>);
-      } else {
-        names.forEach((name) => {
-          if (!formValuesSubscribersRef.current[watchMode].scoped[name]) {
-            formValuesSubscribersRef.current[watchMode].scoped[name] = new Set();
-          }
-          formValuesSubscribersRef.current[watchMode].scoped[name]!.add(
-            publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>,
-          );
-        });
-      }
+  const addGlobalValueSubscriber = useCallback(
+    (publish: Dispatch<SetStateAction<Partial<T>>>, watchMode: WATCH_MODE) => {
+      formValuesSubscribersRef.current[watchMode].global.add(publish);
+      publish(getFormValues());
+    },
+    [getFormValues],
+  );
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      publish(getFormValuesForNames(names) as FormValues<T, K>);
+  /**
+   * Add new subscriber watching a list of field values
+   */
+  const addValueSubscriber = useCallback(
+    <K extends keyof T>(
+      publish: Dispatch<SetStateAction<FormValues<T, K>>>,
+      watchMode: WATCH_MODE,
+      names: (keyof T)[],
+    ) => {
+      names.forEach((name) => {
+        if (!formValuesSubscribersRef.current[watchMode].scoped[name]) {
+          formValuesSubscribersRef.current[watchMode].scoped[name] = new Set();
+        }
+        formValuesSubscribersRef.current[watchMode].scoped[name]!.add(publish);
+      });
+      publish(getFormValuesForNames(names));
     },
     [getFormValuesForNames],
   );
@@ -380,7 +372,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
      Add subscriber has to be setValue saving array. Here, the publisher needs only the first value
      (and the only one) returned in values, so we created a function to do the mapping
      */
-      addValueSubscriber(
+      addValueSubscriber<K>(
         (publish) => {
           // FIXME publish({} as FormValues<T, K>)
           const values = typeof publish === 'function' ? publish({} as FormValues<T, K>) : publish;
@@ -395,24 +387,24 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
   );
 
   /**
-   * Remove values subscriber for given fields
-   * @param publish Function used to be triggered on value change
-   * @param watchMode Type of watcher
-   * @param names Field names
+   * Remove subscriber watching all registered field values
+   */
+  const removeGlobalValueSubscriber = useCallback(
+    (publish: Dispatch<SetStateAction<Partial<T>>>, watchMode: WATCH_MODE): void => {
+      formValuesSubscribersRef.current[watchMode].global.delete(publish as Dispatch<SetStateAction<Partial<T>>>);
+    },
+    [],
+  );
+
+  /**
+   * Remove subscriber watching a list of field values
    */
   const removeValueSubscriber = useCallback(
     <K extends keyof T>(
-      publish: Dispatch<SetStateAction<FormValues<T, K>>> | Dispatch<SetStateAction<Partial<T>>>,
+      publish: Dispatch<SetStateAction<FormValues<T, K>>>,
       watchMode: WATCH_MODE,
-      names?: K[],
+      names: K[],
     ): void => {
-      // Global subscriber
-      if (!names) {
-        formValuesSubscribersRef.current[watchMode].global.delete(publish as Dispatch<SetStateAction<Partial<T>>>);
-        return;
-      }
-
-      // Scoped subscriber
       names.forEach((name) => {
         formValuesSubscribersRef.current[watchMode].scoped[name]?.delete(
           publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>,
@@ -580,7 +572,9 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       formInternal: {
         registerField,
         unregisterField,
+        addGlobalValueSubscriber,
         addValueSubscriber,
+        removeGlobalValueSubscriber,
         removeValueSubscriber,
         addValidationStatusSubscriber,
         removeValidationStatusSubscriber,
@@ -602,7 +596,9 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     [
       registerField,
       unregisterField,
+      addGlobalValueSubscriber,
       addValueSubscriber,
+      removeGlobalValueSubscriber,
       removeValueSubscriber,
       addValidationStatusSubscriber,
       removeValidationStatusSubscriber,

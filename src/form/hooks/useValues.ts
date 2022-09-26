@@ -4,110 +4,138 @@ import { CONTEXT_FORM_DEFAULT, FormContextApi, useFormContext } from '../context
 import { FormValues } from '../types/FormValues';
 import { WATCH_MODE } from '../types/WatchMode';
 
-function useValues<T extends FieldValues, K extends keyof T>(watchMode: WATCH_MODE, names: K[]): FormValues<T, K>;
-function useValues<T extends FieldValues, K extends keyof T>(
-  watchMode: WATCH_MODE,
-  names: K[],
-  form: FormContextApi<T>,
-): FormValues<T, K>;
-
-function useValues<T extends FieldValues>(watchMode: WATCH_MODE): Partial<T>;
-function useValues<T extends FieldValues>(watchMode: WATCH_MODE, names: undefined, form: FormContextApi<T>): Partial<T>;
-
 /**
- * Hook to watch values.
- * If names is not defined, watch all values
- * @param watchMode OnBlur or OnChange
- * @param names (optional) Field names
- * @param form (optional) form to use. If it's not given, form context is used.
+ * Internal hook to handle watch of all field values
  */
-function useValues<T extends FieldValues, K extends keyof T>(
-  watchMode: WATCH_MODE,
-  names?: K[],
-  form?: FormContextApi<T>,
-): FormValues<T, K> | Partial<T> {
+function useGlobalValues<T extends FieldValues>(watchMode: WATCH_MODE, form?: FormContextApi<T>): Partial<T> {
   const formContext = useFormContext<T>();
   const {
-    formInternal: { addValueSubscriber, removeValueSubscriber },
+    formInternal: { addGlobalValueSubscriber, removeGlobalValueSubscriber },
   } = form || formContext;
-  const [currentValues, setCurrentValues] = useState({});
+  const [currentValues, setCurrentValues] = useState<Partial<T>>({});
 
   if (!form && formContext === CONTEXT_FORM_DEFAULT) {
-    throw new Error('No form context could be found while calling "useValues".');
+    throw new Error('No form context could be found.');
   }
 
   useEffect(() => {
-    addValueSubscriber(setCurrentValues, watchMode, names as K[]);
-    return () => removeValueSubscriber(setCurrentValues, watchMode, names as K[]);
-    // names is transformed to string to ensure consistant ref
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addValueSubscriber, removeValueSubscriber, watchMode, names?.join()]);
+    addGlobalValueSubscriber(setCurrentValues, watchMode);
+    return () => removeGlobalValueSubscriber(setCurrentValues, watchMode);
+  }, [addGlobalValueSubscriber, removeGlobalValueSubscriber, watchMode]);
 
   return currentValues;
 }
 
-export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
-  names: K[],
-  form?: FormContextApi<T>,
-): FormValues<T, K>;
-export function useOnChangeValues<T extends FieldValues>(): Partial<T>;
-export function useOnChangeValues<T extends FieldValues>(names: undefined, form: FormContextApi<T>): Partial<T>;
-
 /**
- * Watch field with updates onChange
- * If `names` is not specified, watch all values
- * @param names (optional) Field names
- * @param form (optional) form to use
- * @return
- * ```
- *   const { foo } = useOnChangeValues(['foo']);
- *   useEffect(() => {
- *     console.log(foo);
- *   },[])
- * ```
+ * Internal hook to handle watch for a list of fields
  */
-export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
-  names?: K[],
-  form?: FormContextApi<T>,
-): FormValues<T, K> | Partial<T> {
-  return useValues(
-    WATCH_MODE.ON_CHANGE,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    names,
-    form,
-  );
+function useValues<T extends FieldValues, K extends keyof T>(
+  watchMode: WATCH_MODE,
+  form: FormContextApi<T> | undefined,
+  names: K[],
+): FormValues<T, K> {
+  const formContext = useFormContext<T>();
+  const {
+    formInternal: { addValueSubscriber, removeValueSubscriber },
+  } = form || formContext;
+  const [currentValues, setCurrentValues] = useState<FormValues<T, K>>({} as FormValues<T, K>);
+
+  if (!form && formContext === CONTEXT_FORM_DEFAULT) {
+    throw new Error('No form context could be found');
+  }
+
+  useEffect(() => {
+    addValueSubscriber(setCurrentValues, watchMode, names);
+    return () => removeValueSubscriber(setCurrentValues, watchMode, names);
+    // names is transformed to string to ensure consistant ref
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addValueSubscriber, names?.join(), removeValueSubscriber, watchMode]);
+
+  return currentValues;
 }
 
+/**
+ * Watch all registered fields with updates on change
+ * @param names
+ * @param form You can give a FormContext if the hook is not in `Form`
+ * @example
+ * ```
+ *   const { foo, bar } = useOnBlurValues();
+ *
+ *   useEffect(() => {
+ *     console.log('"Foo" value has changed for', foo);
+ *   },[foo])
+ * ```
+ */
+export function useOnChangeValues<T extends FieldValues>(names?: undefined, form?: FormContextApi<T>): Partial<T>;
+
+/**
+ * Watch a list of registered fields with updates on change
+ * @param names List of watched field names
+ * @param form You can give a FormContext if the hook is not in `Form`
+ * @example
+ * ```
+ *   const { bar } = useOnBlurValues(['bar']);
+ *
+ *   useEffect(() => {
+ *    console.log('"bar" value has changed for', bar);
+ *   },[bar])
+ * ```
+ */
+export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
+  names: K[],
+  form?: FormContextApi<T>,
+): FormValues<T, K>;
+
+export function useOnChangeValues(names?: any, form?: any) {
+  if (typeof names !== 'undefined') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    return useValues(WATCH_MODE.ON_CHANGE, form, names);
+  }
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  return useGlobalValues(WATCH_MODE.ON_CHANGE, form);
+}
+
+/**
+ * Watch all registered fields with updates on blur
+ * @param names
+ * @param form You can give a FormContext if the hook is not in `Form`
+ * @example
+ * ```
+ *   const { foo, bar } = useOnBlurValues();
+ *
+ *   useEffect(() => {
+ *     console.log('"Foo" value has changed for', foo);
+ *   },[foo])
+ * ```
+ */
+export function useOnBlurValues<T extends FieldValues>(names?: undefined, form?: FormContextApi<T>): Partial<T>;
+
+/**
+ * Watch a list of registered fields with updates on blur
+ * @param names List of watched field names
+ * @param form You can give a FormContext if the hook is not in `Form`
+ * @example
+ * ```
+ *   const { bar } = useOnBlurValues(['bar']);
+ *
+ *   useEffect(() => {
+ *    console.log('"bar" value has changed for', bar);
+ *   },[bar])
+ * ```
+ */
 export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
   names: K[],
   form?: FormContextApi<T>,
 ): FormValues<T, K>;
-export function useOnBlurValues<T extends FieldValues>(): Partial<T>;
-export function useOnBlurValues<T extends FieldValues>(names: undefined, form: FormContextApi<T>): Partial<T>;
 
-/**
- * Watch field with updates onBlur
- * If `names` is not specified, watch all values
- * @param names (optional) Field names
- * @param form (optional) form to use
- * @return
- * ```
- *   const { foo } = useOnBlurValues(['foo']);
- *   useEffect(() => {
- *     console.log(foo);
- *   },[])
- * ```
- */
-export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
-  names?: K[],
-  form?: FormContextApi<T>,
-): FormValues<T, K> | Partial<T> {
-  return useValues(
-    WATCH_MODE.ON_BLUR,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    names,
-    form,
-  );
+export function useOnBlurValues(names?: any, form?: any) {
+  if (typeof names !== 'undefined') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    return useValues(WATCH_MODE.ON_BLUR, form, names);
+  }
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  return useGlobalValues(WATCH_MODE.ON_BLUR, form);
 }

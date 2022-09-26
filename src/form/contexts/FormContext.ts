@@ -9,21 +9,21 @@ export interface FormInternal<T extends FieldValues> {
 
   unregisterField(name: keyof T): void;
 
+  addGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
+
   addValueSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
     type: WATCH_MODE,
     names: K[],
   ): void;
 
-  addValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
+  removeGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
 
   removeValueSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
     type: WATCH_MODE,
     name: K[],
   ): void;
-
-  removeValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
 
   addValidationStatusSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
@@ -68,7 +68,9 @@ export interface FormContextApi<T extends FieldValues> {
 export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
   registerField: (): void => {},
   unregisterField: (): void => {},
+  addGlobalValueSubscriber: (): void => {},
   addValueSubscriber: (): void => {},
+  removeGlobalValueSubscriber: (): void => {},
   removeValueSubscriber: (): void => {},
   addValidationStatusSubscriber: (): void => {},
   removeValidationStatusSubscriber: (): void => {},
