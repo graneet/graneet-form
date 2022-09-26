@@ -31,7 +31,7 @@ export interface UseFormOptions<T extends FieldValues> {
  */
 export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOptions<T> = {}): FormContextApi<T> {
   // -- TYPES --
-  const globalTimeoutRef = useRef<Record<string, Record<string, NodeJS.Timeout>>>({
+  const globalTimeoutRef = useRef<Record<'errors' | 'values', Record<string, NodeJS.Timeout>>>({
     errors: {},
     values: {},
   });
@@ -159,7 +159,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     (name: keyof T, watchMode: WATCH_MODE): void => {
       // Update watcher for this field name
       if (formValuesSubscribersRef.current[watchMode].scoped[name]) {
-        formValuesSubscribersRef.current[watchMode].scoped[name]!.forEach((publish) => {
+        formValuesSubscribersRef.current[watchMode].scoped[name]?.forEach((publish) => {
           /*
            * publish is the function given by react hook useState:
            * `const [example, setExample] = useState(() => {})` It's `example`
@@ -203,7 +203,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     (name: keyof T, watchMode: WATCH_MODE): void => {
       // Update watcher for this field name
       if (formErrorsSubscribersRef.current[watchMode].scoped[name]) {
-        formErrorsSubscribersRef.current[watchMode].scoped[name]!.forEach((publish) => {
+        formErrorsSubscribersRef.current[watchMode].scoped[name]?.forEach((publish) => {
           /*
            * publish is the function given by react hook useState:
            * `const [example, setExample] = useState(() => {})` It's `example`
@@ -234,7 +234,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
           // Update global watcher
           formErrorsSubscribersRef.current[watchMode].global.forEach((publish) => {
             // To be simpler, send value returned by getFormValues method
-            publish({ ...formValues });
+            publish(formValues);
           });
         }, 0);
       }
@@ -308,7 +308,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         if (!formValuesSubscribersRef.current[watchMode].scoped[name]) {
           formValuesSubscribersRef.current[watchMode].scoped[name] = new Set();
         }
-        formValuesSubscribersRef.current[watchMode].scoped[name]!.add(publish);
+        formValuesSubscribersRef.current[watchMode].scoped[name]?.add(publish);
       });
       publish(getFormValuesForNames(names));
     },
