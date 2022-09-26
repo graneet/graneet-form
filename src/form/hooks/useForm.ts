@@ -38,7 +38,7 @@ export interface UseFormOptions<T extends FieldValues> {
 
 export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOptions<T> = {}): FormContextApi<T> {
   // -- TYPES --
-  const { current: globalTimeout } = useRef<Record<string, Record<string, NodeJS.Timeout>>>({
+  const globalTimeoutRef = useRef<Record<string, Record<string, NodeJS.Timeout>>>({
     errors: {},
     values: {},
   });
@@ -187,8 +187,8 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         If there is a global subscriber and a lot of fields are render, avoid
         spam of refresh on this subscriber
        */
-        clearTimeout(globalTimeout.values[watchMode]);
-        globalTimeout.values[watchMode] = setTimeout(() => {
+        clearTimeout(globalTimeoutRef.current.values[watchMode]);
+        globalTimeoutRef.current.values[watchMode] = setTimeout(() => {
           const formValues = getFormValues();
           // Update global watcher
           formValuesSubscribersRef.current[watchMode].global.forEach((publish) => {
@@ -198,7 +198,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         }, 0);
       }
     },
-    [getFormValues, globalTimeout],
+    [getFormValues],
   );
 
   /**
@@ -235,8 +235,8 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         If there is a global subscriber and a lot of fields are render, avoid
         spam of refresh on this subscriber
        */
-        clearTimeout(globalTimeout.errors[watchMode]);
-        globalTimeout.errors[watchMode] = setTimeout(() => {
+        clearTimeout(globalTimeoutRef.current.errors[watchMode]);
+        globalTimeoutRef.current.errors[watchMode] = setTimeout(() => {
           const formValues = getFormErrors();
           // Update global watcher
           formErrorsSubscribersRef.current[watchMode].global.forEach((publish) => {
@@ -246,7 +246,7 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         }, 0);
       }
     },
-    [getFormErrors, globalTimeout.errors],
+    [getFormErrors],
   );
 
   /**
