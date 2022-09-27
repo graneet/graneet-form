@@ -21,6 +21,10 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
    */
   getValuesOfSteps(): WizardValues;
 
+  /**
+   * DO NOT use outside this library. It may have breaking changes in this object in a minor or patch version
+   * @internal
+   */
   wizardInternal: {
     /**
      * Register step in the Wizard.

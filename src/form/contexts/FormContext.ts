@@ -137,7 +137,8 @@ export interface FormInternal<T extends FieldValues> {
 
 export interface FormContextApi<T extends FieldValues> {
   /**
-   * DO NOT use outside of library components like Field, useValues, useValidations
+   * DO NOT use outside this library. It may have breaking changes in this object in a minor or patch version
+   * @internal
    */
   formInternal: FormInternal<T>;
 
