@@ -225,52 +225,39 @@ export function useWizard<WizardValues extends Record<string, FieldValues>>(
   );
 
   return useMemo<WizardContextApi<WizardValues>>(
-    () =>
-      Object.defineProperties(
-        {
-          wizardInternal: {
-            updatePlaceholderContent,
-            resetPlaceholderContent,
-            registerStep,
-            unregisterStep,
-            registerPlaceholder,
-            unregisterPlaceholder,
-            stepStatusSetter,
-            setIsStepReady,
-            setValuesGetterForCurrentStep,
-          },
-          steps,
-          currentStep,
-          handleOnNext,
-          handleOnPrevious,
-          isStepReady,
-          getValuesOfCurrentStep,
-          getValuesOfStep,
-          getValuesOfSteps,
-        } as WizardContextApi<WizardValues>,
-        {
-          isLastStep: {
-            get() {
-              return !steps.length || currentStep === steps[steps.length - 1];
-            },
-          },
-          isFirstStep: {
-            get() {
-              return !steps.length || currentStep === steps[0];
-            },
-          },
-          hasNoFooter: {
-            get() {
-              return currentStep && stepsWithoutFooterRef.current.has(currentStep);
-            },
-          },
-          stepsTitles: {
-            get() {
-              return titlesRef.current;
-            },
-          },
-        },
-      ),
+    () => ({
+      wizardInternal: {
+        updatePlaceholderContent,
+        resetPlaceholderContent,
+        registerStep,
+        unregisterStep,
+        registerPlaceholder,
+        unregisterPlaceholder,
+        stepStatusSetter,
+        setIsStepReady,
+        setValuesGetterForCurrentStep,
+      },
+      steps,
+      currentStep,
+      handleOnNext,
+      handleOnPrevious,
+      isStepReady,
+      getValuesOfCurrentStep,
+      getValuesOfStep,
+      getValuesOfSteps,
+      get isLastStep() {
+        return !steps.length || currentStep === steps[steps.length - 1];
+      },
+      get isFirstStep() {
+        return !steps.length || currentStep === steps[0];
+      },
+      get hasNoFooter() {
+        return !!currentStep && stepsWithoutFooterRef.current.has(currentStep);
+      },
+      get stepsTitles() {
+        return titlesRef.current;
+      },
+    }),
     [
       steps,
       currentStep,
