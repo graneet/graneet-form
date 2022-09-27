@@ -38,7 +38,7 @@ export function useValidations<T extends FieldValues, K extends keyof T>(
   );
 
   if (!form && formContext === CONTEXT_FORM_DEFAULT) {
-    throw new Error('No form context could be found while calling "useValidations".');
+    throw new Error('No form context could be found.');
   }
 
   useEffect(() => {

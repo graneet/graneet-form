@@ -9,21 +9,21 @@ export interface FormInternal<T extends FieldValues> {
 
   unregisterField(name: keyof T): void;
 
+  addGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
+
   addValueSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
     type: WATCH_MODE,
     names: K[],
   ): void;
 
-  addValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
+  removeGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
 
   removeValueSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
     type: WATCH_MODE,
     name: K[],
   ): void;
-
-  removeValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
 
   addValidationStatusSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
@@ -45,11 +45,9 @@ export interface FormInternal<T extends FieldValues> {
 
   getFormValuesForNames<K extends keyof T>(names: K[]): FormValues<T, K>;
 
-  getFormValuesForNames(): Partial<T>;
+  getFormErrors(): PartialRecord<keyof T, ValidationStatus>;
 
-  getFormErrorsForNames<K extends keyof T>(names?: K[]): Record<K, ValidationStatus | undefined>;
-
-  getFormErrorsForNames(): PartialRecord<keyof T, ValidationStatus>;
+  getFormErrorsForNames<K extends keyof T>(names: K[]): Record<K, ValidationStatus | undefined>;
 
   updateValidationStatus(name: keyof T, validationStatus: ValidationStatus): void;
 
@@ -70,13 +68,16 @@ export interface FormContextApi<T extends FieldValues> {
 export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
   registerField: (): void => {},
   unregisterField: (): void => {},
+  addGlobalValueSubscriber: (): void => {},
   addValueSubscriber: (): void => {},
+  removeGlobalValueSubscriber: (): void => {},
   removeValueSubscriber: (): void => {},
   addValidationStatusSubscriber: (): void => {},
   removeValidationStatusSubscriber: (): void => {},
   handleOnChange: (): void => {},
   handleOnBlur: (): Promise<void> => Promise.resolve(),
-  getFormValuesForNames: () => ({}),
+  getFormErrors: () => ({}),
+  getFormValuesForNames: () => ({} as FormValues<any, any>),
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   getFormErrorsForNames: (): Record<string, ValidationStatus> => ({}),

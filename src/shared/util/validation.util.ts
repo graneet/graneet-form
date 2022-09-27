@@ -1,8 +1,9 @@
 import { FieldValues } from '../types/FieldValue';
-import { VALIDATION_OUTCOME, ValidationStatuses } from '../types/Validation';
+import { PartialRecord } from '../types/PartialRecord';
+import { VALIDATION_OUTCOME, ValidationStatus } from '../types/Validation';
 
 export function mapValidationStatusesToOutcome<T extends FieldValues>(
-  validationStatuses: ValidationStatuses<T>,
+  validationStatuses: PartialRecord<keyof T, ValidationStatus>,
 ): VALIDATION_OUTCOME {
   let hasInvalid = false;
   let hasUndetermined = false;

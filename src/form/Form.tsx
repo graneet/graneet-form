@@ -23,14 +23,14 @@ interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLF
 export function Form<T extends FieldValues>({ children, form, ...otherProps }: FormProps<T>) {
   const {
     getFormValues,
-    formInternal: { getFormErrorsForNames, getHandleFormSubmit },
+    formInternal: { getFormErrors, getHandleFormSubmit },
   } = form;
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
       event.preventDefault();
 
-      const validations = getFormErrorsForNames();
+      const validations = getFormErrors();
       const isFormValid = mapValidationStatusesToOutcome<T>(validations) === VALIDATION_OUTCOME.VALID;
       if (isFormValid) {
         const handleFormSubmit = getHandleFormSubmit();
@@ -40,7 +40,7 @@ export function Form<T extends FieldValues>({ children, form, ...otherProps }: F
         }
       }
     },
-    [getFormErrorsForNames, getFormValues, getHandleFormSubmit],
+    [getFormErrors, getFormValues, getHandleFormSubmit],
   );
 
   return (
