@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.10](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.10) (2022-09-28)
+
+### Features
+
+- create `addGlobalValidationStatusSubscriber` and `removeGlobalValidationStatusSubscriber` ([#29](https://github.com/graneet/graneet-form/issues/29)) ([d06c068](https://github.com/graneet/graneet-form/commits/d06c0686db57f1468d211add96b2bd194805e03a))
+- simplify generics used in Wizard types ([#26](https://github.com/graneet/graneet-form/issues/26)) ([0868165](https://github.com/graneet/graneet-form/commits/0868165b9b6b010e9d9008fed46c7bf966d3bae4))
+
 ## [2.0.0-beta.9](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.9) (2022-09-18)
 
 ### Bug Fixes
