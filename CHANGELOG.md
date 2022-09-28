@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [2.0.0-beta.10](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.10) (2022-09-28)
+## [2.0.0-beta.11](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.11) (2022-09-28)
 
 ### Features
 
