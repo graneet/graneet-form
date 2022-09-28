@@ -273,32 +273,27 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     [getFormValuesForNames],
   );
 
-  const addValidationStatusSubscriber = useCallback<FormInternal<T>['addValidationStatusSubscriber']>(
-    (
-      publish:
-        | Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>
-        | Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
-      names?: (keyof T)[],
-    ): void => {
-      if (!names) {
-        formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.add(
-          publish as Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>,
-        );
-        // TODO Remove as any
-        publish(getFormErrors() as any);
-      } else {
-        names.forEach((name) => {
-          if (!formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]) {
-            formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name] = new Set();
-          }
-          formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]?.add(
-            publish as Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
-          );
-          publish(getFormErrorsForNames(names));
-        });
-      }
+  const addGlobalValidationStatusSubscriber = useCallback<FormInternal<T>['addGlobalValidationStatusSubscriber']>(
+    (publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>) => {
+      formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.add(publish);
+      publish(getFormErrors());
     },
-    [getFormErrors, getFormErrorsForNames],
+    [getFormErrors],
+  );
+
+  const addValidationStatusSubscriber = useCallback<FormInternal<T>['addValidationStatusSubscriber']>(
+    <K extends keyof T>(publish: Dispatch<SetStateAction<FormValidations<T, K>>>, names: K[]): void => {
+      names.forEach((name) => {
+        // Initialize Set if there is no watcher for the field
+        if (!formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]) {
+          formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name] = new Set();
+        }
+
+        formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]?.add(publish as any);
+        publish(getFormErrorsForNames(names));
+      });
+    },
+    [getFormErrorsForNames],
   );
 
   const registerField = useCallback<FormInternal<T>['registerField']>(
@@ -368,20 +363,15 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
     [],
   );
 
-  const removeValidationStatusSubscriber = useCallback<FormInternal<T>['removeValidationStatusSubscriber']>(
-    <K extends keyof T>(
-      publish:
-        | Dispatch<SetStateAction<FormValidations<T, keyof T>>>
-        | Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>,
-      names?: K[],
-    ): void => {
-      if (!names) {
-        formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.delete(
-          publish as Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>,
-        );
-        return;
-      }
+  const removeGlobalValidationStatusSubscriber = useCallback<FormInternal<T>['removeGlobalValidationStatusSubscriber']>(
+    (publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>): void => {
+      formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.delete(publish);
+    },
+    [],
+  );
 
+  const removeValidationStatusSubscriber = useCallback<FormInternal<T>['removeValidationStatusSubscriber']>(
+    <K extends keyof T>(publish: Dispatch<SetStateAction<FormValidations<T, K>>>, names: K[]): void => {
       names.forEach((name) => {
         formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]?.delete(
           publish as Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
@@ -494,7 +484,9 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
         addValueSubscriber,
         removeGlobalValueSubscriber,
         removeValueSubscriber,
+        addGlobalValidationStatusSubscriber,
         addValidationStatusSubscriber,
+        removeGlobalValidationStatusSubscriber,
         removeValidationStatusSubscriber,
         handleOnChange,
         handleOnBlur,
@@ -518,7 +510,9 @@ export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOpt
       addValueSubscriber,
       removeGlobalValueSubscriber,
       removeValueSubscriber,
+      addGlobalValidationStatusSubscriber,
       addValidationStatusSubscriber,
+      removeGlobalValidationStatusSubscriber,
       removeValidationStatusSubscriber,
       handleOnChange,
       handleOnBlur,
