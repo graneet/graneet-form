@@ -45,7 +45,9 @@ export interface FormInternal<T extends FieldValues> {
    * Add new subscriber watching all registered field errors.
    * @param publish Callback to publish new value
    */
-  addValidationStatusSubscriber(publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>): void;
+  addGlobalValidationStatusSubscriber(
+    publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>,
+  ): void;
 
   /**
    * Add new subscriber watching a list of field errors.
@@ -95,7 +97,9 @@ export interface FormInternal<T extends FieldValues> {
    * Remove subscriber watching all registered field errors.
    * @param publish Callback used to publish new value
    */
-  removeValidationStatusSubscriber(publish: Dispatch<SetStateAction<FormValidations<T, keyof T>>>): void;
+  removeGlobalValidationStatusSubscriber(
+    publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>,
+  ): void;
 
   /**
    * Remove validation status subscriber for given fields.
@@ -185,11 +189,13 @@ export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
   getFormErrorsForNames: (): Record<string, ValidationStatus> => ({}),
   addGlobalValueSubscriber: (): void => {},
   addValueSubscriber: (): void => {},
+  addGlobalValidationStatusSubscriber: (): void => {},
   addValidationStatusSubscriber: (): void => {},
   registerField: (): void => {},
   unregisterField: (): void => {},
   removeGlobalValueSubscriber: (): void => {},
   removeValueSubscriber: (): void => {},
+  removeGlobalValidationStatusSubscriber: (): void => {},
   removeValidationStatusSubscriber: (): void => {},
   handleOnChange: (): void => {},
   handleOnBlur: (): Promise<void> => Promise.resolve(),

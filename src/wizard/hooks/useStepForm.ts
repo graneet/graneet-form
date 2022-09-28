@@ -1,8 +1,14 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef } from 'react';
-import { FieldValues, mapValidationStatusesToOutcome, VALIDATION_OUTCOME, ValidationStatuses } from '../../shared';
+import {
+  FieldValues,
+  mapValidationStatusesToOutcome,
+  VALIDATION_OUTCOME,
+  ValidationStatuses,
+  PartialRecord,
+  ValidationStatus,
+} from '../../shared';
 import { FormContextApi, useForm, UseFormOptions } from '../../form';
 import { useWizardContext } from '../contexts/WizardContext';
-import { FormValidations } from '../../form/types/FormValidations';
 
 interface UseStepFormApi<T extends FieldValues> {
   form: FormContextApi<T>;
@@ -39,7 +45,7 @@ export function useStepForm<WizardValues extends Record<string, FieldValues>, St
   const valuesHasBeenInitializedRef = useRef(false);
 
   const {
-    formInternal: { addValidationStatusSubscriber },
+    formInternal: { addGlobalValidationStatusSubscriber },
     getFormValues,
     setFormValues,
   } = form;
@@ -51,20 +57,20 @@ export function useStepForm<WizardValues extends Record<string, FieldValues>, St
 
     const setFormStatusFromValidationStatuses = ((validationStatuses: ValidationStatuses<WizardValues[Step]>) => {
       stepStatusSetter(mapValidationStatusesToOutcome(validationStatuses));
-    }) as Dispatch<SetStateAction<FormValidations<WizardValues[Step], keyof WizardValues[Step]>>>;
+    }) as Dispatch<SetStateAction<PartialRecord<keyof WizardValues[Step], ValidationStatus | undefined>>>;
     /*
       Put function onto the queue. The action will be done only pending render is done
       In case of big step with many inputs, stepStatus will stay UNDETERMINED until that the render
       is done and only after that, the timeout will be run
      */
-    setTimeout(() => addValidationStatusSubscriber(setFormStatusFromValidationStatuses), 0);
+    setTimeout(() => addGlobalValidationStatusSubscriber(setFormStatusFromValidationStatuses), 0);
 
     return () => {
       setValuesGetterForCurrentStep(() => undefined);
       // On step switch, switch stepStatus, user will not be stuck on not clickable button
       stepStatusSetter(VALIDATION_OUTCOME.VALID);
     };
-  }, [stepStatusSetter, setValuesGetterForCurrentStep, addValidationStatusSubscriber]);
+  }, [stepStatusSetter, setValuesGetterForCurrentStep, addGlobalValidationStatusSubscriber]);
 
   useEffect(() => {
     setValuesGetterForCurrentStep(getFormValues);
