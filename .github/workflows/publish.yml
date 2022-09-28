@@ -1,4 +1,4 @@
-name: Publish
+name: 'Publish'
 
 on:
   push:
@@ -9,17 +9,21 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Setup .npmrc file to publish to npm
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: 16
           registry-url: 'https://registry.npmjs.org'
-      - name: Install dependencies
-        run: npm install
+
+      - name: Install
+        uses: ./.github/composite-actions/install
+
       - name: Build
-        run: npm run build
+        run: pnpm build
+
       - name: Publish to npm
-        run: npm publish --access public
+        run: pnpm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
