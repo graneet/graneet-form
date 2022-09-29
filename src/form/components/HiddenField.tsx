@@ -3,7 +3,7 @@ import { FieldValues } from '../../shared';
 import { Field } from './Field';
 
 interface HiddenFieldProps<T extends FieldValues, K extends keyof T> {
-  name: K & string;
+  name: K;
   children?: ReactNode;
 }
 
@@ -24,7 +24,7 @@ export function HiddenField<T extends FieldValues, K extends keyof T>({
   ...props
 }: HiddenFieldProps<T, K>) {
   return (
-    <Field {...props} render={() => null}>
+    <Field<T, K> {...props} render={() => null}>
       {children}
     </Field>
   );
