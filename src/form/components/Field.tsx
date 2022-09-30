@@ -90,9 +90,9 @@ export function Field<T extends FieldValues, K extends keyof T>({
     [handleChange, name],
   );
 
-  const onBlur = useCallback(async (): Promise<void> => {
+  const onBlur = useCallback((): void => {
     hasFocusRef.current = false;
-    await handleBlur(name, data);
+    handleBlur(name, data);
   }, [handleBlur, name, data]);
 
   const onFocus = useCallback(() => {
@@ -119,15 +119,15 @@ export function Field<T extends FieldValues, K extends keyof T>({
   );
 }
 
-export function composeEventHandlers<Args extends any[]>(
-  originalEventHandler: ((...args: Args) => void | Promise<void>) | undefined,
-  formEventHandler: (...args: Args) => void | Promise<void>,
+export function composeEventHandlers<Args extends unknown[]>(
+  originalEventHandler: ((...args: Args) => void) | undefined,
+  formEventHandler: (...args: Args) => void,
 ) {
   return async (...args: Args): Promise<void> => {
     if (originalEventHandler) {
-      await originalEventHandler(...args);
+      originalEventHandler(...args);
     }
 
-    await formEventHandler(...args);
+    formEventHandler(...args);
   };
 }
