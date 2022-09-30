@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.12](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.12) (2022-09-30)
+
+### Bug Fixes
+
+- remove promise management and types in composeEventHandlers ([#33](https://github.com/graneet/graneet-form/issues/33)) ([4b914bb](https://github.com/graneet/graneet-form/commits/4b914bb79200ad46ff9930cce46627f79bedb7ef))
+
 ## [2.0.0-beta.11](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.11) (2022-09-28)
 
 ### Features
