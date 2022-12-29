@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.13](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.12...v2.0.0-beta.13) (2022-12-29)
+
+### Features
+
+- upgrade all deps ([#34](https://github.com/graneet/graneet-form/issues/34)) ([7dd625e](https://github.com/graneet/graneet-form/commits/7dd625e3af29f0bd6f45b5ae642daa060a046003))
+
 ## [2.0.0-beta.12](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.6...v2.0.0-beta.12) (2022-09-30)
 
 ### Bug Fixes
