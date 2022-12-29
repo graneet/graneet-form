@@ -13,10 +13,10 @@
 ## Install
 
 ```shell
-yarn add graneet-form
-
+pnpm add graneet-form
 # or
-
+yarn add graneet-form
+# or
 npm install graneet-form
 ```
 
