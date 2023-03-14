@@ -167,6 +167,8 @@ export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
 };
 
 export const WizardContext = createContext<WizardContextApi<any>>(CONTEXT_WIZARD_DEFAULT);
-export function useWizardContext<WizardValues extends Record<string, FieldValues>>(): WizardContextApi<WizardValues> {
+export function useWizardContext<
+  WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>,
+>(): WizardContextApi<WizardValues> {
   return useContext(WizardContext);
 }

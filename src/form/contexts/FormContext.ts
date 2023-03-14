@@ -218,6 +218,6 @@ export const FormContext = createContext<FormContextApi<any>>(CONTEXT_FORM_DEFAU
 /**
  * Get React Context for form
  */
-export function useFormContext<T extends FieldValues>(): FormContextApi<T> {
+export function useFormContext<T extends FieldValues = Record<string, Record<string, unknown>>>(): FormContextApi<T> {
   return useContext(FormContext);
 }

@@ -4,7 +4,7 @@ import { ValidationStatusesSetter, WizardContextApi } from '../contexts/WizardCo
 import { PlaceholderContent, PlaceholderContentSetter, StepValidator } from '../types';
 import { PartialRecord } from '../../shared/types/PartialRecord';
 
-export function useWizard<WizardValues extends Record<string, FieldValues>>(
+export function useWizard<WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>>(
   onFinish: (wizardValues: WizardValues) => void,
   onQuit: () => void,
 ): WizardContextApi<WizardValues> {
