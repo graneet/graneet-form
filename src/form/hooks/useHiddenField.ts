@@ -25,8 +25,9 @@ export function useHiddenField<T extends FieldValues, K extends keyof T>(
   name: K,
   form?: FormContextApi<T>,
 ): UseHiddenField<T, K> {
-  const { setFormValues } = useFormContext<T>();
-  const { [name]: value } = useOnChangeValues([name], form);
+  const formContext = useFormContext<T>();
+  const { setFormValues } = formContext;
+  const { [name]: value } = useOnChangeValues<T, K>([name], form || formContext);
 
   return useMemo(
     () => ({
