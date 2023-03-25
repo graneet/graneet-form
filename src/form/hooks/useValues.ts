@@ -67,7 +67,10 @@ function useValues<T extends FieldValues, K extends keyof T>(
  *   },[foo])
  * ```
  */
-export function useOnChangeValues<T extends FieldValues>(names?: undefined, form?: FormContextApi<T>): Partial<T>;
+export function useOnChangeValues<T extends FieldValues = Record<string, unknown>>(
+  names?: undefined,
+  form?: FormContextApi<T>,
+): Partial<T>;
 
 /**
  * Watch a list of registered fields with updates on change
@@ -82,7 +85,7 @@ export function useOnChangeValues<T extends FieldValues>(names?: undefined, form
  *   },[bar])
  * ```
  */
-export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
+export function useOnChangeValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
   names: K[],
   form?: FormContextApi<T>,
 ): FormValues<T, K>;
@@ -110,7 +113,10 @@ export function useOnChangeValues(names?: any, form?: any) {
  *   },[foo])
  * ```
  */
-export function useOnBlurValues<T extends FieldValues>(names?: undefined, form?: FormContextApi<T>): Partial<T>;
+export function useOnBlurValues<T extends FieldValues = Record<string, unknown>>(
+  names?: undefined,
+  form?: FormContextApi<T>,
+): Partial<T>;
 
 /**
  * Watch a list of registered fields with updates on blur
@@ -125,7 +131,7 @@ export function useOnBlurValues<T extends FieldValues>(names?: undefined, form?:
  *   },[bar])
  * ```
  */
-export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
+export function useOnBlurValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
   names: K[],
   form?: FormContextApi<T>,
 ): FormValues<T, K>;

@@ -34,9 +34,10 @@ interface UseStepFormApi<T extends FieldValues> {
  * )
  * ```
  */
-export function useStepForm<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues>(
-  props?: UseFormOptions<WizardValues[Step]>,
-): UseStepFormApi<WizardValues[Step]> {
+export function useStepForm<
+  WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>,
+  Step extends keyof WizardValues = '',
+>(props?: UseFormOptions<WizardValues[Step]>): UseStepFormApi<WizardValues[Step]> {
   const form = useForm(props);
   const {
     wizardInternal: { stepStatusSetter, setValuesGetterForCurrentStep },
