@@ -29,7 +29,9 @@ export interface UseFormOptions<T extends FieldValues> {
  * )
  * ```
  */
-export function useForm<T extends FieldValues>({ onUpdateAfterBlur }: UseFormOptions<T> = {}): FormContextApi<T> {
+export function useForm<T extends FieldValues = Record<string, Record<string, unknown>>>({
+  onUpdateAfterBlur,
+}: UseFormOptions<T> = {}): FormContextApi<T> {
   // -- TYPES --
   const globalTimeoutRef = useRef<Record<'errors' | 'values', Record<string, NodeJS.Timeout>>>({
     errors: {},
