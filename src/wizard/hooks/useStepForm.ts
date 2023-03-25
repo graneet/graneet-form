@@ -12,7 +12,7 @@ import { useWizardContext } from '../contexts/WizardContext';
 
 interface UseStepFormApi<T extends FieldValues> {
   form: FormContextApi<T>;
-  initFormValues: (initialValues: Partial<T>) => void;
+  initFormValues(initialValues: Partial<T>): void;
 }
 
 /**
