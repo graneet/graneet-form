@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.14](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.13...v2.0.0-beta.14) (2023-03-25)
+
+### Features
+
+- **deps:** bump all dependencies ([#38](https://github.com/graneet/graneet-form/issues/38)) ([588e98d](https://github.com/graneet/graneet-form/commits/588e98dd8fce38cbf8f5cec7cdc2218c6196710c))
+- export `FormContextApi` and `UseFormOptions` types ([#39](https://github.com/graneet/graneet-form/issues/39)) ([5240ec0](https://github.com/graneet/graneet-form/commits/5240ec092fe6dc3edd67979e6896595522efe2c4))
+- return by default record of unknown to ensure user use generics ([#36](https://github.com/graneet/graneet-form/issues/36)) ([07dbca9](https://github.com/graneet/graneet-form/commits/07dbca9ce005b10f772162fa35abdb399bcd1d5a))
+- upgrade all deps ([#35](https://github.com/graneet/graneet-form/issues/35)) ([bb5750c](https://github.com/graneet/graneet-form/commits/bb5750cb71beda22d1c03bfbb864dbce0a365a2d))
+
 ## [2.0.0-beta.13](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.12...v2.0.0-beta.13) (2022-12-29)
 
 ### Features
