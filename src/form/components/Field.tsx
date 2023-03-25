@@ -8,9 +8,9 @@ import { RuleContext } from '../contexts/RuleContext';
 export interface FieldRenderProps<T extends FieldValues, K extends keyof T> {
   name: K;
   value: T[K] | undefined;
-  onFocus: () => void;
-  onBlur: () => void;
-  onChange: (e: T[K] | undefined) => void;
+  onFocus(): void;
+  onBlur(): void;
+  onChange(e: T[K] | undefined): void;
 }
 
 export interface FieldRenderState {
@@ -21,7 +21,7 @@ export interface FieldRenderState {
 export interface FieldProps<T extends FieldValues, K extends keyof T> {
   name: K;
   children?: ReactNode;
-  render: (fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState) => JSX.Element | null;
+  render(fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState): JSX.Element | null;
   data?: AnyRecord;
 }
 

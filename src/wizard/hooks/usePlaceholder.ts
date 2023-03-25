@@ -4,8 +4,8 @@ import { PlaceholderContent } from '../types';
 import { useWizardContext } from '../contexts/WizardContext';
 
 interface UsePlaceholder {
-  handleOnNext: () => void;
-  handleOnPrevious: () => void;
+  handleOnNext(): void;
+  handleOnPrevious(): void;
   placeholderContent: PlaceholderContent;
   isLoading: boolean;
   stepStatus: VALIDATION_OUTCOME;
