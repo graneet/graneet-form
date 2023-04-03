@@ -46,7 +46,11 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     isRegistered: boolean;
   }
   const formStateRef = useRef<{ [K in keyof T]?: FieldState<K> }>({});
-  const fieldNameOnChangeByUserRef = useRef<keyof T | undefined>();
+  /**
+   * We can have multiple fields on update at the same time because of usage of effect, we trigger an on change event
+   * before triggering an on blur event.
+   */
+  const focusedFieldNamesRef = useRef(new Set<keyof T>());
 
   const handleFormSubmitRef = useRef<(formValues: Partial<T>) => void | Promise<void>>();
 
@@ -427,7 +431,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       }
       // Keep field name to know on blur if the field has been updated by user input
       if (hasFocus) {
-        fieldNameOnChangeByUserRef.current = name;
+        focusedFieldNamesRef.current.add(name);
       }
       // Update value in store
       formStateRef.current[name]!.value = value;
@@ -446,12 +450,12 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
       if (
         onUpdateAfterBlur &&
-        fieldNameOnChangeByUserRef.current === name &&
+        focusedFieldNamesRef.current.has(name) &&
         formStateRef.current[name]!.validation.status === VALIDATION_OUTCOME.VALID
       ) {
         await onUpdateAfterBlur(name, formStateRef.current[name]!.value, data, { getFormValues, setFormValues });
       }
-      fieldNameOnChangeByUserRef.current = undefined;
+      focusedFieldNamesRef.current.delete(name);
     },
     [updateValueSubscribers, onUpdateAfterBlur, getFormValues, setFormValues],
   );
