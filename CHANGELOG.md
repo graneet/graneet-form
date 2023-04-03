@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.15](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.14...v2.0.0-beta.15) (2023-04-03)
+
+### Features
+
+- **deps:** update all deps ([#41](https://github.com/graneet/graneet-form/issues/41)) ([5998df0](https://github.com/graneet/graneet-form/commits/5998df0fcbf63d0e17cb4c7e44a2c62231a91bcc))
+
+### Bug Fixes
+
+- use a Set instead of value to store focused field name to handle event race condition ([#40](https://github.com/graneet/graneet-form/issues/40)) ([c0fbe6d](https://github.com/graneet/graneet-form/commits/c0fbe6d8e7eb40ab20602d0fe061dd5d3a62680d))
+
 ## [2.0.0-beta.14](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.13...v2.0.0-beta.14) (2023-03-25)
 
 ### Features
