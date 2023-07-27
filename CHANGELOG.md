@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.16](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.15...v2.0.0-beta.16) (2023-07-27)
+
+### Features
+
+- add `handleGoBackTo` to wizard ([#44](https://github.com/graneet/graneet-form/issues/44)) ([83d81ef](https://github.com/graneet/graneet-form/commits/83d81effbba7e9163e4b016ba820ffea9f22f270))
+- **deps:** update all deps ([#42](https://github.com/graneet/graneet-form/issues/42)) ([e667dd4](https://github.com/graneet/graneet-form/commits/e667dd43e4565d75f7e72a68d0518044ac50070c))
+- **deps:** upgrade pnpm version in CI ([#43](https://github.com/graneet/graneet-form/issues/43)) ([752245f](https://github.com/graneet/graneet-form/commits/752245f6af32d322882e64a85b64740ce789ec59))
+
 ## [2.0.0-beta.15](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.14...v2.0.0-beta.15) (2023-04-03)
 
 ### Features
