@@ -181,8 +181,10 @@ export interface FormContextApi<T extends FieldValues> {
   handleSubmit(submitCallback: (formValues: Partial<T>) => void | Promise<void>): () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
-  getFormValuesForNames: () => ({} as FormValues<any, any>),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getFormValuesForNames: () => ({}) as FormValues<any, any>,
   getFormErrors: () => ({}),
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -203,6 +205,7 @@ export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
   getHandleFormSubmit: () => undefined,
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const CONTEXT_FORM_DEFAULT: FormContextApi<any> = {
   formInternal: FORM_INTERVAL_DEFAULT,
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -213,6 +216,7 @@ export const CONTEXT_FORM_DEFAULT: FormContextApi<any> = {
   handleSubmit: () => () => {},
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const FormContext = createContext<FormContextApi<any>>(CONTEXT_FORM_DEFAULT);
 
 /**

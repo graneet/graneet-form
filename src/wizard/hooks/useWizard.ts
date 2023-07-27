@@ -15,6 +15,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
   // -- STEP --
   const [currentStep, setCurrentStep] = useState<keyof WizardValues>();
   const [steps, setSteps] = useState<Array<keyof WizardValues>>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const validationFnsRef = useRef<PartialRecord<keyof WizardValues, StepValidator<WizardValues, any>>>({});
   const stepsWithoutFooterRef = useRef<Set<keyof WizardValues>>(new Set());
   const [isStepReady, setIsStepReady] = useState(false);
