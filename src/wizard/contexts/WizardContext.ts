@@ -95,6 +95,11 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
   };
 
   /**
+   * Go to a previous step
+   */
+  handleGoBackTo(previousStep: keyof WizardValues): void;
+
+  /**
    * Go to the next step if there is one or run onFinish function.
    */
   handleOnNext(): Promise<void>;
@@ -155,6 +160,7 @@ export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
     setIsStepReady: () => {},
     setValuesGetterForCurrentStep: () => {},
   },
+  handleGoBackTo: () => {},
   handleOnNext: async () => {},
   handleOnPrevious: () => {},
   steps: [],
