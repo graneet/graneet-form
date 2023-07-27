@@ -90,6 +90,7 @@ export function useOnChangeValues<T extends FieldValues = Record<string, unknown
   form?: FormContextApi<T>,
 ): FormValues<T, K>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useOnChangeValues(names?: any, form?: any) {
   if (typeof names !== 'undefined') {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -136,6 +137,7 @@ export function useOnBlurValues<T extends FieldValues = Record<string, unknown>,
   form?: FormContextApi<T>,
 ): FormValues<T, K>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useOnBlurValues(names?: any, form?: any) {
   if (typeof names !== 'undefined') {
     // eslint-disable-next-line react-hooks/rules-of-hooks

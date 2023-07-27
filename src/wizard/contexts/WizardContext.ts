@@ -166,6 +166,7 @@ export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
   stepsTitles: [],
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const WizardContext = createContext<WizardContextApi<any>>(CONTEXT_WIZARD_DEFAULT);
 export function useWizardContext<
   WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>,

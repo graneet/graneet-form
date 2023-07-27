@@ -60,6 +60,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     WATCH_MODE,
     {
       global: Set<Dispatch<SetStateAction<Partial<T>>>>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       scoped: PartialRecord<keyof T, Set<Dispatch<SetStateAction<FormValues<T, any>>>>>;
     }
   >;
@@ -105,12 +106,15 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
   const getFormValuesForNames = useCallback<FormInternal<T>['getFormValuesForNames']>(
     <K extends keyof T>(names: K[]): FormValues<T, K> => {
-      return names.reduce<FormValues<T, K>>((acc, name) => {
-        if (formStateRef.current[name]?.isRegistered) {
-          acc[name] = formStateRef.current[name]?.value;
-        }
-        return acc;
-      }, {} as FormValues<T, K>);
+      return names.reduce<FormValues<T, K>>(
+        (acc, name) => {
+          if (formStateRef.current[name]?.isRegistered) {
+            acc[name] = formStateRef.current[name]?.value;
+          }
+          return acc;
+        },
+        {} as FormValues<T, K>,
+      );
     },
     [],
   );
@@ -126,12 +130,15 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
   const getFormErrorsForNames = useCallback<FormInternal<T>['getFormErrorsForNames']>(
     <K extends keyof T>(names: K[]): Record<K, ValidationStatus | undefined> => {
-      return names.reduce<Record<K, ValidationStatus | undefined>>((acc, name) => {
-        if (formStateRef.current[name]?.isRegistered) {
-          acc[name] = formStateRef.current[name]?.validation;
-        }
-        return acc;
-      }, {} as Record<K, ValidationStatus | undefined>);
+      return names.reduce<Record<K, ValidationStatus | undefined>>(
+        (acc, name) => {
+          if (formStateRef.current[name]?.isRegistered) {
+            acc[name] = formStateRef.current[name]?.validation;
+          }
+          return acc;
+        },
+        {} as Record<K, ValidationStatus | undefined>,
+      );
     },
     [],
   );
@@ -295,6 +302,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
           formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name] = new Set();
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]?.add(publish as any);
         publish(getFormErrorsForNames(names));
       });
