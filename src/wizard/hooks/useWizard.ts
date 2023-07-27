@@ -130,6 +130,24 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     [hasNextStep, hasPreviousStep],
   );
 
+  const handleGoBackTo = useCallback<WizardContextApi<WizardValues>['handleGoBackTo']>(
+    (previousStep) => {
+      if (!currentStep) {
+        return;
+      }
+
+      const currentStepIndex = steps.indexOf(currentStep);
+      const targetStepIndex = steps.indexOf(previousStep);
+
+      if (currentStepIndex > targetStepIndex) {
+        setIsStepReady(false);
+        saveValuesOfCurrentStepInWizardValues();
+        setTimeout(() => setCurrentStep(steps[targetStepIndex]), 0);
+      }
+    },
+    [currentStep, saveValuesOfCurrentStepInWizardValues, steps],
+  );
+
   const handleOnNext = useCallback<WizardContextApi<WizardValues>['handleOnNext']>(async (): Promise<void> => {
     if (!currentStep) {
       return;
@@ -242,6 +260,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       currentStep,
       handleOnNext,
       handleOnPrevious,
+      handleGoBackTo,
       isStepReady,
       getValuesOfCurrentStep,
       getValuesOfStep,
