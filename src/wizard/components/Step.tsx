@@ -30,13 +30,10 @@ export interface StepProps<WizardValues extends Record<string, FieldValues>, Ste
  * </Wizard
  * ``
  */
-export function Step<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues>({
-  children,
-  name,
-  onNext,
-  noFooter,
-  title,
-}: StepProps<WizardValues, Step>) {
+export function Step<
+  WizardValues extends Record<string, FieldValues> = Record<never, FieldValues>,
+  Step extends keyof WizardValues = keyof WizardValues,
+>({ children, name, onNext, noFooter, title }: StepProps<WizardValues, Step>) {
   const wizard = useWizardContext<WizardValues>();
 
   const {
@@ -44,7 +41,7 @@ export function Step<WizardValues extends Record<string, FieldValues>, Step exte
     wizardInternal: { registerStep, unregisterStep, setIsStepReady },
   } = wizard;
 
-  // When Step is used outside of wizard context, it will throw an error
+  // When Step is used outside wizard context, it will throw an error
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   if (wizard === CONTEXT_WIZARD_DEFAULT) {
