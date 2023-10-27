@@ -178,7 +178,7 @@ export interface FormContextApi<T extends FieldValues> {
    * Wrapper to handle form submit
    * @param submitCallback Callback executed when form is sent
    */
-  handleSubmit(submitCallback: (formValues: Partial<T>) => void | Promise<void>): () => void;
+  experimental_handleSubmit(submitCallback: (formValues: Partial<T>) => void | Promise<void>): () => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -213,7 +213,7 @@ export const CONTEXT_FORM_DEFAULT: FormContextApi<any> = {
   getFormValues: () => ({}),
   setFormValues: () => {},
   resetForm: () => {},
-  handleSubmit: () => () => {},
+  experimental_handleSubmit: () => () => {},
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
