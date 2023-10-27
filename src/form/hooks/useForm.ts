@@ -482,7 +482,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
   const resetForm = useCallback<FormContextApi<T>['resetForm']>((): void => setFormValues({}, true), [setFormValues]);
 
-  const handleSubmit = useCallback<FormContextApi<T>['handleSubmit']>(
+  const handleSubmit = useCallback<FormContextApi<T>['experimental_handleSubmit']>(
     (submitCallback: (formValues: Partial<T>) => void | Promise<void>) => () => {
       handleFormSubmitRef.current = submitCallback;
     },
@@ -515,7 +515,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       getFormValues,
       resetForm,
       setFormValues,
-      handleSubmit,
+      experimental_handleSubmit: handleSubmit,
     }),
     [
       registerField,
