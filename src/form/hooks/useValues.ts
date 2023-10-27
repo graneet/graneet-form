@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FieldValues } from '../../shared';
+import { FieldValues, Prettify } from '../../shared';
 import { FormContextApi } from '../contexts/FormContext';
 import { FormValues } from '../types/FormValues';
 import { WATCH_MODE } from '../types/WatchMode';
@@ -80,7 +80,7 @@ export function useOnChangeValues<T extends FieldValues = Record<string, unknown
 export function useOnChangeValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
   names: K[],
   form: FormContextApi<T>,
-): FormValues<T, K>;
+): Prettify<FormValues<T, K>>;
 
 export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
   names: K[] | undefined,
@@ -131,7 +131,7 @@ export function useOnBlurValues<T extends FieldValues = Record<string, unknown>>
 export function useOnBlurValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
   names: K[],
   form: FormContextApi<T>,
-): FormValues<T, K>;
+): Prettify<FormValues<T, K>>;
 
 export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
   names: K[] | undefined,
