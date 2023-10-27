@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.17](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.16...v2.0.0-beta.17) (2023-10-27)
+
+### Features
+
+- prefix unstable function with "experimental\_" ([#49](https://github.com/graneet/graneet-form/issues/49)) ([a8eb2af](https://github.com/graneet/graneet-form/commits/a8eb2afb2f41442b9f0abfdb472093307c55f44c))
+- update `useHiddenField`, `useOnChangeValues` and `useOnBlurValues` to have the form as a required parameters ([#45](https://github.com/graneet/graneet-form/issues/45)) ([a37b383](https://github.com/graneet/graneet-form/commits/a37b383692505382d4248fc1bb763cd96602fe7b))
+- update all deps to latest version ([#46](https://github.com/graneet/graneet-form/issues/46)) ([f34a959](https://github.com/graneet/graneet-form/commits/f34a9593a690088559dfb45cdb08f4b66327eda3))
+
+### Bug Fixes
+
+- generics of Step ([#47](https://github.com/graneet/graneet-form/issues/47)) ([f04d1d7](https://github.com/graneet/graneet-form/commits/f04d1d7cb392274f42e2c9b2fc7bbd7668d136a4))
+- use Prettify type on onchange hooks ([#48](https://github.com/graneet/graneet-form/issues/48)) ([71ed0e8](https://github.com/graneet/graneet-form/commits/71ed0e80022e62a094ef4bea9172927b0e69ff99))
+
 ## [2.0.0-beta.16](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.15...v2.0.0-beta.16) (2023-07-27)
 
 ### Features
