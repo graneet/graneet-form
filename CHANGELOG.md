@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.18](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.17...v2.0.0-beta.18) (2023-10-29)
+
+### Bug Fixes
+
+- infer second generic of hidden field ([#50](https://github.com/graneet/graneet-form/issues/50)) ([55924b5](https://github.com/graneet/graneet-form/commits/55924b59f129758c750713c85284ebc482f1c6bb))
+
 ## [2.0.0-beta.17](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.16...v2.0.0-beta.17) (2023-10-27)
 
 ### Features
