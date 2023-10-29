@@ -19,7 +19,7 @@ interface HiddenFieldProps<T extends FieldValues, K extends keyof T> {
  * )
  * ```
  */
-export function HiddenField<T extends FieldValues, K extends keyof T>({
+export function HiddenField<T extends FieldValues, K extends keyof T = keyof T>({
   children = null,
   ...props
 }: HiddenFieldProps<T, K>) {
