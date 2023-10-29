@@ -6,8 +6,18 @@ import { useOnChangeValues } from './useValues';
 export interface UseHiddenField<T extends FieldValues, K extends keyof T> {
   name: K;
   value: T[K] | undefined;
-  setValue: (newValue: T[K]) => void;
+  setValue(newValue: T[K]): void;
 }
+
+export function useHiddenField<T extends FieldValues, K extends keyof T>(
+  name: K | FormContextApi<T>,
+  form: FormContextApi<T>,
+): UseHiddenField<T, K>;
+
+export function useHiddenField<T extends FieldValues, K extends keyof T>(
+  name: K,
+  form: FormContextApi<T> | K,
+): UseHiddenField<T, K>;
 
 /**
  * Hook to use in association to HiddenField
@@ -16,26 +26,31 @@ export interface UseHiddenField<T extends FieldValues, K extends keyof T> {
  * @example
  * ```
  * const fooHiddenField = useHiddenField('foo');
- * return (
- *  <HiddenField {...fooHiddenField} />
- * )
+ * return <HiddenField {...fooHiddenField} />
  * ```
  */
 export function useHiddenField<T extends FieldValues, K extends keyof T>(
-  name: K,
-  form: FormContextApi<T>,
+  name: K | FormContextApi<T>,
+  form: K | FormContextApi<T>,
 ): UseHiddenField<T, K> {
-  const { [name]: value } = useOnChangeValues([name], form);
+  // TODO delete this when form is always the first param
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const internalForm: any = !!name && typeof name === 'object' && 'formInternal' in name ? name : form;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const internalName: any = !!name && typeof name === 'object' && 'formInternal' in name ? form : name;
+
+  const { [internalName]: value } = useOnChangeValues(internalForm, [internalName]);
 
   return useMemo(
     () => ({
-      name,
-      value,
+      name: internalName,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      value: value as any,
       setValue: (newValue) => {
-        const objectValue = { [name]: newValue } as unknown as Partial<T>;
-        return form.setFormValues(objectValue);
+        const objectValue = { [internalName]: newValue } as unknown as Partial<T>;
+        return internalForm.setFormValues(objectValue);
       },
     }),
-    [name, value, form],
+    [internalName, value, internalForm],
   );
 }

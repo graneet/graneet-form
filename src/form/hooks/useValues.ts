@@ -46,8 +46,7 @@ function useValues<T extends FieldValues, K extends keyof T>(
 
 /**
  * Watch all registered fields with updates on change
- * @param names
- * @param form
+ * @deprecated use `useOnChangeValues(form, undefined)` instead
  * @example
  * ```
  *  const form = useFormContext();
@@ -55,7 +54,7 @@ function useValues<T extends FieldValues, K extends keyof T>(
  *
  *   useEffect(() => {
  *     console.log('"Foo" value has changed for', foo);
- *   },[foo])
+ *   }, [foo])
  * ```
  */
 export function useOnChangeValues<T extends FieldValues = Record<string, unknown>>(
@@ -64,9 +63,27 @@ export function useOnChangeValues<T extends FieldValues = Record<string, unknown
 ): Partial<T>;
 
 /**
+ * Watch all registered fields with updates on change
+ * @example
+ * ```
+ *  const form = useFormContext();
+ *   const { foo, bar } = useOnBlurValues(form, undefined);
+ *
+ *   useEffect(() => {
+ *     console.log('"Foo" value has changed for', foo);
+ *   }, [foo])
+ * ```
+ */
+export function useOnChangeValues<T extends FieldValues = Record<string, unknown>>(
+  form: FormContextApi<T>,
+  names: undefined,
+): Partial<T>;
+
+/**
  * Watch a list of registered fields with updates on change
  * @param names List of watched field names
  * @param form
+ * @deprecated use `useOnChangeValues(form, names)` instead
  * @example
  * ```
  *   const form = useFormContext();
@@ -74,7 +91,7 @@ export function useOnChangeValues<T extends FieldValues = Record<string, unknown
  *
  *   useEffect(() => {
  *    console.log('"bar" value has changed for', bar);
- *   },[bar])
+ *   }, [bar])
  * ```
  */
 export function useOnChangeValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
@@ -82,23 +99,47 @@ export function useOnChangeValues<T extends FieldValues = Record<string, unknown
   form: FormContextApi<T>,
 ): Prettify<FormValues<T, K>>;
 
-export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
-  names: K[] | undefined,
+/**
+ * Watch a list of registered fields with updates on change
+ * @param form
+ * @param names List of watched field names
+ * @example
+ * ```
+ *   const form = useFormContext();
+ *   const { bar } = useOnBlurValues(form, ['bar']);
+ *
+ *   useEffect(() => {
+ *    console.log('"bar" value has changed for', bar);
+ *   }, [bar])
+ * ```
+ */
+export function useOnChangeValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
   form: FormContextApi<T>,
+  names: K[],
+): Prettify<FormValues<T, K>>;
+
+export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
+  names: K[] | undefined | FormContextApi<T>,
+  form: FormContextApi<T> | K[] | undefined,
 ) {
+  // TODO delete this when form is always the first param
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const internalForm: any = !!names && 'formInternal' in names ? names : form;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const internalNames: any = !!names && 'formInternal' in names ? form : names;
+
   if (typeof names !== 'undefined') {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useValues(WATCH_MODE.ON_CHANGE, form, names);
+    return useValues(WATCH_MODE.ON_CHANGE, internalForm, internalNames);
   }
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  return useGlobalValues(WATCH_MODE.ON_CHANGE, form);
+  return useGlobalValues(WATCH_MODE.ON_CHANGE, internalForm);
 }
 
 /**
  * Watch all registered fields with updates on blur
- * @param names
- * @param form
+ * @deprecated useOnBlurValues(form, undefined)
  * @example
  * ```
  *  const form = useFormContext();
@@ -106,7 +147,7 @@ export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
  *
  *   useEffect(() => {
  *     console.log('"Foo" value has changed for', foo);
- *   },[foo])
+ *   }, [foo])
  * ```
  */
 export function useOnBlurValues<T extends FieldValues = Record<string, unknown>>(
@@ -115,9 +156,27 @@ export function useOnBlurValues<T extends FieldValues = Record<string, unknown>>
 ): Partial<T>;
 
 /**
+ * Watch all registered fields with updates on blur
+ * @example
+ * ```
+ *  const form = useFormContext();
+ *   const { foo, bar } = useOnBlurValues(form, undefined);
+ *
+ *   useEffect(() => {
+ *     console.log('"Foo" value has changed for', foo);
+ *   }, [foo])
+ * ```
+ */
+export function useOnBlurValues<T extends FieldValues = Record<string, unknown>>(
+  form: FormContextApi<T>,
+  names: undefined,
+): Partial<T>;
+
+/**
  * Watch a list of registered fields with updates on blur
  * @param names List of watched field names
- * @param form You can give a FormContext if the hook is not in `Form`
+ * @param form
+ * @deprecated useOnBlurValues(form, names)
  * @example
  * ```
  *   const form = useFormContext();
@@ -125,7 +184,7 @@ export function useOnBlurValues<T extends FieldValues = Record<string, unknown>>
  *
  *   useEffect(() => {
  *    console.log('"bar" value has changed for', bar);
- *   },[bar])
+ *   }, [bar])
  * ```
  */
 export function useOnBlurValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
@@ -133,15 +192,40 @@ export function useOnBlurValues<T extends FieldValues = Record<string, unknown>,
   form: FormContextApi<T>,
 ): Prettify<FormValues<T, K>>;
 
-export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
-  names: K[] | undefined,
+/**
+ * Watch a list of registered fields with updates on blur
+ * @param names List of watched field names
+ * @param form
+ * @example
+ * ```
+ *   const form = useFormContext();
+ *   const { bar } = useOnBlurValues(['bar'], form);
+ *
+ *   useEffect(() => {
+ *    console.log('"bar" value has changed for', bar);
+ *   }, [bar])
+ * ```
+ */
+export function useOnBlurValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
   form: FormContextApi<T>,
+  names: K[],
+): Prettify<FormValues<T, K>>;
+
+export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
+  names: K[] | undefined | FormContextApi<T>,
+  form: FormContextApi<T> | K[] | undefined,
 ) {
+  // TODO delete this when form is always the first param
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const internalForm: any = !!names && 'formInternal' in names ? names : form;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const internalNames: any = !!names && 'formInternal' in names ? form : names;
+
   if (typeof names !== 'undefined') {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useValues(WATCH_MODE.ON_BLUR, form, names);
+    return useValues(WATCH_MODE.ON_BLUR, internalForm, internalNames);
   }
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  return useGlobalValues(WATCH_MODE.ON_BLUR, form);
+  return useGlobalValues(WATCH_MODE.ON_BLUR, internalForm);
 }
