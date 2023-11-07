@@ -9,26 +9,6 @@ export interface UseHiddenField<T extends FieldValues, K extends keyof T> {
   setValue(newValue: T[K]): void;
 }
 
-export function useHiddenField<T extends FieldValues, K extends keyof T>(
-  name: K | FormContextApi<T>,
-  form: FormContextApi<T>,
-): UseHiddenField<T, K>;
-
-export function useHiddenField<T extends FieldValues, K extends keyof T>(
-  name: K,
-  form: FormContextApi<T> | K,
-): UseHiddenField<T, K>;
-
-export function useHiddenField<T extends FieldValues, K extends keyof T>(
-  form: FormContextApi<T>,
-  name: K | FormContextApi<T>,
-): UseHiddenField<T, K>;
-
-export function useHiddenField<T extends FieldValues, K extends keyof T>(
-  form: FormContextApi<T> | K,
-  name: K,
-): UseHiddenField<T, K>;
-
 /**
  * Hook to use in association to HiddenField
  * @param name Field name
@@ -40,27 +20,21 @@ export function useHiddenField<T extends FieldValues, K extends keyof T>(
  * ```
  */
 export function useHiddenField<T extends FieldValues, K extends keyof T>(
-  name: K | FormContextApi<T>,
-  form: K | FormContextApi<T>,
+  form: FormContextApi<T>,
+  name: K,
 ): UseHiddenField<T, K> {
-  // TODO delete this when form is always the first param
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const internalForm: any = !!name && typeof name === 'object' && 'formInternal' in name ? name : form;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const internalName: any = !!name && typeof name === 'object' && 'formInternal' in name ? form : name;
-
-  const { [internalName]: value } = useOnChangeValues(internalForm, [internalName]);
+  const { [name]: value } = useOnChangeValues(form, [name]);
 
   return useMemo(
     () => ({
-      name: internalName,
+      name,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       value: value as any,
       setValue: (newValue) => {
-        const objectValue = { [internalName]: newValue } as unknown as Partial<T>;
-        return internalForm.setFormValues(objectValue);
+        const objectValue = { [name]: newValue } as unknown as Partial<T>;
+        return form.setFormValues(objectValue);
       },
     }),
-    [internalName, value, internalForm],
+    [form, name, value],
   );
 }
