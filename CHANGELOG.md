@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.21](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.20...v2.0.0-beta.21) (2023-11-07)
+
+### ⚠ BREAKING CHANGES
+
+- remove deprecated usages (#54)
+
+### Features
+
+- remove deprecated usages ([#54](https://github.com/graneet/graneet-form/issues/54)) ([2d6d911](https://github.com/graneet/graneet-form/commits/2d6d911d750944daa6280acf859cd2fd3e48b07c))
+
 ## [2.0.0-beta.20](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.19...v2.0.0-beta.20) (2023-11-07)
 
 ### Bug Fixes
