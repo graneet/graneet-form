@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.19](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.18...v2.0.0-beta.19) (2023-11-07)
+
+### Features
+
+- add `isValid` to replace `isFormValid` ([#51](https://github.com/graneet/graneet-form/issues/51)) ([c241991](https://github.com/graneet/graneet-form/commits/c241991bbb207c2a5fedc3efcee6e2e5772029d1))
+- inverse params of `useOnChangeValues`, `useOnBlurValues` and `useHiddenField` ([#52](https://github.com/graneet/graneet-form/issues/52)) ([a50cfa9](https://github.com/graneet/graneet-form/commits/a50cfa926b2145489a04fcb82537efc2c3c7c0f3))
+
 ## [2.0.0-beta.18](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.17...v2.0.0-beta.18) (2023-10-29)
 
 ### Bug Fixes
