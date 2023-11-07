@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.20](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.19...v2.0.0-beta.20) (2023-11-07)
+
+### Bug Fixes
+
+- add missing useHiddenField types ([#53](https://github.com/graneet/graneet-form/issues/53)) ([7cadf80](https://github.com/graneet/graneet-form/commits/7cadf806cbac50caf2ab80b161cf5c642f27ade4))
+
 ## [2.0.0-beta.19](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.18...v2.0.0-beta.19) (2023-11-07)
 
 ### Features
