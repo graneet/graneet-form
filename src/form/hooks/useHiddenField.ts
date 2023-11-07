@@ -19,6 +19,16 @@ export function useHiddenField<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T> | K,
 ): UseHiddenField<T, K>;
 
+export function useHiddenField<T extends FieldValues, K extends keyof T>(
+  form: FormContextApi<T>,
+  name: K | FormContextApi<T>,
+): UseHiddenField<T, K>;
+
+export function useHiddenField<T extends FieldValues, K extends keyof T>(
+  form: FormContextApi<T> | K,
+  name: K,
+): UseHiddenField<T, K>;
+
 /**
  * Hook to use in association to HiddenField
  * @param name Field name
