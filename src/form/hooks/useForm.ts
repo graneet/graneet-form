@@ -17,16 +17,22 @@ export interface UseFormOptions<T extends FieldValues> {
 }
 
 /**
- * Generate form object used by `Form`
+ * Hook to define a form
+
  * @example
- * ```
+ * ```tsx
+ *
+ * interface FormValues {
+ *   name: string
+ * }
+ *
+ * // in the component
  * const form = useForm();
  *
- * return(
- *   <Form form={form}>
- *     <TextInput name="name" />
- *   </Form>
- * )
+ * // in the JSX component
+ * <Form form={form}>
+ *   <TextInput<FormValues> name="name" />
+ * </Form>
  * ```
  */
 export function useForm<T extends FieldValues = Record<string, Record<string, unknown>>>({

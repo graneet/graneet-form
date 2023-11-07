@@ -12,14 +12,17 @@ interface RuleProps {
    */
   message: string;
   /**
-   * Is validation function run with debounce
+   * Is validation function run with debouncing
    */
   isDebounced?: boolean;
 }
 
 /**
+ * Registers a validation rule with the given message and validation function.
+ * Optionally, the rule can be debounced.
+ *
  * @example
- * ```
+ * ```tsx
  * <TextField name="foo">
  *  <Rule
  *    message="REQUIRED"

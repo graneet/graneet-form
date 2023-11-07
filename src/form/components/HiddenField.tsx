@@ -3,20 +3,35 @@ import { FieldValues } from '../../shared';
 import { Field } from './Field';
 
 interface HiddenFieldProps<T extends FieldValues, K extends keyof T> {
+  /**
+   * The name of the field.
+   */
   name: K;
+
+  /**
+   * Rules
+   */
   children?: ReactNode;
 }
 
 /**
- * HiddenField, need to be used with useHiddenField hook
- * @param name - Field name
- * @param children - Rules (optional)
+ * A function component that renders a form field that is hidden from the user.
  * @example
- * ```
- * const fooHiddenField = useHiddenField('foo');
- * return (
- *  <HiddenField {...fooHiddenField} />
- * )
+ * ```tsx
+ * // Import the component
+ * import {HiddenField} from './HiddenField';
+ *
+ * // Define form field values type
+ * interface FormFieldValues {
+ *  field1: string;
+ *  field2: number;
+ * }
+ *
+ * // Usage
+ * <HiddenField<FormFieldValues, 'field1'>
+ *  name="field1"
+ *  id="hidden-field"
+ * />
  * ```
  */
 export function HiddenField<T extends FieldValues, K extends keyof T = keyof T>({

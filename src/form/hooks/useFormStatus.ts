@@ -4,13 +4,19 @@ import { useValidations } from './useValidations';
 import { FormContextApi } from '../contexts/FormContext';
 
 interface FormStatus {
+  /**
+   * The current status of a form's validation outcome.
+   */
   formStatus: VALIDATION_OUTCOME;
+
+  /**
+   * Indicates whether the form is considered valid or not.
+   */
   isValid: boolean;
 }
 
 /**
- * Hook to watch form status.
- * @param form form to use. If it's not given, form context is used.
+ * Retrieves the status of a form and its validation outcomes
  */
 export function useFormStatus<T extends FieldValues>(form: FormContextApi<T>): FormStatus {
   const validations = useValidations(form, undefined);

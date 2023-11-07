@@ -19,29 +19,38 @@ export interface FieldRenderState {
 }
 
 export interface FieldProps<T extends FieldValues, K extends keyof T> {
+  /**
+   * The name of the field.
+   */
   name: K;
+
+  /**
+   * Rules
+   */
   children?: ReactNode;
-  render(fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState): JSX.Element | null;
+
+  /**
+   * The function used to render the field component
+   */
+  render(fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState): ReactNode | null;
+
   data?: AnyRecord;
 }
 
 /**
- * Component to integrate a form content in the form system. Every component like input,
- * checkbox has to be rendered by this component
- * @param name - Name of the field, used as identifier
- * @param children Rules (optional)
- * @param render Function to render
- * @param data data transmitted to onUpdateAfterBlur
+ * Represents a field in a form.
  * @example
- * ```
- * <Field
- *    name="foo"
- *    render={(props) => {
- *    const { onChange, ...rest } = props;
- *      return (<input {...rest} onChange={(e) => onChange(e.target.value)} />);
- *    }}
- *  >
- *    {children}
+ * ```tsx
+ * <Field name="userName">
+ *   {(fieldProps, fieldStatus) => (
+ *     <input
+ *        name={fieldProps.name}
+ *        value={fieldProps.value || ''}
+ *        onBlur={fieldProps.onBlur}
+ *        onFocus={fieldProps.onFocus}
+ *        onChange={(e) => fieldProps.onChange(e.target.value)}
+ *     />
+ *   )}
  * </Field>
  * ```
  */

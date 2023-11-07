@@ -10,7 +10,7 @@ interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLF
 /**
  * Context to handle Form. Similar to <form> but using React Context
  * @example
- * ```
+ * ```tsx
  * const form = useForm():
  *
  * return (
