@@ -10,10 +10,10 @@ interface FormStatus {
 
 /**
  * Hook to watch form status.
- * @param form (optional) form to use. If it's not given, form context is used.
+ * @param form form to use. If it's not given, form context is used.
  */
-export function useFormStatus<T extends FieldValues>(form?: FormContextApi<T>): FormStatus {
-  const validations = useValidations<T>(undefined, form);
+export function useFormStatus<T extends FieldValues>(form: FormContextApi<T>): FormStatus {
+  const validations = useValidations(form, undefined);
   const [status, setStatus] = useState(VALIDATION_OUTCOME.UNDETERMINED);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FieldValues, Prettify } from '../../shared';
-import { FormContextApi } from '../contexts/FormContext';
+import { CONTEXT_FORM_DEFAULT, FormContextApi } from '../contexts/FormContext';
 import { FormValues } from '../types/FormValues';
 import { WATCH_MODE } from '../types/WatchMode';
 
@@ -12,6 +12,10 @@ function useGlobalValues<T extends FieldValues>(watchMode: WATCH_MODE, form: For
     formInternal: { addGlobalValueSubscriber, removeGlobalValueSubscriber },
   } = form;
   const [currentValues, setCurrentValues] = useState<Partial<T>>({});
+
+  if (form === CONTEXT_FORM_DEFAULT) {
+    throw new Error('No form context could be found.');
+  }
 
   useEffect(() => {
     addGlobalValueSubscriber(setCurrentValues, watchMode);
@@ -33,6 +37,10 @@ function useValues<T extends FieldValues, K extends keyof T>(
     formInternal: { addValueSubscriber, removeValueSubscriber },
   } = form;
   const [currentValues, setCurrentValues] = useState<FormValues<T, K>>({} as FormValues<T, K>);
+
+  if (form === CONTEXT_FORM_DEFAULT) {
+    throw new Error('No form context could be found.');
+  }
 
   useEffect(() => {
     addValueSubscriber(setCurrentValues, watchMode, names);
@@ -84,13 +92,13 @@ export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T>,
   names: K[] | undefined,
 ) {
-  if (typeof names !== 'undefined') {
+  if (names === undefined) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useValues(WATCH_MODE.ON_CHANGE, form, names);
+    return useGlobalValues(WATCH_MODE.ON_CHANGE, form);
   }
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  return useGlobalValues(WATCH_MODE.ON_CHANGE, form);
+  return useValues(WATCH_MODE.ON_CHANGE, form, names);
 }
 
 /**
@@ -133,11 +141,11 @@ export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T>,
   names: K[] | undefined,
 ) {
-  if (typeof names !== 'undefined') {
+  if (names === undefined) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useValues(WATCH_MODE.ON_BLUR, form, names);
+    return useGlobalValues(WATCH_MODE.ON_BLUR, form);
   }
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  return useGlobalValues(WATCH_MODE.ON_BLUR, form);
+  return useValues(WATCH_MODE.ON_BLUR, form, names);
 }
