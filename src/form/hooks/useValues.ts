@@ -53,15 +53,20 @@ function useValues<T extends FieldValues, K extends keyof T>(
 }
 
 /**
- * Watch all registered fields with updates on change
- * @example
- * ```
- *  const form = useFormContext();
- *   const { foo, bar } = useOnBlurValues(form, undefined);
+ * Watch all fields values. Values are updated on change.
  *
+ * @example
+ * ```tsx
+ * interface FormValues {
+ *  foo: string
+ *  bar: number
+ * }
+ *
+ *  // in your component
+ *  const { foo, bar } = useOnChangeValues<FormValues>(form, undefined);
  *   useEffect(() => {
- *     console.log('"Foo" value has changed for', foo);
- *   }, [foo])
+ *     console.log(foo, bar);
+ *   }, [foo, bar])
  * ```
  */
 export function useOnChangeValues<T extends FieldValues = Record<string, unknown>>(
@@ -70,17 +75,21 @@ export function useOnChangeValues<T extends FieldValues = Record<string, unknown
 ): Partial<T>;
 
 /**
- * Watch a list of registered fields with updates on change
- * @param form
- * @param names List of watched field names
- * @example
- * ```
- *   const form = useFormContext();
- *   const { bar } = useOnBlurValues(form, ['bar']);
+ * Watch a list of fields values. Values are updated on change.
+ * Watching a list of fields instead of all fields can be a huge performance improvement.
  *
+ * @example
+ * ```tsx
+ * interface FormValues {
+ *  foo: string
+ *  bar: number
+ * }
+ *
+ *  // in your component
+ *  const { foo } = useOnChangeValues<FormValues>(form, ['foo']);
  *   useEffect(() => {
- *    console.log('"bar" value has changed for', bar);
- *   }, [bar])
+ *     console.log(foo);
+ *   }, [foo, bar])
  * ```
  */
 export function useOnChangeValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
@@ -102,15 +111,20 @@ export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
 }
 
 /**
- * Watch all registered fields with updates on blur
- * @example
- * ```
- *  const form = useFormContext();
- *   const { foo, bar } = useOnBlurValues(form, undefined);
+ * Watch all fields values. Values are updated on blur.
  *
+ * @example
+ * ```tsx
+ * interface FormValues {
+ *  foo: string
+ *  bar: number
+ * }
+ *
+ *  // in your component
+ *  const { foo, bar } = useOnBlurValues<FormValues>(form, undefined);
  *   useEffect(() => {
- *     console.log('"Foo" value has changed for', foo);
- *   }, [foo])
+ *     console.log(foo, bar);
+ *   }, [foo, bar])
  * ```
  */
 export function useOnBlurValues<T extends FieldValues = Record<string, unknown>>(
@@ -119,17 +133,21 @@ export function useOnBlurValues<T extends FieldValues = Record<string, unknown>>
 ): Partial<T>;
 
 /**
- * Watch a list of registered fields with updates on blur
- * @param names List of watched field names
- * @param form
- * @example
- * ```
- *   const form = useFormContext();
- *   const { bar } = useOnBlurValues(['bar'], form);
+ * Watch a list of fields values. Values are updated on blur.
+ * Watching a list of fields instead of all fields can be a huge performance improvement.
  *
+ * @example
+ * ```tsx
+ * interface FormValues {
+ *  foo: string
+ *  bar: number
+ * }
+ *
+ *  // in your component
+ *  const { foo } = useOnBlurValues<FormValues>(form, ['foo']);
  *   useEffect(() => {
- *    console.log('"bar" value has changed for', bar);
- *   }, [bar])
+ *     console.log(foo);
+ *   }, [foo, bar])
  * ```
  */
 export function useOnBlurValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(

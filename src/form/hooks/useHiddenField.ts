@@ -4,17 +4,27 @@ import { FormContextApi } from '../contexts/FormContext';
 import { useOnChangeValues } from './useValues';
 
 export interface UseHiddenField<T extends FieldValues, K extends keyof T> {
+  /**
+   * The name of the field.
+   */
   name: K;
+
+  /**
+   * Field value
+   */
   value: T[K] | undefined;
+
+  /**
+   * Callback to update hidden field
+   * @param newValue
+   */
   setValue(newValue: T[K]): void;
 }
 
 /**
  * Hook to use in association to HiddenField
- * @param name Field name
- * @param form
  * @example
- * ```
+ * ```tsx
  * const fooHiddenField = useHiddenField('foo');
  * return <HiddenField {...fooHiddenField} />
  * ```

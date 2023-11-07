@@ -49,11 +49,16 @@ function useValidationsInternal<T extends FieldValues, K extends keyof T>(
 
 /**
  * Watch all registered fields errors
- * @param form
- * @param names undefined
+ *
  * @example
- * ```
- *  const { foo, bar } = useValidations(form, undefined);
+ * ```tsx
+ * interface FormValues {
+ *  foo: string
+ *  bar: number
+ * }
+ *
+ *  // in your component
+ *  const { foo, bar } = useValidations<FormValues>(form, undefined);
  *   useEffect(() => {
  *     console.log(foo, bar);
  *   }, [foo, bar])
@@ -65,15 +70,20 @@ export function useValidations<T extends FieldValues>(
 ): PartialRecord<keyof T, ValidationStatus | undefined>;
 
 /**
- * Watch a list of registered fields errors
- * @param form
- * @param names List of watched field names
+ * Watch a list of fields errors
+ *
  * @example
- * ```
- * const { foo } = useValidations(form, ['foo']);
+ * ```tsx
+ * interface FormValues {
+ *  foo: string
+ *  bar: number
+ * }
+ *
+ *  // in your component
+ *  const { foo } = useValidations<FormValues>(form, [foo]);
  *   useEffect(() => {
  *     console.log(foo);
- *   }, [foo])
+ *   }, [foo, bar])
  * ```
  */
 export function useValidations<T extends FieldValues, K extends keyof T>(
