@@ -5,10 +5,6 @@ import { FormContextApi } from '../contexts/FormContext';
 
 interface FormStatus {
   formStatus: VALIDATION_OUTCOME;
-  /**
-   * @deprecated use `isValid` instead
-   */
-  isFormValid: boolean;
   isValid: boolean;
 }
 
@@ -27,7 +23,6 @@ export function useFormStatus<T extends FieldValues>(form?: FormContextApi<T>): 
   return useMemo(
     () => ({
       formStatus: status,
-      isFormValid: status === VALIDATION_OUTCOME.VALID,
       isValid: status === VALIDATION_OUTCOME.VALID,
     }),
     [status],
