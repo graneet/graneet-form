@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.24](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.23...v2.0.0-beta.24) (2023-11-13)
+
+### Features
+
+- revert some changes related to build ([9ed2d04](https://github.com/graneet/graneet-form/commits/9ed2d0450c12d1d620533ef8c39e4b0769c4bc89))
+
 ## [2.0.0-beta.23](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.22...v2.0.0-beta.23) (2023-11-13)
 
 ### ⚠ BREAKING CHANGES
