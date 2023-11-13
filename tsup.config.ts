@@ -5,7 +5,8 @@ const isProduction = (options: Options) => options.env?.NODE_ENV === 'production
 
 export default defineConfig((options) => ({
   entry: ['src/index.ts'],
-  format: ['esm'],
+  format: ['cjs', 'esm'],
+  target: 'es6',
   clean: true,
   splitting: true,
   treeshake: true,
