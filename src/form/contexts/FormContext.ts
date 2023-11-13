@@ -160,9 +160,8 @@ export interface FormContextApi<T extends FieldValues> {
   /**
    * Update form values.
    * @param newValues Record containing new values
-   * @param eraseAll If true, reset all values associated to a registered field
    */
-  setFormValues(newValues: Partial<T>, eraseAll?: boolean): void;
+  setFormValues(newValues: Partial<T>): void;
 
   /**
    * Reset form value and trigger form rerender.

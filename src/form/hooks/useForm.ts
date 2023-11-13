@@ -402,18 +402,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const setFormValues = useCallback<FormContextApi<T>['setFormValues']>(
-    (newValues: Partial<T>, eraseAll = false) => {
-      if (eraseAll) {
-        Object.keys(formStateRef.current).forEach((fieldName) => {
-          const { name } = formStateRef.current[fieldName]!;
-
-          if (formStateRef.current[name]) {
-            formStateRef.current[name]!.value = undefined;
-            updateValueForAllTypeOfSubscribers(name);
-          }
-        });
-      }
-
+    (newValues: Partial<T>) => {
       Object.keys(newValues).forEach((name: keyof T) => {
         // If the field is already stored, only update the value
         if (formStateRef.current[name]) {
@@ -486,7 +475,16 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     [updateErrorSubscribers],
   );
 
-  const resetForm = useCallback<FormContextApi<T>['resetForm']>((): void => setFormValues({}, true), [setFormValues]);
+  const resetForm = useCallback<FormContextApi<T>['resetForm']>((): void => {
+    Object.keys(formStateRef.current).forEach((fieldName) => {
+      const { name } = formStateRef.current[fieldName]!;
+
+      if (formStateRef.current[name]) {
+        formStateRef.current[name]!.value = undefined;
+        updateValueForAllTypeOfSubscribers(name);
+      }
+    });
+  }, [updateValueForAllTypeOfSubscribers]);
 
   const handleSubmit = useCallback<FormContextApi<T>['experimental_handleSubmit']>(
     (submitCallback: (formValues: Partial<T>) => void | Promise<void>) => () => {
