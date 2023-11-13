@@ -1,6 +1,6 @@
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { AnyRecord, FieldValues, ValidationStatus } from '../../shared';
-import { useFormContext } from '../contexts/FormContext';
+import { CONTEXT_FORM_DEFAULT, useFormContext } from '../contexts/FormContext';
 import { useFieldValidation } from '../hooks/useFieldValidation';
 import { useRules } from '../hooks/useRules';
 import { RuleContext } from '../contexts/RuleContext';
@@ -60,6 +60,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
   render,
   data = undefined,
 }: FieldProps<T, K>) {
+  const form = useFormContext<T>();
   const {
     formInternal: {
       registerField,
@@ -68,7 +69,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
       handleOnBlur: handleBlur,
       updateValidationStatus,
     },
-  } = useFormContext<T>();
+  } = form;
   const { ruleContext, rules, debouncedRules } = useRules();
 
   const [value, setValue] = useState<T[K] | undefined>(undefined);
@@ -107,6 +108,10 @@ export function Field<T extends FieldValues, K extends keyof T>({
   const onFocus = useCallback(() => {
     hasFocusRef.current = true;
   }, []);
+
+  if (form === CONTEXT_FORM_DEFAULT) {
+    throw new Error('No form context could be found.');
+  }
 
   return (
     <RuleContext.Provider value={ruleContext}>
