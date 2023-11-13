@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.23](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.22...v2.0.0-beta.23) (2023-11-13)
+
+### ⚠ BREAKING CHANGES
+
+- remove `eraseAll` option of `setFormValues` (#59)
+
+### Features
+
+- improve jsdoc ([#57](https://github.com/graneet/graneet-form/issues/57)) ([9e6acd8](https://github.com/graneet/graneet-form/commits/9e6acd83340880634b5591f6b26363b0cefac472))
+- remove `eraseAll` option of `setFormValues` ([#59](https://github.com/graneet/graneet-form/issues/59)) ([5e4f915](https://github.com/graneet/graneet-form/commits/5e4f9150ac98b07c2b813f3afd91391ab0927cbb))
+- throw an error if field is not in form ([#58](https://github.com/graneet/graneet-form/issues/58)) ([6c7a668](https://github.com/graneet/graneet-form/commits/6c7a668766c983e095fa3f646a4bb17eeff477d3))
+- tweak build to reduce size and add tree shaking ([#56](https://github.com/graneet/graneet-form/issues/56)) ([2ab7af7](https://github.com/graneet/graneet-form/commits/2ab7af7da13a48684e7a2adecfaee13dabae70be))
+
 ## [2.0.0-beta.22](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.21...v2.0.0-beta.22) (2023-11-07)
 
 ### ⚠ BREAKING CHANGES
