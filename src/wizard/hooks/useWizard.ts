@@ -154,7 +154,9 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     }
     // Make validation for the step if one is declared
     if (validationFnsRef.current[currentStep]) {
-      const isStepValid = await validationFnsRef.current[currentStep]!(getValuesOfCurrentStep());
+      const isStepValid = await validationFnsRef.current[currentStep]!(
+        valuesStepGetterRef.current() as WizardValues[keyof WizardValues],
+      );
       if (!isStepValid) {
         return;
       }
@@ -170,7 +172,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       return;
     }
     await onFinish(wizardValuesRef.current);
-  }, [currentStep, getValuesOfCurrentStep, hasNextStep, onFinish, saveValuesOfCurrentStepInWizardValues, steps]);
+  }, [currentStep, hasNextStep, onFinish, saveValuesOfCurrentStepInWizardValues, steps]);
 
   const handleOnPrevious = useCallback<WizardContextApi<WizardValues>['handleOnPrevious']>((): void => {
     if (!currentStep) {
