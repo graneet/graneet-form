@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   eslint:
-    name: Eslint
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -13,7 +13,7 @@ jobs:
       - name: Install
         uses: ./.github/composite-actions/install
 
-      - name: Run Eslint
+      - name: Run lint
         run: pnpm lint
 
   build:

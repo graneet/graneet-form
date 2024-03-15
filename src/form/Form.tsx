@@ -1,8 +1,18 @@
-import React, { FormHTMLAttributes, ReactNode, useCallback, FormEventHandler } from 'react';
-import { FieldValues, mapValidationStatusesToOutcome, VALIDATION_OUTCOME } from '../shared';
-import { FormContext, FormContextApi } from './contexts/FormContext';
+import React, {
+  type FormHTMLAttributes,
+  type ReactNode,
+  useCallback,
+  type FormEventHandler,
+} from 'react';
+import {
+  type FieldValues,
+  mapValidationStatusesToOutcome,
+  VALIDATION_OUTCOME,
+} from '../shared';
+import { FormContext, type FormContextApi } from './contexts/FormContext';
 
-interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
+interface FormProps<T extends FieldValues>
+  extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
   children: ReactNode;
   form: FormContextApi<T>;
 }
@@ -20,7 +30,11 @@ interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLF
  * )
  * ```
  */
-export function Form<T extends FieldValues>({ children, form, ...otherProps }: FormProps<T>) {
+export function Form<T extends FieldValues>({
+  children,
+  form,
+  ...otherProps
+}: FormProps<T>) {
   const {
     getFormValues,
     formInternal: { getFormErrors, getHandleFormSubmit },
@@ -31,7 +45,9 @@ export function Form<T extends FieldValues>({ children, form, ...otherProps }: F
       event.preventDefault();
 
       const validations = getFormErrors();
-      const isFormValid = mapValidationStatusesToOutcome<T>(validations) === VALIDATION_OUTCOME.VALID;
+      const isFormValid =
+        mapValidationStatusesToOutcome<T>(validations) ===
+        VALIDATION_OUTCOME.VALID;
       if (isFormValid) {
         const handleFormSubmit = getHandleFormSubmit();
 

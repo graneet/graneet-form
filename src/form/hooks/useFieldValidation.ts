@@ -1,11 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FieldValue, VALIDATION_OUTCOME, ValidationStatus } from '../../shared';
-import { VALIDATION_STATE_UNDETERMINED, VALIDATION_STATE_VALID } from '../types/Validation';
-import { IRule } from './useRules';
+import {
+  type FieldValue,
+  VALIDATION_OUTCOME,
+  type ValidationStatus,
+} from '../../shared';
+import {
+  VALIDATION_STATE_UNDETERMINED,
+  VALIDATION_STATE_VALID,
+} from '../types/Validation';
+import type { IRule } from './useRules';
 
 const DEBOUNCE_TIME = 500;
 
-export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], value: FieldValue): ValidationStatus {
+export function useFieldValidation(
+  rules: IRule[],
+  debouncedRules: IRule[],
+  value: FieldValue,
+): ValidationStatus {
   const numberOfRules = rules.length + debouncedRules.length;
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>(
     numberOfRules ? VALIDATION_STATE_UNDETERMINED : VALIDATION_STATE_VALID,
@@ -18,9 +29,9 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
 
   const testRules = useCallback(
     (rulesToTest: IRule[], fieldValue: FieldValue, phaseId: number) => {
-      rulesToTest.forEach(({ validatorFn, errorMessage }) => {
+      for (const { validatorFn, errorMessage } of rulesToTest) {
         if (metaStateRef.current.hasError) {
-          return;
+          continue;
         }
         Promise.resolve(validatorFn(fieldValue))
           .then((isValid) => {
@@ -42,16 +53,22 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
           If we run the last rule, and no error was thrown,
           update status to VALIDATION_STATE_VALID
          */
-            if (isValid && metaStateRef.current.countRulesResolved === numberOfRules) {
+            if (
+              isValid &&
+              metaStateRef.current.countRulesResolved === numberOfRules
+            ) {
               setValidationStatus(VALIDATION_STATE_VALID);
             }
           })
           .catch(({ message }) => {
-            const status: ValidationStatus = { status: VALIDATION_OUTCOME.INVALID, message };
+            const status: ValidationStatus = {
+              status: VALIDATION_OUTCOME.INVALID,
+              message,
+            };
             metaStateRef.current.hasError = true;
             setValidationStatus(status);
           });
-      });
+      }
     },
     [numberOfRules],
   );

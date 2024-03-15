@@ -1,11 +1,16 @@
-import { Field, FieldValues } from 'graneet-form';
-import { ChangeEventHandler } from 'react';
+import { Field, type FieldValues } from 'graneet-form';
+import type { ChangeEventHandler } from 'react';
 
-type KeysMatching<T, V> = { [K in keyof T]-?: T[K] extends V ? K : never }[keyof T];
+type KeysMatching<T, V> = {
+  [K in keyof T]-?: T[K] extends V ? K : never;
+}[keyof T];
 
 type TextFieldValue = string | undefined;
 
-interface TextFieldProps<T extends FieldValues, K extends KeysMatching<T, TextFieldValue>> {
+interface TextFieldProps<
+  T extends FieldValues,
+  K extends KeysMatching<T, TextFieldValue>,
+> {
   name: K;
 }
 
@@ -23,8 +28,15 @@ export function TextField<
           onChange(e.target.value as T[K]);
         };
 
-        return <input value={value} onChange={handleChange} onBlur={onBlur} onFocus={onFocus} />;
+        return (
+          <input
+            value={value}
+            onChange={handleChange}
+            onBlur={onBlur}
+            onFocus={onFocus}
+          />
+        );
       }}
-    ></Field>
+    />
   );
 }

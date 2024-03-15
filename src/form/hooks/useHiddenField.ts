@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { FieldValues } from '../../shared';
-import { FormContextApi } from '../contexts/FormContext';
+import type { FieldValues } from '../../shared';
+import type { FormContextApi } from '../contexts/FormContext';
 import { useOnChangeValues } from './useValues';
 
 export interface UseHiddenField<T extends FieldValues, K extends keyof T> {
@@ -38,7 +38,7 @@ export function useHiddenField<T extends FieldValues, K extends keyof T>(
   return useMemo(
     () => ({
       name,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       value: value as any,
       setValue: (newValue) => {
         const objectValue = { [name]: newValue } as unknown as Partial<T>;

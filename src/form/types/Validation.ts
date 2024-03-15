@@ -1,4 +1,4 @@
-import { FieldValue, VALIDATION_OUTCOME, ValidationStatus } from '../../shared';
+import { type FieldValue, VALIDATION_OUTCOME, type ValidationStatus } from '../../shared';
 
 export const VALIDATION_STATE_VALID: ValidationStatus = {
   status: VALIDATION_OUTCOME.VALID,

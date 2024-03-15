@@ -1,9 +1,9 @@
 import { WizardExample } from '../components/WizardExample/WizardExample.tsx';
 
 type WizardValues = {
-  step1: {};
+  step1: Record<never, never>;
 
-  step2: {};
+  step2: Record<never, never>;
 };
 
 export function WizardTests() {

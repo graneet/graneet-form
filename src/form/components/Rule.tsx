@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useRuleContext } from '../contexts/RuleContext';
-import { Validator } from '../types/Validation';
+import type { Validator } from '../types/Validation';
 
 interface RuleProps {
   /**
@@ -31,7 +31,11 @@ interface RuleProps {
  * </TextField>
  * ```
  */
-export function Rule({ message, validationFn, isDebounced = false }: RuleProps) {
+export function Rule({
+  message,
+  validationFn,
+  isDebounced = false,
+}: RuleProps) {
   const { registerRule, unregisterRule } = useRuleContext();
 
   useEffect(() => {

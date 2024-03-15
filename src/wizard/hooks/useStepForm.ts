@@ -1,13 +1,20 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
-  FieldValues,
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
+import {
+  type FieldValues,
   mapValidationStatusesToOutcome,
   VALIDATION_OUTCOME,
-  ValidationStatuses,
-  PartialRecord,
-  ValidationStatus,
+  type ValidationStatuses,
+  type PartialRecord,
+  type ValidationStatus,
 } from '../../shared';
-import { FormContextApi, useForm, UseFormOptions } from '../../form';
+import { type FormContextApi, useForm, type UseFormOptions } from '../../form';
 import { useWizardContext } from '../contexts/WizardContext';
 
 interface UseStepFormApi<T extends FieldValues> {
@@ -35,9 +42,14 @@ interface UseStepFormApi<T extends FieldValues> {
  * ```
  */
 export function useStepForm<
-  WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>,
+  WizardValues extends Record<string, FieldValues> = Record<
+    string,
+    Record<string, unknown>
+  >,
   Step extends keyof WizardValues = '',
->(props?: UseFormOptions<WizardValues[Step]>): UseStepFormApi<WizardValues[Step]> {
+>(
+  props?: UseFormOptions<WizardValues[Step]>,
+): UseStepFormApi<WizardValues[Step]> {
   const form = useForm(props);
   const {
     wizardInternal: { stepStatusSetter, setValuesGetterForCurrentStep },
@@ -56,29 +68,47 @@ export function useStepForm<
     // So by then, set step status to undefined, the user will not be able to go to next step
     stepStatusSetter(VALIDATION_OUTCOME.UNDETERMINED);
 
-    const setFormStatusFromValidationStatuses = ((validationStatuses: ValidationStatuses<WizardValues[Step]>) => {
+    const setFormStatusFromValidationStatuses = ((
+      validationStatuses: ValidationStatuses<WizardValues[Step]>,
+    ) => {
       stepStatusSetter(mapValidationStatusesToOutcome(validationStatuses));
-    }) as Dispatch<SetStateAction<PartialRecord<keyof WizardValues[Step], ValidationStatus | undefined>>>;
+    }) as Dispatch<
+      SetStateAction<
+        PartialRecord<keyof WizardValues[Step], ValidationStatus | undefined>
+      >
+    >;
     /*
       Put function onto the queue. The action will be done only pending render is done
       In case of big step with many inputs, stepStatus will stay UNDETERMINED until that the render
       is done and only after that, the timeout will be run
      */
-    setTimeout(() => addGlobalValidationStatusSubscriber(setFormStatusFromValidationStatuses), 0);
+    setTimeout(
+      () =>
+        addGlobalValidationStatusSubscriber(
+          setFormStatusFromValidationStatuses,
+        ),
+      0,
+    );
 
     return () => {
       setValuesGetterForCurrentStep(() => undefined);
       // On step switch, switch stepStatus, user will not be stuck on not clickable button
       stepStatusSetter(VALIDATION_OUTCOME.VALID);
     };
-  }, [stepStatusSetter, setValuesGetterForCurrentStep, addGlobalValidationStatusSubscriber]);
+  }, [
+    stepStatusSetter,
+    setValuesGetterForCurrentStep,
+    addGlobalValidationStatusSubscriber,
+  ]);
 
   useEffect(() => {
     setValuesGetterForCurrentStep(getFormValues);
   }, [getFormValues, setValuesGetterForCurrentStep]);
 
   useEffect(() => {
-    const valuesOfCurrentStep = getValuesOfCurrentStep() as Partial<WizardValues[Step]>;
+    const valuesOfCurrentStep = getValuesOfCurrentStep() as Partial<
+      WizardValues[Step]
+    >;
     // If values for the current step are stored in the wizard context, we update values of the form
     // and set valuesHasBeenInitialized to true to detect if values getting has been done
     if (valuesOfCurrentStep) {

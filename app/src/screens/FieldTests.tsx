@@ -18,6 +18,7 @@ export function FieldTests() {
       <br />
 
       <button
+        type="button"
         onClick={() => {
           alert(JSON.stringify(form.getFormValues()));
         }}
