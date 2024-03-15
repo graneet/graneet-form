@@ -1,11 +1,7 @@
-import React, {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import type { AnyRecord, FieldValues, ValidationStatus } from '../../shared';
+import React, { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import type { AnyRecord } from '../../shared/types/AnyRecord';
+import type { FieldValues } from '../../shared/types/FieldValue';
+import type { ValidationStatus } from '../../shared/types/Validation';
 import { CONTEXT_FORM_DEFAULT, useFormContext } from '../contexts/FormContext';
 import { RuleContext } from '../contexts/RuleContext';
 import { useFieldValidation } from '../hooks/useFieldValidation';
@@ -38,10 +34,7 @@ export interface FieldProps<T extends FieldValues, K extends keyof T> {
   /**
    * The function used to render the field component
    */
-  render(
-    fieldProps: FieldRenderProps<T, K>,
-    fieldState: FieldRenderState,
-  ): ReactNode | null;
+  render(fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState): ReactNode | null;
 
   data?: AnyRecord;
 }

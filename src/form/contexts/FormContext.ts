@@ -1,7 +1,10 @@
 import { type Dispatch, type SetStateAction, createContext, useContext } from 'react';
-import type { AnyRecord, FieldValues, ValidationStatus } from '../../shared';
+import type { AnyRecord } from '../../shared/types/AnyRecord';
+import type { FieldValues } from '../../shared/types/FieldValue';
 import type { PartialRecord } from '../../shared/types/PartialRecord';
-import type { FormValidations, FormValues } from '../types';
+import type { ValidationStatus } from '../../shared/types/Validation';
+import type { FormValidations } from '../types/FormValidations';
+import type { FormValues } from '../types/FormValues';
 import type { WATCH_MODE } from '../types/WatchMode';
 
 export interface FormInternal<T extends FieldValues> {

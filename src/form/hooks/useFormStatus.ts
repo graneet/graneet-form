@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  type FieldValues,
-  mapValidationStatusesToOutcome,
-  VALIDATION_OUTCOME,
-} from '../../shared';
-import { useValidations } from './useValidations';
+import type { FieldValues } from '../../shared/types/FieldValue';
+import { VALIDATION_OUTCOME } from '../../shared/types/Validation';
+import { mapValidationStatusesToOutcome } from '../../shared/util/validation.util';
 import type { FormContextApi } from '../contexts/FormContext';
+import { useValidations } from './useValidations';
 
 interface FormStatus {
   /**
@@ -22,9 +20,7 @@ interface FormStatus {
 /**
  * Retrieves the status of a form and its validation outcomes
  */
-export function useFormStatus<T extends FieldValues>(
-  form: FormContextApi<T>,
-): FormStatus {
+export function useFormStatus<T extends FieldValues>(form: FormContextApi<T>): FormStatus {
   const validations = useValidations(form, undefined);
   const [status, setStatus] = useState(VALIDATION_OUTCOME.UNDETERMINED);
 
