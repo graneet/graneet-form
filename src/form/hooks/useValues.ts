@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
-import { FieldValues, Prettify } from '../../shared';
-import { CONTEXT_FORM_DEFAULT, FormContextApi } from '../contexts/FormContext';
-import { FormValues } from '../types/FormValues';
+import type { FieldValues, Prettify } from '../../shared';
+import {
+  CONTEXT_FORM_DEFAULT,
+  type FormContextApi,
+} from '../contexts/FormContext';
+import type { FormValues } from '../types/FormValues';
 import { WATCH_MODE } from '../types/WatchMode';
 
 /**
  * Internal hook to handle watch of all field values
  */
-function useGlobalValues<T extends FieldValues>(watchMode: WATCH_MODE, form: FormContextApi<T>): Partial<T> {
+function useGlobalValues<T extends FieldValues>(
+  watchMode: WATCH_MODE,
+  form: FormContextApi<T>,
+): Partial<T> {
   const {
     formInternal: { addGlobalValueSubscriber, removeGlobalValueSubscriber },
   } = form;
@@ -36,17 +42,18 @@ function useValues<T extends FieldValues, K extends keyof T>(
   const {
     formInternal: { addValueSubscriber, removeValueSubscriber },
   } = form;
-  const [currentValues, setCurrentValues] = useState<FormValues<T, K>>({} as FormValues<T, K>);
+  const [currentValues, setCurrentValues] = useState<FormValues<T, K>>(
+    {} as FormValues<T, K>,
+  );
 
   if (form === CONTEXT_FORM_DEFAULT) {
     throw new Error('No form context could be found.');
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `names` is transformed to string to ensure consistant ref
   useEffect(() => {
     addValueSubscriber(setCurrentValues, watchMode, names);
     return () => removeValueSubscriber(setCurrentValues, watchMode, names);
-    // `names` is transformed to string to ensure consistant ref
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addValueSubscriber, names?.join(), removeValueSubscriber, watchMode]);
 
   return currentValues;
@@ -69,10 +76,9 @@ function useValues<T extends FieldValues, K extends keyof T>(
  *   }, [foo, bar])
  * ```
  */
-export function useOnChangeValues<T extends FieldValues = Record<string, unknown>>(
-  form: FormContextApi<T>,
-  names: undefined,
-): Partial<T>;
+export function useOnChangeValues<
+  T extends FieldValues = Record<string, unknown>,
+>(form: FormContextApi<T>, names: undefined): Partial<T>;
 
 /**
  * Watch a list of fields values. Values are updated on change.
@@ -92,10 +98,10 @@ export function useOnChangeValues<T extends FieldValues = Record<string, unknown
  *   }, [foo, bar])
  * ```
  */
-export function useOnChangeValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
-  form: FormContextApi<T>,
-  names: K[],
-): Prettify<FormValues<T, K>>;
+export function useOnChangeValues<
+  T extends FieldValues = Record<string, unknown>,
+  K extends keyof T = keyof T,
+>(form: FormContextApi<T>, names: K[]): Prettify<FormValues<T, K>>;
 
 export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T>,
@@ -127,10 +133,9 @@ export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
  *   }, [foo, bar])
  * ```
  */
-export function useOnBlurValues<T extends FieldValues = Record<string, unknown>>(
-  form: FormContextApi<T>,
-  names: undefined,
-): Partial<T>;
+export function useOnBlurValues<
+  T extends FieldValues = Record<string, unknown>,
+>(form: FormContextApi<T>, names: undefined): Partial<T>;
 
 /**
  * Watch a list of fields values. Values are updated on blur.
@@ -150,10 +155,10 @@ export function useOnBlurValues<T extends FieldValues = Record<string, unknown>>
  *   }, [foo, bar])
  * ```
  */
-export function useOnBlurValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
-  form: FormContextApi<T>,
-  names: K[],
-): Prettify<FormValues<T, K>>;
+export function useOnBlurValues<
+  T extends FieldValues = Record<string, unknown>,
+  K extends keyof T = keyof T,
+>(form: FormContextApi<T>, names: K[]): Prettify<FormValues<T, K>>;
 
 export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T>,

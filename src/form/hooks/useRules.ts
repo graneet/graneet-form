@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import { RuleContextApi } from '../contexts/RuleContext';
-import { Validator } from '../types/Validation';
+import type { RuleContextApi } from '../contexts/RuleContext';
+import type { Validator } from '../types/Validation';
 
 export interface IRule {
   validatorFn: Validator;
@@ -17,23 +17,34 @@ export function useRules(): UseRules {
   const [rules, setRules] = useState<IRule[]>([]);
   const [debouncedRules, setDebouncedRules] = useState<IRule[]>([]);
 
-  const registerRule = useCallback((testFn: Validator, errorMessage: string, isDebounced: boolean): void => {
-    if (isDebounced) {
-      setDebouncedRules((prev) => [...prev, { validatorFn: testFn, errorMessage }]);
-    } else {
-      setRules((prev) => [...prev, { validatorFn: testFn, errorMessage }]);
-    }
-  }, []);
+  const registerRule = useCallback(
+    (testFn: Validator, errorMessage: string, isDebounced: boolean): void => {
+      if (isDebounced) {
+        setDebouncedRules((prev) => [
+          ...prev,
+          { validatorFn: testFn, errorMessage },
+        ]);
+      } else {
+        setRules((prev) => [...prev, { validatorFn: testFn, errorMessage }]);
+      }
+    },
+    [],
+  );
 
-  const unregisterRule = useCallback((testFn: Validator, isDebounced: boolean): void => {
-    if (isDebounced) {
-      setDebouncedRules((previousDebouncedRules) =>
-        previousDebouncedRules.filter((rule) => rule.validatorFn !== testFn),
-      );
-    } else {
-      setRules((previousRules) => previousRules.filter((rule) => rule.validatorFn !== testFn));
-    }
-  }, []);
+  const unregisterRule = useCallback(
+    (testFn: Validator, isDebounced: boolean): void => {
+      if (isDebounced) {
+        setDebouncedRules((previousDebouncedRules) =>
+          previousDebouncedRules.filter((rule) => rule.validatorFn !== testFn),
+        );
+      } else {
+        setRules((previousRules) =>
+          previousRules.filter((rule) => rule.validatorFn !== testFn),
+        );
+      }
+    },
+    [],
+  );
 
   const ruleContext = useMemo(
     () => ({

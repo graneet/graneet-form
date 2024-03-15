@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: Allow every type
 export type FieldValue = any;
 
 export type FieldValues = Record<string, FieldValue>;

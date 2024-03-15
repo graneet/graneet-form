@@ -1,20 +1,34 @@
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext } from 'react';
-import { FieldValues, VALIDATION_OUTCOME } from '../../shared';
-import { PlaceholderContentSetter, StepValidator } from '../types';
+import {
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+  createContext,
+  useContext,
+} from 'react';
+import type { FieldValues, VALIDATION_OUTCOME } from '../../shared';
+import type { PlaceholderContentSetter, StepValidator } from '../types';
 
-export type ValidationStatusesSetter = Dispatch<SetStateAction<VALIDATION_OUTCOME>>;
+export type ValidationStatusesSetter = Dispatch<
+  SetStateAction<VALIDATION_OUTCOME>
+>;
 
-export interface WizardContextApi<WizardValues extends Record<string, FieldValues>> {
+export interface WizardContextApi<
+  WizardValues extends Record<string, FieldValues>,
+> {
   /**
    * Get values for specified step.
    * @param stepName Step name
    */
-  getValuesOfStep<Step extends keyof WizardValues>(stepName: Step): WizardValues[Step] | undefined;
+  getValuesOfStep<Step extends keyof WizardValues>(
+    stepName: Step,
+  ): WizardValues[Step] | undefined;
 
   /**
    * Get values for the current step.
    */
-  getValuesOfCurrentStep<Step extends keyof WizardValues>(): WizardValues[Step] | undefined;
+  getValuesOfCurrentStep<Step extends keyof WizardValues>():
+    | WizardValues[Step]
+    | undefined;
 
   /**
    * Get values for all the steps.
@@ -83,7 +97,9 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
      * Set callback used to get form values for the current step.
      * @param stepValuesGetter Callback to get current step form values
      */
-    setValuesGetterForCurrentStep(stepValuesGetter: () => FieldValues | undefined): void;
+    setValuesGetterForCurrentStep(
+      stepValuesGetter: () => FieldValues | undefined,
+    ): void;
 
     /**
      * Update step status
@@ -172,10 +188,15 @@ export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
   stepsTitles: [],
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const WizardContext = createContext<WizardContextApi<any>>(CONTEXT_WIZARD_DEFAULT);
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export const WizardContext = createContext<WizardContextApi<any>>(
+  CONTEXT_WIZARD_DEFAULT,
+);
 export function useWizardContext<
-  WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>,
+  WizardValues extends Record<string, FieldValues> = Record<
+    string,
+    Record<string, unknown>
+  >,
 >(): WizardContextApi<WizardValues> {
   return useContext(WizardContext);
 }

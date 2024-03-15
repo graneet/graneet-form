@@ -1,9 +1,15 @@
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { AnyRecord, FieldValues, ValidationStatus } from '../../shared';
+import React, {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import type { AnyRecord, FieldValues, ValidationStatus } from '../../shared';
 import { CONTEXT_FORM_DEFAULT, useFormContext } from '../contexts/FormContext';
+import { RuleContext } from '../contexts/RuleContext';
 import { useFieldValidation } from '../hooks/useFieldValidation';
 import { useRules } from '../hooks/useRules';
-import { RuleContext } from '../contexts/RuleContext';
 
 export interface FieldRenderProps<T extends FieldValues, K extends keyof T> {
   name: K;
@@ -32,7 +38,10 @@ export interface FieldProps<T extends FieldValues, K extends keyof T> {
   /**
    * The function used to render the field component
    */
-  render(fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState): ReactNode | null;
+  render(
+    fieldProps: FieldRenderProps<T, K>,
+    fieldState: FieldRenderState,
+  ): ReactNode | null;
 
   data?: AnyRecord;
 }
@@ -83,6 +92,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
     return () => unregisterField(name);
   }, [name, registerField, unregisterField]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Update pristine state on value update
   useEffect(() => {
     if (isPristine && hasFocusRef.current) {
       setIsPristine(false);

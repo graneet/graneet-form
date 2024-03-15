@@ -1,8 +1,8 @@
-import { createContext, Dispatch, SetStateAction, useContext } from 'react';
-import { AnyRecord, FieldValues, ValidationStatus } from '../../shared';
-import { WATCH_MODE } from '../types/WatchMode';
-import { PartialRecord } from '../../shared/types/PartialRecord';
-import { FormValues, FormValidations } from '../types';
+import { type Dispatch, type SetStateAction, createContext, useContext } from 'react';
+import type { AnyRecord, FieldValues, ValidationStatus } from '../../shared';
+import type { PartialRecord } from '../../shared/types/PartialRecord';
+import type { FormValidations, FormValues } from '../types';
+import type { WATCH_MODE } from '../types/WatchMode';
 
 export interface FormInternal<T extends FieldValues> {
   /**
@@ -180,13 +180,12 @@ export interface FormContextApi<T extends FieldValues> {
   experimental_handleSubmit(submitCallback: (formValues: Partial<T>) => void | Promise<void>): () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   getFormValuesForNames: () => ({}) as FormValues<any, any>,
   getFormErrors: () => ({}),
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+  // @ts-expect-error
   getFormErrorsForNames: (): Record<string, ValidationStatus> => ({}),
   addGlobalValueSubscriber: (): void => {},
   addValueSubscriber: (): void => {},
@@ -204,18 +203,16 @@ export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
   getHandleFormSubmit: () => undefined,
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const CONTEXT_FORM_DEFAULT: FormContextApi<any> = {
   formInternal: FORM_INTERVAL_DEFAULT,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   getFormValues: () => ({}),
   setFormValues: () => {},
   resetForm: () => {},
   experimental_handleSubmit: () => () => {},
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const FormContext = createContext<FormContextApi<any>>(CONTEXT_FORM_DEFAULT);
 
 /**

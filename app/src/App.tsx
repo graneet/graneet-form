@@ -8,6 +8,7 @@ function App() {
   return (
     <div style={{ height: '50rem' }}>
       <button
+        type="button"
         onClick={() => {
           setScreen('form');
         }}
@@ -15,6 +16,7 @@ function App() {
         Display form
       </button>
       <button
+        type="button"
         onClick={() => {
           setScreen('wizard');
         }}
@@ -25,7 +27,9 @@ function App() {
       <br />
       <br />
 
-      <div style={{ height: '100%', border: '1px solid gray', padding: '1rem' }}>
+      <div
+        style={{ height: '100%', border: '1px solid gray', padding: '1rem' }}
+      >
         {screen === 'form' && <FieldTests />}
         {screen === 'wizard' && <WizardTests />}
       </div>

@@ -24,5 +24,18 @@ export type {
   FormContextApi,
   UseFormOptions,
 } from './form';
-export { useWizard, useStepForm, usePlaceholder, useWizardContext, WizardContext, Placeholder, Step } from './wizard';
-export type { WizardLabels, PlaceholderProps, StepProps, StepValidator } from './wizard';
+export {
+  useWizard,
+  useStepForm,
+  usePlaceholder,
+  useWizardContext,
+  WizardContext,
+  Placeholder,
+  Step,
+} from './wizard';
+export type {
+  WizardLabels,
+  PlaceholderProps,
+  StepProps,
+  StepValidator,
+} from './wizard';

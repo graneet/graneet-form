@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
-import { FieldValues } from '../../shared';
+import React, { type ReactNode } from 'react';
+import type { FieldValues } from '../../shared';
 import { Field } from './Field';
 
 interface HiddenFieldProps<T extends FieldValues, K extends keyof T> {
@@ -34,10 +34,10 @@ interface HiddenFieldProps<T extends FieldValues, K extends keyof T> {
  * />
  * ```
  */
-export function HiddenField<T extends FieldValues, K extends keyof T = keyof T>({
-  children = null,
-  ...props
-}: HiddenFieldProps<T, K>) {
+export function HiddenField<
+  T extends FieldValues,
+  K extends keyof T = keyof T,
+>({ children = null, ...props }: HiddenFieldProps<T, K>) {
   return (
     <Field<T, K> {...props} render={() => null}>
       {children}

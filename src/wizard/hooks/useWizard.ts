@@ -1,37 +1,58 @@
-import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
-import { FieldValues, VALIDATION_OUTCOME } from '../../shared';
-import { ValidationStatusesSetter, WizardContextApi } from '../contexts/WizardContext';
-import { PlaceholderContent, PlaceholderContentSetter, StepValidator } from '../types';
-import { PartialRecord } from '../../shared/types/PartialRecord';
+import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import type { FieldValues, VALIDATION_OUTCOME } from '../../shared';
+import type { PartialRecord } from '../../shared/types/PartialRecord';
+import type {
+  ValidationStatusesSetter,
+  WizardContextApi,
+} from '../contexts/WizardContext';
+import type {
+  PlaceholderContent,
+  PlaceholderContentSetter,
+  StepValidator,
+} from '../types';
 
-export function useWizard<WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>>(
+export function useWizard<
+  WizardValues extends Record<string, FieldValues> = Record<
+    string,
+    Record<string, unknown>
+  >,
+>(
   onFinish: (wizardValues: WizardValues) => void,
   onQuit: () => void,
 ): WizardContextApi<WizardValues> {
   // -- VALUES --
   const wizardValuesRef = useRef<WizardValues>({} as WizardValues);
-  const valuesStepGetterRef = useRef<() => FieldValues | undefined>(() => undefined);
+  const valuesStepGetterRef = useRef<() => FieldValues | undefined>(
+    () => undefined,
+  );
 
   // -- STEP --
   const [currentStep, setCurrentStep] = useState<keyof WizardValues>();
   const [steps, setSteps] = useState<Array<keyof WizardValues>>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const validationFnsRef = useRef<PartialRecord<keyof WizardValues, StepValidator<WizardValues, any>>>({});
+  const validationFnsRef = useRef<
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    PartialRecord<keyof WizardValues, StepValidator<WizardValues, any>>
+  >({});
   const stepsWithoutFooterRef = useRef<Set<keyof WizardValues>>(new Set());
   const [isStepReady, setIsStepReady] = useState(false);
 
   // -- PLACEHOLDER --
-  const placeholderContentSetterRef = useRef<Set<PlaceholderContentSetter>>(new Set());
+  const placeholderContentSetterRef = useRef<Set<PlaceholderContentSetter>>(
+    new Set(),
+  );
   const stepStatusSetterRef = useRef<Set<ValidationStatusesSetter>>(new Set());
 
   // -- TITLE --
-  const titlesRef = useRef<{ name: keyof WizardValues; title: string | undefined }[]>([]);
+  const titlesRef = useRef<
+    { name: keyof WizardValues; title: string | undefined }[]
+  >([]);
 
   // -- UTILS --
   const hasPreviousStep = useCallback((index: number) => index - 1 >= 0, []);
 
   const hasNextStep = useCallback(
-    (index: number, listOfSteps: Array<keyof WizardValues>) => index + 1 <= listOfSteps.length - 1,
+    (index: number, listOfSteps: Array<keyof WizardValues>) =>
+      index + 1 <= listOfSteps.length - 1,
     [],
   );
 
@@ -41,30 +62,40 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       // add values only if getter returns values
       const stepValues = valuesStepGetterRef.current();
       if (stepValues) {
-        wizardValuesRef.current[currentStep] = stepValues as WizardValues[keyof WizardValues];
+        wizardValuesRef.current[currentStep] =
+          stepValues as WizardValues[keyof WizardValues];
       }
     }
   }, [currentStep]);
 
   // -- API --
 
-  const getValuesOfStep = useCallback<WizardContextApi<WizardValues>['getValuesOfStep']>(
-    <Step extends keyof WizardValues>(step: Step): WizardValues[Step] | undefined => wizardValuesRef.current[step],
+  const getValuesOfStep = useCallback<
+    WizardContextApi<WizardValues>['getValuesOfStep']
+  >(
+    <Step extends keyof WizardValues>(
+      step: Step,
+    ): WizardValues[Step] | undefined => wizardValuesRef.current[step],
     [],
   );
 
-  const getValuesOfCurrentStep = useCallback<WizardContextApi<WizardValues>['getValuesOfCurrentStep']>(
+  const getValuesOfCurrentStep = useCallback<
+    WizardContextApi<WizardValues>['getValuesOfCurrentStep']
+  >(
     <Step extends keyof WizardValues>(): WizardValues[Step] | undefined =>
-      currentStep ? (getValuesOfStep(currentStep) as WizardValues[Step]) : undefined,
+      currentStep
+        ? (getValuesOfStep(currentStep) as WizardValues[Step])
+        : undefined,
     [currentStep, getValuesOfStep],
   );
 
-  const getValuesOfSteps = useCallback<WizardContextApi<WizardValues>['getValuesOfSteps']>(
-    (): WizardValues => wizardValuesRef.current,
-    [],
-  );
+  const getValuesOfSteps = useCallback<
+    WizardContextApi<WizardValues>['getValuesOfSteps']
+  >((): WizardValues => wizardValuesRef.current, []);
 
-  const registerStep = useCallback<WizardContextApi<WizardValues>['wizardInternal']['registerStep']>(
+  const registerStep = useCallback<
+    WizardContextApi<WizardValues>['wizardInternal']['registerStep']
+  >(
     <Step extends keyof WizardValues>(
       name: Step,
       validationFn?: StepValidator<WizardValues, Step>,
@@ -74,7 +105,9 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       // Current step is the first step registered
       setSteps((previous) => {
         if (previous.indexOf(name) !== -1) {
-          throw new Error(`Attempting to register step "${String(name)}" a second time`);
+          throw new Error(
+            `Attempting to register step "${String(name)}" a second time`,
+          );
         }
 
         if (previous.length === 0) {
@@ -95,12 +128,16 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     [],
   );
 
-  const unregisterStep = useCallback<WizardContextApi<WizardValues>['wizardInternal']['unregisterStep']>(
+  const unregisterStep = useCallback<
+    WizardContextApi<WizardValues>['wizardInternal']['unregisterStep']
+  >(
     (name: keyof WizardValues): void => {
       setSteps((previous) => {
         const index = previous.indexOf(name);
         if (index === -1) {
-          throw new Error(`No step ${String(name)} to be unregistered was found.`);
+          throw new Error(
+            `No step ${String(name)} to be unregistered was found.`,
+          );
         }
 
         /*
@@ -125,12 +162,16 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
 
       delete validationFnsRef.current[name];
       stepsWithoutFooterRef.current.delete(name);
-      titlesRef.current = titlesRef.current.filter(({ name: currentName }) => currentName !== name);
+      titlesRef.current = titlesRef.current.filter(
+        ({ name: currentName }) => currentName !== name,
+      );
     },
     [hasNextStep, hasPreviousStep],
   );
 
-  const handleGoBackTo = useCallback<WizardContextApi<WizardValues>['handleGoBackTo']>(
+  const handleGoBackTo = useCallback<
+    WizardContextApi<WizardValues>['handleGoBackTo']
+  >(
     (previousStep) => {
       if (!currentStep) {
         return;
@@ -148,12 +189,15 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     [currentStep, saveValuesOfCurrentStepInWizardValues, steps],
   );
 
-  const handleOnNext = useCallback<WizardContextApi<WizardValues>['handleOnNext']>(async (): Promise<void> => {
+  const handleOnNext = useCallback<
+    WizardContextApi<WizardValues>['handleOnNext']
+  >(async (): Promise<void> => {
     if (!currentStep) {
       return;
     }
     // Make validation for the step if one is declared
     if (validationFnsRef.current[currentStep]) {
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
       const isStepValid = await validationFnsRef.current[currentStep]!(
         valuesStepGetterRef.current() as WizardValues[keyof WizardValues],
       );
@@ -172,9 +216,17 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       return;
     }
     await onFinish(wizardValuesRef.current);
-  }, [currentStep, hasNextStep, onFinish, saveValuesOfCurrentStepInWizardValues, steps]);
+  }, [
+    currentStep,
+    hasNextStep,
+    onFinish,
+    saveValuesOfCurrentStepInWizardValues,
+    steps,
+  ]);
 
-  const handleOnPrevious = useCallback<WizardContextApi<WizardValues>['handleOnPrevious']>((): void => {
+  const handleOnPrevious = useCallback<
+    WizardContextApi<WizardValues>['handleOnPrevious']
+  >((): void => {
     if (!currentStep) {
       return;
     }
@@ -189,18 +241,34 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       }
       onQuit();
     }
-  }, [currentStep, hasPreviousStep, onQuit, saveValuesOfCurrentStepInWizardValues, steps]);
+  }, [
+    currentStep,
+    hasPreviousStep,
+    onQuit,
+    saveValuesOfCurrentStepInWizardValues,
+    steps,
+  ]);
 
-  const registerPlaceholder = useCallback<WizardContextApi<WizardValues>['wizardInternal']['registerPlaceholder']>(
-    (placeholderContentSetter: PlaceholderContentSetter, stepStatusSetter: ValidationStatusesSetter): void => {
+  const registerPlaceholder = useCallback<
+    WizardContextApi<WizardValues>['wizardInternal']['registerPlaceholder']
+  >(
+    (
+      placeholderContentSetter: PlaceholderContentSetter,
+      stepStatusSetter: ValidationStatusesSetter,
+    ): void => {
       placeholderContentSetterRef.current.add(placeholderContentSetter);
       stepStatusSetterRef.current.add(stepStatusSetter);
     },
     [],
   );
 
-  const unregisterPlaceholder = useCallback<WizardContextApi<WizardValues>['wizardInternal']['unregisterPlaceholder']>(
-    (placeholderContentSetter: PlaceholderContentSetter, stepStatusSetter: ValidationStatusesSetter): void => {
+  const unregisterPlaceholder = useCallback<
+    WizardContextApi<WizardValues>['wizardInternal']['unregisterPlaceholder']
+  >(
+    (
+      placeholderContentSetter: PlaceholderContentSetter,
+      stepStatusSetter: ValidationStatusesSetter,
+    ): void => {
       placeholderContentSetterRef.current.delete(placeholderContentSetter);
       stepStatusSetterRef.current.delete(stepStatusSetter);
     },
@@ -210,9 +278,12 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
   const updatePlaceholderContent = useCallback<
     WizardContextApi<WizardValues>['wizardInternal']['updatePlaceholderContent']
   >((placement: string, children: ReactNode): void => {
-    placeholderContentSetterRef.current.forEach((placeholderContentSetter) => {
-      placeholderContentSetter((previous: PlaceholderContent) => ({ ...previous, [placement]: children }));
-    });
+    for (const placeholderContentSetter of placeholderContentSetterRef.current) {
+      placeholderContentSetter((previous: PlaceholderContent) => ({
+        ...previous,
+        [placement]: children,
+      }));
+    }
   }, []);
 
   const resetPlaceholderContent = useCallback<
@@ -222,9 +293,9 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       if (placement) {
         updatePlaceholderContent(placement, undefined);
       } else {
-        placeholderContentSetterRef.current.forEach((placeholderContentSetter) => {
+        for (const placeholderContentSetter of placeholderContentSetterRef.current) {
           placeholderContentSetter({} as PlaceholderContent);
-        });
+        }
       }
     },
     [updatePlaceholderContent],
@@ -232,18 +303,22 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
 
   const setValuesGetterForCurrentStep = useCallback<
     WizardContextApi<WizardValues>['wizardInternal']['setValuesGetterForCurrentStep']
-  >(<Step extends keyof WizardValues>(stepValuesGetter: () => WizardValues[Step] | undefined): void => {
-    valuesStepGetterRef.current = stepValuesGetter;
-  }, []);
-
-  const stepStatusSetter = useCallback<WizardContextApi<WizardValues>['wizardInternal']['stepStatusSetter']>(
-    (status: VALIDATION_OUTCOME) => {
-      stepStatusSetterRef.current.forEach((stepStatusSetterFunc) => {
-        stepStatusSetterFunc(status);
-      });
+  >(
+    <Step extends keyof WizardValues>(
+      stepValuesGetter: () => WizardValues[Step] | undefined,
+    ): void => {
+      valuesStepGetterRef.current = stepValuesGetter;
     },
     [],
   );
+
+  const stepStatusSetter = useCallback<
+    WizardContextApi<WizardValues>['wizardInternal']['stepStatusSetter']
+  >((status: VALIDATION_OUTCOME) => {
+    for (const stepStatusSetterFunc of stepStatusSetterRef.current) {
+      stepStatusSetterFunc(status);
+    }
+  }, []);
 
   return useMemo<WizardContextApi<WizardValues>>(
     () => ({
