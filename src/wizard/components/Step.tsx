@@ -2,7 +2,6 @@ import { ReactNode, useEffect } from 'react';
 import { FieldValues } from '../../shared/types/FieldValue';
 import { CONTEXT_WIZARD_DEFAULT, useWizardContext } from '../contexts/WizardContext';
 import { StepValidator } from '../types';
-import { useCallbackRef } from '../../shared/util/common.util';
 
 export interface StepProps<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues> {
   children: ReactNode;
@@ -42,10 +41,6 @@ export function Step<
     wizardInternal: { registerStep, unregisterStep, setIsStepReady },
   } = wizard;
 
-  const onNextRef = useCallbackRef(onNext);
-  const registerStepRef = useCallbackRef(registerStep);
-  const unregisterStepRef = useCallbackRef(unregisterStep);
-
   // When Step is used outside wizard context, it will throw an error
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -54,9 +49,9 @@ export function Step<
   }
 
   useEffect(() => {
-    registerStepRef(name, onNextRef, noFooter, title);
-    return () => unregisterStepRef(name);
-  }, [name, noFooter, onNextRef, registerStepRef, title, unregisterStepRef]);
+    registerStep(name, onNext, noFooter, title);
+    return () => unregisterStep(name);
+  }, [registerStep, unregisterStep, name, onNext, noFooter, title]);
 
   useEffect(() => {
     if (currentStep === name) {
