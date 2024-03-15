@@ -25,7 +25,7 @@
     "prepare": "husky install",
     "start": "tsup --config tsup.config.ts --env.NODE_ENV development",
     "build": "tsup --config tsup.config.ts --env.NODE_ENV production",
-    "lint": "eslint ./",
+    "lint": "eslint ./src",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
     "release:patch": "standard-version --release-as patch",
