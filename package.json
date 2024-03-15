@@ -10,6 +10,7 @@
     "type": "git",
     "url": "git@github.com:graneet/graneet-form.git"
   },
+  "sideEffects": false,
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
