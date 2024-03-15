@@ -71,7 +71,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       noFooter?: boolean,
       title?: string,
     ): void => {
-      // Current step is the first step registered
+      // The Current step is the first step registered
       setSteps((previous) => {
         if (previous.indexOf(name) !== -1) {
           throw new Error(`Attempting to register step "${String(name)}" a second time`);
@@ -103,31 +103,36 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
           throw new Error(`No step ${String(name)} to be unregistered was found.`);
         }
 
+        const newSteps = [...previous.slice(0, index), ...previous.slice(index + 1)];
+        // the unregistered step is not the current one
+        if (currentStep !== name) {
+          return newSteps;
+        }
+
         /*
-        There is 3 cases when we unregister step on currentStep:
+        There are 3 cases when we unregister a step on currentStep:
           - If there is a previous step: this step is the new current
           - Else is there is a next step: this step is the new current
-          - Else, current step is undefined
+          - Else, the current step is undefined
        */
         let newCurrentStep: keyof WizardValues;
-        // There is a previous step, the current step is index - 1
+        // There is a previous step
         if (hasPreviousStep(index)) {
           newCurrentStep = previous[index - 1];
-          // Else, there is a next step, the current step is index + 1
+          // There is a next step
         } else if (hasNextStep(index, previous)) {
           newCurrentStep = previous[index + 1];
         }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        // @ts-expect-error This is probably wrong
         setCurrentStep(newCurrentStep);
-        return [...previous.slice(0, index), ...previous.slice(index + 1)];
+        return newSteps;
       });
 
       delete validationFnsRef.current[name];
       stepsWithoutFooterRef.current.delete(name);
       titlesRef.current = titlesRef.current.filter(({ name: currentName }) => currentName !== name);
     },
-    [hasNextStep, hasPreviousStep],
+    [currentStep, hasNextStep, hasPreviousStep],
   );
 
   const handleGoBackTo = useCallback<WizardContextApi<WizardValues>['handleGoBackTo']>(
