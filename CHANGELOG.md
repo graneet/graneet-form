@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.29](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.28...v2.0.0-beta.29) (2024-03-16)
+
+
+### Bug Fixes
+
+* wizard issues when on next ref change ([#66](https://github.com/graneet/graneet-form/issues/66)) ([99701d7](https://github.com/graneet/graneet-form/commits/99701d7e7ee6afb64bcea7ecc3618a4be7f3cfb2))
+
 ## [2.0.0-beta.28](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.27...v2.0.0-beta.28) (2024-03-16)
 
 
