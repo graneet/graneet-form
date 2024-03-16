@@ -7,7 +7,7 @@ import type { PlaceholderContent, PlaceholderContentSetter } from '../types/Plac
 import type { StepValidator } from '../types/StepValidator';
 
 export function useWizard<WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>>(
-  onFinish: (wizardValues: WizardValues) => void,
+  onFinish: (wizardValues: WizardValues) => void | Promise<void>,
   onQuit: () => void,
 ): WizardContextApi<WizardValues> {
   // -- VALUES --
@@ -17,10 +17,9 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
   // -- STEP --
   const [currentStep, setCurrentStep] = useState<keyof WizardValues>();
   const [steps, setSteps] = useState<Array<keyof WizardValues>>([]);
-  const validationFnsRef = useRef<
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    PartialRecord<keyof WizardValues, StepValidator<WizardValues, any>>
-  >({});
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  const validationFnsRef = useRef<PartialRecord<keyof WizardValues, StepValidator<WizardValues, any>>>({});
+
   const stepsWithoutFooterRef = useRef<Set<keyof WizardValues>>(new Set());
   const [isStepReady, setIsStepReady] = useState(false);
 
