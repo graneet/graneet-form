@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.28](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.27...v2.0.0-beta.28) (2024-03-16)
+
+
+### Features
+
+* add demo app ([#63](https://github.com/graneet/graneet-form/issues/63)) ([4bc33e5](https://github.com/graneet/graneet-form/commits/4bc33e571db8d3356e47270c3dcc67600731fe9c))
+* improve tree shacking ([#65](https://github.com/graneet/graneet-form/issues/65)) ([89712af](https://github.com/graneet/graneet-form/commits/89712af9260dcd3e5484a4eeb32c804c3d4bb2fe))
+* use biome ([#64](https://github.com/graneet/graneet-form/issues/64)) ([1b10f6c](https://github.com/graneet/graneet-form/commits/1b10f6c05ae738760f5ccdc093dd5a25a4263b55))
+
 ## [2.0.0-beta.27](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.26...v2.0.0-beta.27) (2024-03-15)
 
 ## [2.0.0-beta.26](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.25...v2.0.0-beta.26) (2024-03-15)
