@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect } from 'react';
 import type { FieldValues } from '../../shared/types/FieldValue';
+import { useCallbackRef } from '../../shared/util/useCallbackRef';
 import { CONTEXT_WIZARD_DEFAULT, useWizardContext } from '../contexts/WizardContext';
 import type { StepValidator } from '../types/StepValidator';
 
@@ -48,10 +49,12 @@ export function Step<
     throw new Error('Step not in wizard');
   }
 
+  const onNextRef = useCallbackRef(onNext ?? (() => true));
+
   useEffect(() => {
-    registerStep(name, onNext, noFooter, title);
+    registerStep(name, onNextRef, noFooter, title);
     return () => unregisterStep(name);
-  }, [registerStep, unregisterStep, name, onNext, noFooter, title]);
+  }, [registerStep, unregisterStep, name, noFooter, title, onNextRef]);
 
   useEffect(() => {
     if (currentStep === name) {
