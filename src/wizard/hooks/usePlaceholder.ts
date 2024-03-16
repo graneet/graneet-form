@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { VALIDATION_OUTCOME } from '../../shared';
+import { VALIDATION_OUTCOME } from '../../shared/types/Validation';
 import { useWizardContext } from '../contexts/WizardContext';
-import type { PlaceholderContent } from '../types';
+import type { PlaceholderContent } from '../types/PlaceholderContent';
 
 interface UsePlaceholder {
   handleOnNext(): void;
@@ -18,12 +18,9 @@ export function usePlaceholder(): UsePlaceholder {
     wizardInternal: { registerPlaceholder, unregisterPlaceholder },
   } = useWizardContext();
 
-  const [placeholderContent, setPlaceholderContent] =
-    useState<PlaceholderContent>({});
+  const [placeholderContent, setPlaceholderContent] = useState<PlaceholderContent>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [stepStatus, setStepStatus] = useState<VALIDATION_OUTCOME>(
-    VALIDATION_OUTCOME.VALID,
-  );
+  const [stepStatus, setStepStatus] = useState<VALIDATION_OUTCOME>(VALIDATION_OUTCOME.VALID);
 
   useEffect(() => {
     registerPlaceholder(setPlaceholderContent, setStepStatus);

@@ -1,22 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  type FieldValue,
-  VALIDATION_OUTCOME,
-  type ValidationStatus,
-} from '../../shared';
-import {
-  VALIDATION_STATE_UNDETERMINED,
-  VALIDATION_STATE_VALID,
-} from '../types/Validation';
+import type { FieldValue } from '../../shared/types/FieldValue';
+import { VALIDATION_OUTCOME, type ValidationStatus } from '../../shared/types/Validation';
+import { VALIDATION_STATE_UNDETERMINED, VALIDATION_STATE_VALID } from '../types/Validation';
 import type { IRule } from './useRules';
 
 const DEBOUNCE_TIME = 500;
 
-export function useFieldValidation(
-  rules: IRule[],
-  debouncedRules: IRule[],
-  value: FieldValue,
-): ValidationStatus {
+export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], value: FieldValue): ValidationStatus {
   const numberOfRules = rules.length + debouncedRules.length;
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>(
     numberOfRules ? VALIDATION_STATE_UNDETERMINED : VALIDATION_STATE_VALID,
@@ -53,10 +43,7 @@ export function useFieldValidation(
           If we run the last rule, and no error was thrown,
           update status to VALIDATION_STATE_VALID
          */
-            if (
-              isValid &&
-              metaStateRef.current.countRulesResolved === numberOfRules
-            ) {
+            if (isValid && metaStateRef.current.countRulesResolved === numberOfRules) {
               setValidationStatus(VALIDATION_STATE_VALID);
             }
           })

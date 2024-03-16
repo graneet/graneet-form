@@ -1,8 +1,6 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { defineConfig, type Options } from 'tsup';
+import { type Options, defineConfig } from 'tsup';
 
-const isProduction = (options: Options) =>
-  options.env?.NODE_ENV === 'production';
+const isProduction = (options: Options) => options.env?.NODE_ENV === 'production';
 
 export default defineConfig((options) => ({
   entry: ['src/index.ts'],

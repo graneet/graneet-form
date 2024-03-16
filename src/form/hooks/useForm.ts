@@ -1,17 +1,8 @@
-import {
-  type Dispatch,
-  type SetStateAction,
-  useCallback,
-  useMemo,
-  useRef,
-} from 'react';
-import {
-  type AnyRecord,
-  type FieldValues,
-  VALIDATION_OUTCOME,
-  type ValidationStatus,
-} from '../../shared';
+import { type Dispatch, type SetStateAction, useCallback, useMemo, useRef } from 'react';
+import type { AnyRecord } from '../../shared/types/AnyRecord';
+import type { FieldValues } from '../../shared/types/FieldValue';
 import type { PartialRecord } from '../../shared/types/PartialRecord';
+import { VALIDATION_OUTCOME, type ValidationStatus } from '../../shared/types/Validation';
 import type { FormContextApi, FormInternal } from '../contexts/FormContext';
 import type { FormValidations } from '../types/FormValidations';
 import type { FormValues } from '../types/FormValues';
@@ -46,13 +37,11 @@ export interface UseFormOptions<T extends FieldValues> {
  * </Form>
  * ```
  */
-export function useForm<
-  T extends FieldValues = Record<string, Record<string, unknown>>,
->({ onUpdateAfterBlur }: UseFormOptions<T> = {}): FormContextApi<T> {
+export function useForm<T extends FieldValues = Record<string, Record<string, unknown>>>({
+  onUpdateAfterBlur,
+}: UseFormOptions<T> = {}): FormContextApi<T> {
   // -- TYPES --
-  const globalTimeoutRef = useRef<
-    Record<'errors' | 'values', Record<string, NodeJS.Timeout>>
-  >({
+  const globalTimeoutRef = useRef<Record<'errors' | 'values', Record<string, NodeJS.Timeout>>>({
     errors: {},
     values: {},
   });
@@ -71,8 +60,7 @@ export function useForm<
    */
   const focusedFieldNamesRef = useRef(new Set<keyof T>());
 
-  const handleFormSubmitRef =
-    useRef<(formValues: Partial<T>) => void | Promise<void>>();
+  const handleFormSubmitRef = useRef<(formValues: Partial<T>) => void | Promise<void>>();
 
   // -- SUBSCRIPTION --
 
@@ -101,15 +89,8 @@ export function useForm<
   type FormErrorSubscribersRef = Record<
     WATCH_MODE,
     {
-      global: Set<
-        Dispatch<
-          SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>
-        >
-      >;
-      scoped: PartialRecord<
-        keyof T,
-        Set<Dispatch<SetStateAction<FormValidations<T, keyof T>>>>
-      >;
+      global: Set<Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>>;
+      scoped: PartialRecord<keyof T, Set<Dispatch<SetStateAction<FormValidations<T, keyof T>>>>>;
     }
   >;
   const formErrorsSubscribersRef = useRef<FormErrorSubscribersRef>({
@@ -126,37 +107,31 @@ export function useForm<
   // -- EXPORTS --
 
   const getFormValues = useCallback<FormContextApi<T>['getFormValues']>(() => {
-    return Object.keys(formStateRef.current).reduce<Partial<T>>(
-      (acc, name: keyof T) => {
-        if (formStateRef.current[name]?.isRegistered) {
-          acc[name] = formStateRef.current[name]?.value;
-        }
-        return acc;
-      },
-      {},
-    );
+    return Object.keys(formStateRef.current).reduce<Partial<T>>((acc, name: keyof T) => {
+      if (formStateRef.current[name]?.isRegistered) {
+        acc[name] = formStateRef.current[name]?.value;
+      }
+      return acc;
+    }, {});
   }, []);
 
-  const getFormValuesForNames = useCallback<
-    FormInternal<T>['getFormValuesForNames']
-  >(<K extends keyof T>(names: K[]): FormValues<T, K> => {
-    return names.reduce<FormValues<T, K>>(
-      (acc, name) => {
-        if (formStateRef.current[name]?.isRegistered) {
-          acc[name] = formStateRef.current[name]?.value;
-        }
-        return acc;
-      },
-      {} as FormValues<T, K>,
-    );
-  }, []);
+  const getFormValuesForNames = useCallback<FormInternal<T>['getFormValuesForNames']>(
+    <K extends keyof T>(names: K[]): FormValues<T, K> => {
+      return names.reduce<FormValues<T, K>>(
+        (acc, name) => {
+          if (formStateRef.current[name]?.isRegistered) {
+            acc[name] = formStateRef.current[name]?.value;
+          }
+          return acc;
+        },
+        {} as FormValues<T, K>,
+      );
+    },
+    [],
+  );
 
-  const getFormErrors = useCallback<
-    FormInternal<T>['getFormErrors']
-  >((): PartialRecord<keyof T, ValidationStatus> => {
-    return Object.keys(formStateRef.current).reduce<
-      PartialRecord<keyof T, ValidationStatus>
-    >((acc, name: keyof T) => {
+  const getFormErrors = useCallback<FormInternal<T>['getFormErrors']>((): PartialRecord<keyof T, ValidationStatus> => {
+    return Object.keys(formStateRef.current).reduce<PartialRecord<keyof T, ValidationStatus>>((acc, name: keyof T) => {
       if (formStateRef.current[name]?.isRegistered) {
         acc[name] = formStateRef.current[name]?.validation;
       }
@@ -164,12 +139,8 @@ export function useForm<
     }, {});
   }, []);
 
-  const getFormErrorsForNames = useCallback<
-    FormInternal<T>['getFormErrorsForNames']
-  >(
-    <K extends keyof T>(
-      names: K[],
-    ): Record<K, ValidationStatus | undefined> => {
+  const getFormErrorsForNames = useCallback<FormInternal<T>['getFormErrorsForNames']>(
+    <K extends keyof T>(names: K[]): Record<K, ValidationStatus | undefined> => {
       return names.reduce<Record<K, ValidationStatus | undefined>>(
         (acc, name) => {
           if (formStateRef.current[name]?.isRegistered) {
@@ -193,8 +164,7 @@ export function useForm<
     (name: keyof T, watchMode: WATCH_MODE): void => {
       // Update watcher for this field name
       if (formValuesSubscribersRef.current[watchMode].scoped[name]) {
-        for (const publish of formValuesSubscribersRef.current[watchMode]
-          .scoped[name] || []) {
+        for (const publish of formValuesSubscribersRef.current[watchMode].scoped[name] || []) {
           /*
            * Publish is a function given by react hook `useState`:
            * `const [example, setExample] = useState(() => {})` It's `setExample`
@@ -205,9 +175,7 @@ export function useForm<
            */
           publish((previous) => ({
             ...previous,
-            [name]: formStateRef.current[name]?.isRegistered
-              ? formStateRef.current[name]?.value
-              : undefined,
+            [name]: formStateRef.current[name]?.isRegistered ? formStateRef.current[name]?.value : undefined,
           }));
         }
       }
@@ -220,8 +188,7 @@ export function useForm<
         globalTimeoutRef.current.values[watchMode] = setTimeout(() => {
           const formValues = getFormValues();
           // Update global watcher
-          for (const publish of formValuesSubscribersRef.current[watchMode]
-            .global) {
+          for (const publish of formValuesSubscribersRef.current[watchMode].global) {
             // To be simpler, send value returned by getFormValues method
             publish(formValues);
           }
@@ -241,8 +208,7 @@ export function useForm<
     (name: keyof T, watchMode: WATCH_MODE): void => {
       // Update watcher for this field name
       if (formErrorsSubscribersRef.current[watchMode].scoped[name]) {
-        for (const publish of formErrorsSubscribersRef.current[watchMode]
-          .scoped[name] || []) {
+        for (const publish of formErrorsSubscribersRef.current[watchMode].scoped[name] || []) {
           /*
            * Publish is a function given by react hook useState:
            * `const [example, setExample] = useState(() => {})` It's `setExample`
@@ -270,8 +236,7 @@ export function useForm<
         globalTimeoutRef.current.errors[watchMode] = setTimeout(() => {
           const formValues = getFormErrors();
           // Update global watcher
-          for (const publish of formErrorsSubscribersRef.current[watchMode]
-            .global) {
+          for (const publish of formErrorsSubscribersRef.current[watchMode].global) {
             // To be simpler, send value returned by getFormValues method
             publish(formValues);
           }
@@ -307,9 +272,7 @@ export function useForm<
     [updateErrorSubscribers],
   );
 
-  const addGlobalValueSubscriber = useCallback<
-    FormInternal<T>['addGlobalValueSubscriber']
-  >(
+  const addGlobalValueSubscriber = useCallback<FormInternal<T>['addGlobalValueSubscriber']>(
     (publish: Dispatch<SetStateAction<Partial<T>>>, watchMode: WATCH_MODE) => {
       formValuesSubscribersRef.current[watchMode].global.add(publish);
       publish(getFormValues());
@@ -334,36 +297,20 @@ export function useForm<
     [getFormValuesForNames],
   );
 
-  const addGlobalValidationStatusSubscriber = useCallback<
-    FormInternal<T>['addGlobalValidationStatusSubscriber']
-  >(
-    (
-      publish: Dispatch<
-        SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>
-      >,
-    ) => {
-      formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.add(
-        publish,
-      );
+  const addGlobalValidationStatusSubscriber = useCallback<FormInternal<T>['addGlobalValidationStatusSubscriber']>(
+    (publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>) => {
+      formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.add(publish);
       publish(getFormErrors());
     },
     [getFormErrors],
   );
 
-  const addValidationStatusSubscriber = useCallback<
-    FormInternal<T>['addValidationStatusSubscriber']
-  >(
-    <K extends keyof T>(
-      publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
-      names: K[],
-    ): void => {
+  const addValidationStatusSubscriber = useCallback<FormInternal<T>['addValidationStatusSubscriber']>(
+    <K extends keyof T>(publish: Dispatch<SetStateAction<FormValidations<T, K>>>, names: K[]): void => {
       for (const name of names) {
         // Initialize Set if there is no watcher for the field
-        if (
-          !formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]
-        ) {
-          formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name] =
-            new Set();
+        if (!formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]) {
+          formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name] = new Set();
         }
 
         formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[
@@ -377,15 +324,10 @@ export function useForm<
   );
 
   const registerField = useCallback<FormInternal<T>['registerField']>(
-    <K extends keyof T>(
-      name: K,
-      setValue: (value: T[K] | undefined) => void,
-    ): void => {
+    <K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): void => {
       const previousValueStored = formStateRef.current[name]?.value;
       if (formStateRef.current[name]?.isRegistered) {
-        throw new Error(
-          `Attempting to register field "${String(name)}" a second time`,
-        );
+        throw new Error(`Attempting to register field "${String(name)}" a second time`);
       }
 
       formStateRef.current[name] = {
@@ -402,10 +344,7 @@ export function useForm<
       addValueSubscriber<K>(
         (publish) => {
           // FIXME publish({} as FormValues<T, K>)
-          const values =
-            typeof publish === 'function'
-              ? publish({} as FormValues<T, K>)
-              : publish;
+          const values = typeof publish === 'function' ? publish({} as FormValues<T, K>) : publish;
           setValue(values?.[name]);
         },
         WATCH_MODE.ON_CHANGE,
@@ -430,23 +369,14 @@ export function useForm<
     [updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers],
   );
 
-  const removeGlobalValueSubscriber = useCallback<
-    FormInternal<T>['removeGlobalValueSubscriber']
-  >(
-    (
-      publish: Dispatch<SetStateAction<Partial<T>>>,
-      watchMode: WATCH_MODE,
-    ): void => {
-      formValuesSubscribersRef.current[watchMode].global.delete(
-        publish as Dispatch<SetStateAction<Partial<T>>>,
-      );
+  const removeGlobalValueSubscriber = useCallback<FormInternal<T>['removeGlobalValueSubscriber']>(
+    (publish: Dispatch<SetStateAction<Partial<T>>>, watchMode: WATCH_MODE): void => {
+      formValuesSubscribersRef.current[watchMode].global.delete(publish as Dispatch<SetStateAction<Partial<T>>>);
     },
     [],
   );
 
-  const removeValueSubscriber = useCallback<
-    FormInternal<T>['removeValueSubscriber']
-  >(
+  const removeValueSubscriber = useCallback<FormInternal<T>['removeValueSubscriber']>(
     <K extends keyof T>(
       publish: Dispatch<SetStateAction<FormValues<T, K>>>,
       watchMode: WATCH_MODE,
@@ -461,32 +391,17 @@ export function useForm<
     [],
   );
 
-  const removeGlobalValidationStatusSubscriber = useCallback<
-    FormInternal<T>['removeGlobalValidationStatusSubscriber']
-  >(
-    (
-      publish: Dispatch<
-        SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>
-      >,
-    ): void => {
-      formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.delete(
-        publish,
-      );
+  const removeGlobalValidationStatusSubscriber = useCallback<FormInternal<T>['removeGlobalValidationStatusSubscriber']>(
+    (publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>): void => {
+      formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].global.delete(publish);
     },
     [],
   );
 
-  const removeValidationStatusSubscriber = useCallback<
-    FormInternal<T>['removeValidationStatusSubscriber']
-  >(
-    <K extends keyof T>(
-      publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
-      names: K[],
-    ): void => {
+  const removeValidationStatusSubscriber = useCallback<FormInternal<T>['removeValidationStatusSubscriber']>(
+    <K extends keyof T>(publish: Dispatch<SetStateAction<FormValidations<T, K>>>, names: K[]): void => {
       for (const name of names) {
-        formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[
-          name
-        ]?.delete(
+        formErrorsSubscribersRef.current[WATCH_MODE.ON_CHANGE].scoped[name]?.delete(
           publish as Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
         );
       }
@@ -549,8 +464,7 @@ export function useForm<
         onUpdateAfterBlur &&
         focusedFieldNamesRef.current.has(name) &&
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        formStateRef.current[name]!.validation.status ===
-          VALIDATION_OUTCOME.VALID
+        formStateRef.current[name]!.validation.status === VALIDATION_OUTCOME.VALID
       ) {
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         await onUpdateAfterBlur(name, formStateRef.current[name]!.value, data, {
@@ -563,9 +477,7 @@ export function useForm<
     [updateValueSubscribers, onUpdateAfterBlur, getFormValues, setFormValues],
   );
 
-  const updateValidationStatus = useCallback<
-    FormInternal<T>['updateValidationStatus']
-  >(
+  const updateValidationStatus = useCallback<FormInternal<T>['updateValidationStatus']>(
     (name: keyof T, validationStatus: ValidationStatus): void => {
       if (!formStateRef.current[name]) {
         throw new Error(`Field "${String(name)}" is not registered`);
@@ -591,13 +503,10 @@ export function useForm<
     }
   }, [updateValueForAllTypeOfSubscribers]);
 
-  const handleSubmit = useCallback<
-    FormContextApi<T>['experimental_handleSubmit']
-  >(
-    (submitCallback: (formValues: Partial<T>) => void | Promise<void>) =>
-      () => {
-        handleFormSubmitRef.current = submitCallback;
-      },
+  const handleSubmit = useCallback<FormContextApi<T>['experimental_handleSubmit']>(
+    (submitCallback: (formValues: Partial<T>) => void | Promise<void>) => () => {
+      handleFormSubmitRef.current = submitCallback;
+    },
     [],
   );
 

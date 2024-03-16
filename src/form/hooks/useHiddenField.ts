@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { FieldValues } from '../../shared';
+import type { FieldValues } from '../../shared/types/FieldValue';
 import type { FormContextApi } from '../contexts/FormContext';
 import { useOnChangeValues } from './useValues';
 

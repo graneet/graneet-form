@@ -1,28 +1,20 @@
 import { useEffect, useState } from 'react';
-import type {
-  FieldValues,
-  PartialRecord,
-  Prettify,
-  ValidationStatus,
-} from '../../shared';
-import {
-  CONTEXT_FORM_DEFAULT,
-  type FormContextApi,
-} from '../contexts/FormContext';
+import type { FieldValues } from '../../shared/types/FieldValue';
+import type { PartialRecord } from '../../shared/types/PartialRecord';
+import type { Prettify } from '../../shared/types/Prettify';
+import type { ValidationStatus } from '../../shared/types/Validation';
+import { CONTEXT_FORM_DEFAULT, type FormContextApi } from '../contexts/FormContext';
 import type { FormValidations } from '../types/FormValidations';
 
 function useGlobalValidationInternal<T extends FieldValues>(
   form: FormContextApi<T>,
 ): PartialRecord<keyof T, ValidationStatus | undefined> {
   const {
-    formInternal: {
-      addGlobalValidationStatusSubscriber,
-      removeGlobalValidationStatusSubscriber,
-    },
+    formInternal: { addGlobalValidationStatusSubscriber, removeGlobalValidationStatusSubscriber },
   } = form;
-  const [currentValidations, setCurrentValidations] = useState<
-    PartialRecord<keyof T, ValidationStatus | undefined>
-  >({});
+  const [currentValidations, setCurrentValidations] = useState<PartialRecord<keyof T, ValidationStatus | undefined>>(
+    {},
+  );
 
   if (form === CONTEXT_FORM_DEFAULT) {
     throw new Error('No form context could be found.');
@@ -31,10 +23,7 @@ function useGlobalValidationInternal<T extends FieldValues>(
   useEffect(() => {
     addGlobalValidationStatusSubscriber(setCurrentValidations);
     return () => removeGlobalValidationStatusSubscriber(setCurrentValidations);
-  }, [
-    addGlobalValidationStatusSubscriber,
-    removeGlobalValidationStatusSubscriber,
-  ]);
+  }, [addGlobalValidationStatusSubscriber, removeGlobalValidationStatusSubscriber]);
 
   return currentValidations;
 }
@@ -44,14 +33,9 @@ function useValidationsInternal<T extends FieldValues, K extends keyof T>(
   names: K[],
 ): Prettify<FormValidations<T, K>> {
   const {
-    formInternal: {
-      addValidationStatusSubscriber,
-      removeValidationStatusSubscriber,
-    },
+    formInternal: { addValidationStatusSubscriber, removeValidationStatusSubscriber },
   } = form;
-  const [currentValidations, setCurrentValidations] = useState<
-    FormValidations<T, K>
-  >({} as FormValidations<T, K>);
+  const [currentValidations, setCurrentValidations] = useState<FormValidations<T, K>>({} as FormValidations<T, K>);
 
   if (form === CONTEXT_FORM_DEFAULT) {
     throw new Error('No form context could be found.');
@@ -61,11 +45,7 @@ function useValidationsInternal<T extends FieldValues, K extends keyof T>(
   useEffect(() => {
     addValidationStatusSubscriber(setCurrentValidations, names);
     return () => removeValidationStatusSubscriber(setCurrentValidations, names);
-  }, [
-    addValidationStatusSubscriber,
-    names?.join(),
-    removeValidationStatusSubscriber,
-  ]);
+  }, [addValidationStatusSubscriber, names?.join(), removeValidationStatusSubscriber]);
 
   return currentValidations;
 }

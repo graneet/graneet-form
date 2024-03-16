@@ -1,15 +1,9 @@
 import { type ReactNode, useEffect } from 'react';
 import type { FieldValues } from '../../shared/types/FieldValue';
-import {
-  CONTEXT_WIZARD_DEFAULT,
-  useWizardContext,
-} from '../contexts/WizardContext';
-import type { StepValidator } from '../types';
+import { CONTEXT_WIZARD_DEFAULT, useWizardContext } from '../contexts/WizardContext';
+import type { StepValidator } from '../types/StepValidator';
 
-export interface StepProps<
-  WizardValues extends Record<string, FieldValues>,
-  Step extends keyof WizardValues,
-> {
+export interface StepProps<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues> {
   children: ReactNode;
   name: Step;
   onNext?: StepValidator<WizardValues, Step>;
