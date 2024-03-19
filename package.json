@@ -1,13 +1,7 @@
 {
   "name": "graneet-form",
   "version": "2.0.0-beta.29",
-  "keywords": [
-    "react",
-    "form",
-    "forms",
-    "validation",
-    "typescript"
-  ],
+  "keywords": ["react", "form", "forms", "validation", "typescript"],
   "homepage": "https://github.com/graneet/graneet-form",
   "bugs": {
     "url": "https://github.com/graneet/graneet-form/issues"
@@ -25,7 +19,7 @@
   "scripts": {
     "start": "tsup --config tsup.config.ts --env.NODE_ENV development",
     "build": "tsup --config tsup.config.ts --env.NODE_ENV production",
-    "lint": "biome lint ./src ./app",
+    "lint": "biome lint ./src ./app ./docs",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
     "release:patch": "standard-version --release-as patch",

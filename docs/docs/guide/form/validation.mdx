@@ -1,0 +1,53 @@
+import { IFrame } from "../../../src/components/IFrame";
+
+# Validation
+
+## Rule
+The library exposes the `Rule` component that you need to use to implement your rule. For example, there is a simple rule to check if a value is defined.
+
+```tsx
+const isNullOrUndefined = (x: unknown): x is null | undefined => x === null || x === undefined;
+
+const isEmpty = (value: unknown): value is '' => value === '';
+
+const isRequired = (value: unknown) => !isNullOrUndefined(value) && !isEmpty(value);
+
+const RuleIsRequired = () => {
+  return <Rule message="This field is required" validationFn={isRequired} />;
+}
+
+
+// In you component
+<Field
+      name={name}
+      render={(fieldProps) => {
+        const { onBlur, onChange, onFocus, value } = fieldProps;
+
+        const handleChange: InputHTMLAttributes<HTMLInputElement>['onChange'] =
+          (e) => {
+            onChange(e.target.value);
+          };
+
+        return (
+          <input
+            onChange={handleChange}
+            onBlur={onBlur}
+            onFocus={onFocus}
+            value={value}
+          />
+        );
+      }}
+    >
+      <RuleIsRequired /> {/* The field is now a required field */}
+</Field>
+```
+
+You can use the rule inside each `Field` of the library. Rule will be checked on blur.
+
+## Hooks
+
+TODO useValidations & useFormStatus
+
+## Example
+
+<IFrame model="validation-form" />

@@ -1,0 +1,20 @@
+import { IFrame } from "../../../src/components/IFrame";
+
+# Usage
+
+You can build forms strongly types with a simple syntax.
+
+## Explanation
+
+The library has a concept of registered field. When an input (having the library wrapper) is rendered with JSX. It is registered and will be
+able to see, update or watch its value.
+
+## Example
+
+In this example, we are building a simple form with one input with a default value.
+
+<IFrame model="simple-form" />
+
+## Access to form in nested component of `Form`
+
+To avoid prop drilling of form from `useForm`, you can use `useFormContext` inside a component, child of `Form`
