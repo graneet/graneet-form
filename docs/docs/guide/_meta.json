@@ -1,0 +1,17 @@
+[
+  {
+    "type": "dir",
+    "name": "start",
+    "label": "Getting started"
+  },
+  {
+    "type": "dir",
+    "name": "form",
+    "label": "Form"
+  },
+  {
+    "type": "dir",
+    "name": "wizard",
+    "label": "Wizard"
+  }
+]

@@ -1,0 +1,41 @@
+import { Tab, Tabs } from 'rspress/theme';
+
+# Why building another form library
+
+At Graneet, we are dealing with big form. We have pages having potentially 1000 inputs displayed at the same time. We used in the past very well known library like Formik or React hook form. But there no who could match our needs.
+
+## Formik
+The problem we encountered with the library is performance issues. This is every good library, but the library is not built with performance in mind. We had too much page loading and updated due to rendering issue.
+
+## React hook form
+React hook form is known for being a very performent library and having a very good API. But we had two blocking issues:
+- error triggers many renders (because the library handles error in a big object without having a subscriber system)
+- in our app, we have multiple steps forms and integrating form in it was a very big challenge. At a time, we developed a solution on top of React hook form (see the POC of our CTO built several years ago https://github.com/orgs/react-hook-form/discussions/1979). But with time and additional complexities, we came with an unmaintainable overlay. The decision was made to build a library matching our needs.
+
+# Specifications
+The library is built with performance is mind and keys features are:
+- having a subscribers system: you can watch a field or a form
+- error handling
+- build-in step form system (called Wizard)
+
+# Installation
+
+To use graneet-form in your project, invoke the following command:
+
+<Tabs>
+    <Tab label="pnpm">
+        ```shell
+            pnpm install graneet-form
+        ```
+    </Tab>
+    <Tab label="yarn">
+        ```shell
+            yarn install graneet-form
+        ```
+    </Tab>
+    <Tab label="npm">
+        ```shell
+            npm install graneet-form
+        ```
+    </Tab>
+</Tabs>

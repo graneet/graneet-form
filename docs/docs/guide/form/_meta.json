@@ -1,0 +1,27 @@
+[
+  {
+    "type": "file",
+    "name": "usage",
+    "label": "Usage"
+  },
+  {
+    "type": "file",
+    "name": "subscribers",
+    "label": "Subscribers"
+  },
+  {
+    "type": "file",
+    "name": "validation",
+    "label": "Validation"
+  },
+  {
+    "type": "file",
+    "name": "hidden-field",
+    "label": "Hidden Field"
+  },
+  {
+    "type": "file",
+    "name": "complex-typescript",
+    "label": "Complex Typescript"
+  }
+]
