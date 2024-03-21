@@ -8,8 +8,12 @@ interface FormValues {
 export function FieldTests() {
   const form = useForm<FormValues>();
 
+  const onSubmit = (values: FormValues) => {
+    alert(JSON.stringify(values));
+  };
+
   return (
-    <Form form={form}>
+    <Form form={form} onSubmit={form.experimental_handleSubmit(onSubmit)}>
       <div>Text field test</div>
       <TextField<FormValues> name="foo" />
 
@@ -17,14 +21,7 @@ export function FieldTests() {
       <br />
       <br />
 
-      <button
-        type="button"
-        onClick={() => {
-          alert(JSON.stringify(form.getFormValues()));
-        }}
-      >
-        Get values
-      </button>
+      <button type="submit">Get values</button>
     </Form>
   );
 }

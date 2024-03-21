@@ -1,4 +1,5 @@
 import { Field, type FieldValues } from 'graneet-form';
+import { Rule } from 'graneet-form';
 import type { ChangeEventHandler } from 'react';
 
 type KeysMatching<T, V> = {
@@ -7,10 +8,7 @@ type KeysMatching<T, V> = {
 
 type TextFieldValue = string | undefined;
 
-interface TextFieldProps<
-  T extends FieldValues,
-  K extends KeysMatching<T, TextFieldValue>,
-> {
+interface TextFieldProps<T extends FieldValues, K extends KeysMatching<T, TextFieldValue>> {
   name: K;
 }
 
@@ -28,15 +26,10 @@ export function TextField<
           onChange(e.target.value as T[K]);
         };
 
-        return (
-          <input
-            value={value}
-            onChange={handleChange}
-            onBlur={onBlur}
-            onFocus={onFocus}
-          />
-        );
+        return <input value={value} onChange={handleChange} onBlur={onBlur} onFocus={onFocus} />;
       }}
-    />
+    >
+      <Rule validationFn={(v) => !!v} message="false" />
+    </Field>
   );
 }
