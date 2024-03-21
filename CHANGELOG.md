@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.30](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.29...v2.0.0-beta.30) (2024-03-21)
+
+
+### Features
+
+* add link to doc ([#68](https://github.com/graneet/graneet-form/issues/68)) ([ede8f54](https://github.com/graneet/graneet-form/commits/ede8f54f6a40d19065828acbcc831975cb545e5d))
+* allow usage onSubmit on form balise ([#70](https://github.com/graneet/graneet-form/issues/70)) ([4f12444](https://github.com/graneet/graneet-form/commits/4f124445a873f0bdd74c32ea14f1ef8241886a8f))
+* init doc ([#67](https://github.com/graneet/graneet-form/issues/67)) ([46c01ce](https://github.com/graneet/graneet-form/commits/46c01ce86badec74ae2a97730d5ab61e8451064a))
+* upgrade all deps ([#69](https://github.com/graneet/graneet-form/issues/69)) ([735e2ae](https://github.com/graneet/graneet-form/commits/735e2aef1c12d538af2d8713ea4c1d59ef5fe6cb))
+
 ## [2.0.0-beta.29](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.28...v2.0.0-beta.29) (2024-03-16)
 
 
