@@ -3,6 +3,7 @@ import type { AnyRecord } from '../../shared/types/AnyRecord';
 import type { FieldValues } from '../../shared/types/FieldValue';
 import type { PartialRecord } from '../../shared/types/PartialRecord';
 import { VALIDATION_OUTCOME, type ValidationStatus } from '../../shared/types/Validation';
+import { useCallbackRef } from '../../shared/util/useCallbackRef';
 import type { FormContextApi, FormInternal } from '../contexts/FormContext';
 import type { FormValidations } from '../types/FormValidations';
 import type { FormValues } from '../types/FormValues';
@@ -103,6 +104,8 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       scoped: {},
     },
   });
+
+  const onUpdateAfterBlurRef = useCallbackRef(onUpdateAfterBlur ?? (() => {}));
 
   // -- EXPORTS --
 
@@ -461,20 +464,19 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       }
 
       if (
-        onUpdateAfterBlur &&
         focusedFieldNamesRef.current.has(name) &&
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         formStateRef.current[name]!.validation.status === VALIDATION_OUTCOME.VALID
       ) {
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        await onUpdateAfterBlur(name, formStateRef.current[name]!.value, data, {
+        await onUpdateAfterBlurRef(name, formStateRef.current[name]!.value, data, {
           getFormValues,
           setFormValues,
         });
       }
       focusedFieldNamesRef.current.delete(name);
     },
-    [updateValueSubscribers, onUpdateAfterBlur, getFormValues, setFormValues],
+    [updateValueSubscribers, onUpdateAfterBlurRef, getFormValues, setFormValues],
   );
 
   const updateValidationStatus = useCallback<FormInternal<T>['updateValidationStatus']>(

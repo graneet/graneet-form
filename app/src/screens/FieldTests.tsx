@@ -1,4 +1,5 @@
 import { Form, useForm } from 'graneet-form';
+import { useEffect, useState } from 'react';
 import { TextField } from '../components/TextField.tsx';
 
 interface FormValues {
@@ -6,10 +7,20 @@ interface FormValues {
 }
 
 export function FieldTests() {
-  const form = useForm<FormValues>();
+  const [trigger, setTrigger] = useState('');
+  const form = useForm<FormValues>({
+    onUpdateAfterBlur: () => {
+      console.log(trigger);
+    },
+  });
+
+  useEffect(() => {
+    console.log('render', form);
+  }, [form]);
 
   const onSubmit = (values: FormValues) => {
     alert(JSON.stringify(values));
+    setTrigger(JSON.stringify(values));
   };
 
   return (
