@@ -11,12 +11,20 @@ import { VALIDATION_STATE_UNDETERMINED } from '../types/Validation';
 import { WATCH_MODE } from '../types/WatchMode';
 
 export interface UseFormOptions<T extends FieldValues> {
+  /**
+   * Callback run on blur when a field is updated
+   */
   onUpdateAfterBlur?<K extends keyof T>(
     name: K,
     value: T[K] | undefined,
     data: AnyRecord,
     formPartial: Pick<FormContextApi<T>, 'getFormValues' | 'setFormValues'>,
   ): Promise<void> | void;
+
+  /**
+   * Form default values
+   */
+  defaultValues?: Partial<T>;
 }
 
 /**
@@ -40,6 +48,7 @@ export interface UseFormOptions<T extends FieldValues> {
  */
 export function useForm<T extends FieldValues = Record<string, Record<string, unknown>>>({
   onUpdateAfterBlur,
+  defaultValues,
 }: UseFormOptions<T> = {}): FormContextApi<T> {
   // -- TYPES --
   const globalTimeoutRef = useRef<Record<'errors' | 'values', Record<string, NodeJS.Timeout>>>({
@@ -54,7 +63,24 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     validation: ValidationStatus;
     isRegistered: boolean;
   }
-  const formStateRef = useRef<{ [K in keyof T]?: FieldState<K> }>({});
+  const formStateRef = useRef<{ [K in keyof T]?: FieldState<K> }>(
+    (Object.keys(defaultValues ?? {}) as (keyof T)[]).reduce(
+      (acc, key) => {
+        console.log(1);
+
+        acc[key] = {
+          name: key,
+          value: defaultValues?.[key],
+          validation: VALIDATION_STATE_UNDETERMINED,
+          isRegistered: false,
+        };
+
+        return acc;
+      },
+      {} as { [K in keyof T]?: FieldState<K> },
+    ),
+  );
+
   /**
    * We can have multiple fields on update at the same time because of usage of effect, we trigger an on change event
    * before triggering an on blur event.

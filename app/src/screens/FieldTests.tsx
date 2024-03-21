@@ -12,6 +12,9 @@ export function FieldTests() {
     onUpdateAfterBlur: () => {
       console.log(trigger);
     },
+    defaultValues: {
+      foo: 'Victor',
+    },
   });
 
   useEffect(() => {
