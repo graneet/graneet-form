@@ -137,9 +137,9 @@ export interface FormInternal<T extends FieldValues> {
   updateValidationStatus(name: keyof T, validationStatus: ValidationStatus): void;
 
   /**
-   * Get callback initialized by used than must be run on form submit
+   * Get callback initialized by used than must be run on form submitted
    */
-  getHandleFormSubmit(): ((formValues: Partial<T>) => void | Promise<void>) | undefined;
+  getHandleFormSubmit(): ((formValues: T) => void | Promise<void>) | undefined;
 }
 
 export interface FormContextApi<T extends FieldValues> {
@@ -180,7 +180,7 @@ export interface FormContextApi<T extends FieldValues> {
    * Wrapper to handle form submit
    * @param submitCallback Callback executed when form is sent
    */
-  experimental_handleSubmit(submitCallback: (formValues: Partial<T>) => void | Promise<void>): () => void;
+  experimental_handleSubmit(submitCallback: (formValues: T) => void | Promise<void>): () => void;
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>

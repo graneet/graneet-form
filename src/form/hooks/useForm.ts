@@ -60,7 +60,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
    */
   const focusedFieldNamesRef = useRef(new Set<keyof T>());
 
-  const handleFormSubmitRef = useRef<(formValues: Partial<T>) => void | Promise<void>>();
+  const handleFormSubmitRef = useRef<(formValues: T) => void | Promise<void>>();
 
   // -- SUBSCRIPTION --
 
@@ -504,7 +504,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   }, [updateValueForAllTypeOfSubscribers]);
 
   const handleSubmit = useCallback<FormContextApi<T>['experimental_handleSubmit']>(
-    (submitCallback: (formValues: Partial<T>) => void | Promise<void>) => () => {
+    (submitCallback: (formValues: T) => void | Promise<void>) => () => {
       handleFormSubmitRef.current = submitCallback;
     },
     [],

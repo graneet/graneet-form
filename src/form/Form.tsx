@@ -1,4 +1,4 @@
-import React, { type FormHTMLAttributes, type ReactNode, useCallback, type FormEventHandler } from 'react';
+import { type FormEventHandler, type FormHTMLAttributes, type ReactNode, useCallback } from 'react';
 import type { FieldValues } from '../shared/types/FieldValue';
 import { VALIDATION_OUTCOME } from '../shared/types/Validation';
 import { mapValidationStatusesToOutcome } from '../shared/util/validation.util';
@@ -7,6 +7,7 @@ import { FormContext, type FormContextApi } from './contexts/FormContext';
 interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
   children: ReactNode;
   form: FormContextApi<T>;
+  onSubmit(): void;
 }
 
 /**
@@ -22,11 +23,15 @@ interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLF
  * )
  * ```
  */
-export function Form<T extends FieldValues>({ children, form, ...otherProps }: FormProps<T>) {
+export function Form<T extends FieldValues>({ children, form, onSubmit, ...otherProps }: FormProps<T>) {
   const {
     getFormValues,
     formInternal: { getFormErrors, getHandleFormSubmit },
   } = form;
+
+  if (onSubmit) {
+    onSubmit();
+  }
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
@@ -38,7 +43,7 @@ export function Form<T extends FieldValues>({ children, form, ...otherProps }: F
         const handleFormSubmit = getHandleFormSubmit();
 
         if (handleFormSubmit) {
-          await handleFormSubmit(getFormValues());
+          await handleFormSubmit(getFormValues() as T);
         }
       }
     },
