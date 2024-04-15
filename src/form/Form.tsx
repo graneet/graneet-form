@@ -7,7 +7,7 @@ import { FormContext, type FormContextApi } from './contexts/FormContext';
 interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
   children: ReactNode;
   form: FormContextApi<T>;
-  onSubmit(): void;
+  onSubmit?: () => void;
 }
 
 /**
