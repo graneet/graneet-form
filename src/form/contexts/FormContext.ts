@@ -180,7 +180,7 @@ export interface FormContextApi<T extends FieldValues> {
    * Wrapper to handle form submit
    * @param submitCallback Callback executed when form is sent
    */
-  experimental_handleSubmit(submitCallback: (formValues: T) => void | Promise<void>): () => void;
+  handleSubmit(submitCallback: (formValues: T) => void | Promise<void>): () => void;
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -212,7 +212,7 @@ export const CONTEXT_FORM_DEFAULT: FormContextApi<any> = {
   getFormValues: () => ({}),
   setFormValues: () => {},
   resetForm: () => {},
-  experimental_handleSubmit: () => () => {},
+  handleSubmit: () => () => {},
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>

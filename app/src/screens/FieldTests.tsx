@@ -27,7 +27,7 @@ export function FieldTests() {
   };
 
   return (
-    <Form form={form} onSubmit={form.experimental_handleSubmit(onSubmit)}>
+    <Form form={form} onSubmit={form.handleSubmit(onSubmit)}>
       <div>Text field test</div>
       <TextField<FormValues> name="foo" />
 

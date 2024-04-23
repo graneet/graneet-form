@@ -66,8 +66,6 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   const formStateRef = useRef<{ [K in keyof T]?: FieldState<K> }>(
     (Object.keys(defaultValues ?? {}) as (keyof T)[]).reduce(
       (acc, key) => {
-        console.log(1);
-
         acc[key] = {
           name: key,
           value: defaultValues?.[key],
@@ -531,7 +529,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     }
   }, [updateValueForAllTypeOfSubscribers]);
 
-  const handleSubmit = useCallback<FormContextApi<T>['experimental_handleSubmit']>(
+  const handleSubmit = useCallback<FormContextApi<T>['handleSubmit']>(
     (submitCallback: (formValues: T) => void | Promise<void>) => () => {
       handleFormSubmitRef.current = submitCallback;
     },
@@ -564,7 +562,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       getFormValues,
       resetForm,
       setFormValues,
-      experimental_handleSubmit: handleSubmit,
+      handleSubmit: handleSubmit,
     }),
     [
       registerField,
