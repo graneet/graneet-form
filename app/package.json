@@ -10,15 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "graneet-form": "file:../"
   },
   "devDependencies": {
-    "@types/react": "18.2.67",
-    "@types/react-dom": "18.2.22",
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.0",
     "@vitejs/plugin-react-swc": "3.6.0",
-    "typescript": "5.4.3",
-    "vite": "5.2.2"
+    "typescript": "5.4.5",
+    "vite": "5.2.11"
   }
 }
