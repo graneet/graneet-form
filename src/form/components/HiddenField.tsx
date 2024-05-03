@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { FieldValues } from '../../shared/types/FieldValue';
 import { Field } from './Field';
 
