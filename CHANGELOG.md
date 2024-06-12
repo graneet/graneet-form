@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.31...v2.0.0) (2024-06-12)
+
+
+### Features
+
+* change handleSubmit to stable ([#73](https://github.com/graneet/graneet-form/issues/73)) ([a8e80ff](https://github.com/graneet/graneet-form/commits/a8e80ff6bccda532c40c51d3113552646f699934))
+* pnpm v9 ([#74](https://github.com/graneet/graneet-form/issues/74)) ([dd6abbd](https://github.com/graneet/graneet-form/commits/dd6abbd1fd5fdcf02756ce1778fc1bbc5703e59d))
+* update all dependencies ([50c85ec](https://github.com/graneet/graneet-form/commits/50c85ecd1148d5410ec2e44262e40ddc74f6e99e))
+
 ## [2.0.0-beta.31](https://github.com/graneet/graneet-form/compare/v2.0.0-beta.29...v2.0.0-beta.31) (2024-04-15)
 
 
