@@ -102,11 +102,9 @@ export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
   names: K[] | undefined,
 ) {
   if (names === undefined) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     return useGlobalValues(WATCH_MODE.ON_CHANGE, form);
   }
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useValues(WATCH_MODE.ON_CHANGE, form, names);
 }
 
@@ -160,10 +158,8 @@ export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
   names: K[] | undefined,
 ) {
   if (names === undefined) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     return useGlobalValues(WATCH_MODE.ON_BLUR, form);
   }
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useValues(WATCH_MODE.ON_BLUR, form, names);
 }

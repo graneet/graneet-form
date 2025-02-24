@@ -43,7 +43,6 @@ export function Step<
   } = wizard;
 
   // When Step is used outside wizard context, it will throw an error
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   if (wizard === CONTEXT_WIZARD_DEFAULT) {
     throw new Error('Step not in wizard');
@@ -66,6 +65,5 @@ export function Step<
     return null;
   }
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 }

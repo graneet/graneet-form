@@ -120,7 +120,6 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
         } else if (hasNextStep(index, previous)) {
           newCurrentStep = previous[index + 1];
         }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         setCurrentStep(newCurrentStep);
         return [...previous.slice(0, index), ...previous.slice(index + 1)];

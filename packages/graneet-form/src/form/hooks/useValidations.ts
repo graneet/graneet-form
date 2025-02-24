@@ -99,10 +99,8 @@ export function useValidations<T extends FieldValues, K extends keyof T>(
   names: K[] | undefined,
 ) {
   if (names === undefined) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     return useGlobalValidationInternal(form);
   }
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useValidationsInternal(form, names);
 }
