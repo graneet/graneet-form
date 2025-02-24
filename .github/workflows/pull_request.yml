@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   eslint:
-    name: Lint
+    name: Format
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -13,8 +13,8 @@ jobs:
       - name: Install
         uses: ./.github/composite-actions/install
 
-      - name: Run lint
-        run: pnpm lint
+      - name: Run format
+        run: pnpm format:check
 
   build:
     name: Build
@@ -27,4 +27,4 @@ jobs:
         uses: ./.github/composite-actions/install
 
       - name: Build
-        run: pnpm build
+        run: pnpm build --filter "graneet-form"

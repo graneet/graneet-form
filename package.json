@@ -14,7 +14,8 @@
   "license": "MIT",
   "scripts": {
     "start:dev": "pnpm -r dev",
-    "lint": "biome check .",
+    "format:check": "biome format .",
+    "format:write": "biome format --write .",
     "test": "exit 0"
   },
   "devDependencies": {

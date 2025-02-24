@@ -11,7 +11,4 @@ export interface ValidationStatus {
   message: string | undefined;
 }
 
-export type ValidationStatuses<T extends FieldValues> = Record<
-  keyof T,
-  ValidationStatus | undefined
->;
+export type ValidationStatuses<T extends FieldValues> = Record<keyof T, ValidationStatus | undefined>;
