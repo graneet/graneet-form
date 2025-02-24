@@ -14,6 +14,7 @@
   "license": "MIT",
   "scripts": {
     "start:dev": "pnpm -r dev",
+    "build:docs": "pnpm --filter graneet-form-documentation build",
     "format:check": "biome format .",
     "format:write": "biome format --write .",
     "test": "exit 0"
