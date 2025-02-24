@@ -12,9 +12,14 @@
   },
   "sideEffects": false,
   "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "source": "src/index.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "start:dev": "pnpm -r dev",
-    "lint": "biome check .",
+    "dev": "tsup --config tsup.config.ts --env.NODE_ENV development",
+    "build": "tsup --config tsup.config.ts --env.NODE_ENV production",
+    "lint": "biome lint ./src ./app ./docs",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
     "release:patch": "standard-version --release-as patch",
@@ -22,21 +27,20 @@
     "test": "exit 0"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.7.2",
     "@commitlint/cli": "19.3.0",
     "@commitlint/config-conventional": "19.2.2",
+    "@types/node": "20.12.8",
+    "@types/react": "18.3.1",
+    "@biomejs/biome": "1.7.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "rollup": "4.17.2",
     "standard-version": "9.5.0",
+    "tslib": "2.6.2",
+    "tsup": "8.0.2",
     "typescript": "5.4.5"
   },
   "peerDependencies": {
-    "react": "^16.8.0 || ^17 || ^18 || ^19"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@biomejs/biome",
-      "@swc/core",
-      "core-js",
-      "esbuild"
-    ]
+    "react": "^16.8.0 || ^17 || ^18"
   }
 }
