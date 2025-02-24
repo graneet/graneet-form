@@ -27,20 +27,16 @@
     "test": "exit 0"
   },
   "devDependencies": {
-    "@commitlint/cli": "19.3.0",
-    "@commitlint/config-conventional": "19.2.2",
-    "@types/node": "20.12.8",
-    "@types/react": "18.3.1",
-    "@biomejs/biome": "1.7.2",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "rollup": "4.17.2",
-    "standard-version": "9.5.0",
-    "tslib": "2.6.2",
-    "tsup": "8.0.2",
-    "typescript": "5.4.5"
+    "@types/node": "22.13.5",
+    "@types/react": "19.0.10",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "rollup": "4.34.8",
+    "tslib": "2.8.1",
+    "tsup": "8.3.6",
+    "typescript": "5.7.3"
   },
   "peerDependencies": {
-    "react": "^16.8.0 || ^17 || ^18"
+    "react": "^16.8.0 || ^17 || ^18 || ^19"
   }
 }

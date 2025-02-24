@@ -85,7 +85,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
    */
   const focusedFieldNamesRef = useRef(new Set<keyof T>());
 
-  const handleFormSubmitRef = useRef<(formValues: T) => void | Promise<void>>();
+  const handleFormSubmitRef = useRef<(formValues: T) => void | Promise<void> | undefined>(undefined);
 
   // -- SUBSCRIPTION --
 
