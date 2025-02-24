@@ -31,11 +31,7 @@ interface RuleProps {
  * </TextField>
  * ```
  */
-export function Rule({
-  message,
-  validationFn,
-  isDebounced = false,
-}: RuleProps) {
+export function Rule({ message, validationFn, isDebounced = false }: RuleProps) {
   const { registerRule, unregisterRule } = useRuleContext();
 
   useEffect(() => {

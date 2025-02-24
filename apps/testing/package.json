@@ -1,5 +1,5 @@
 {
-  "name": "graneet-form",
+  "name": "graneet-form-testing",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,7 +12,7 @@
   "dependencies": {
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "graneet-form": "file:../"
+    "graneet-form": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "18.3.1",

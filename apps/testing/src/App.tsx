@@ -27,9 +27,7 @@ function App() {
       <br />
       <br />
 
-      <div
-        style={{ height: '100%', border: '1px solid gray', padding: '1rem' }}
-      >
+      <div style={{ height: '100%', border: '1px solid gray', padding: '1rem' }}>
         {screen === 'form' && <FieldTests />}
         {screen === 'wizard' && <WizardTests />}
       </div>

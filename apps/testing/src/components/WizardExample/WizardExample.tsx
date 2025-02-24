@@ -1,17 +1,7 @@
-import {
-  type FieldValues,
-  Step,
-  type StepValidator,
-  WizardContext,
-  useWizard,
-  useWizardContext,
-} from 'graneet-form';
+import { type FieldValues, Step, type StepValidator, WizardContext, useWizard, useWizardContext } from 'graneet-form';
 import type { ReactNode } from 'react';
 
-export interface StepExampleProps<
-  WizardValues extends Record<string, FieldValues>,
-  Step extends keyof WizardValues,
-> {
+export interface StepExampleProps<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues> {
   name: Step;
   children: ReactNode;
   onNext?: StepValidator<WizardValues, Step>;
@@ -22,13 +12,7 @@ export interface StepExampleProps<
 function StepExample<
   WizardValues extends Record<string, FieldValues>,
   Step extends keyof WizardValues = keyof WizardValues,
->({
-  name,
-  onNext,
-  title,
-  children,
-  noFooter,
-}: StepExampleProps<WizardValues, Step>) {
+>({ name, onNext, title, children, noFooter }: StepExampleProps<WizardValues, Step>) {
   const wizardContext = useWizardContext();
 
   return (
@@ -62,9 +46,11 @@ export interface WizardProps<WizardValues extends Record<string, FieldValues>> {
   onFinish(wizardValues: WizardValues): void;
 }
 
-function WizardExampleComponent<
-  WizardValues extends Record<string, FieldValues>,
->({ onFinish, onQuit, children }: WizardProps<WizardValues>) {
+function WizardExampleComponent<WizardValues extends Record<string, FieldValues>>({
+  onFinish,
+  onQuit,
+  children,
+}: WizardProps<WizardValues>) {
   const wizard = useWizard(onFinish, onQuit);
 
   return (
