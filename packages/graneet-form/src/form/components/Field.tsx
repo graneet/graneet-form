@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { AnyRecord } from '../../shared/types/AnyRecord';
 import type { FieldValues } from '../../shared/types/FieldValue';
 import type { ValidationStatus } from '../../shared/types/Validation';
@@ -64,27 +64,31 @@ export function Field<T extends FieldValues, K extends keyof T>({
 }: FieldProps<T, K>) {
   const form = useFormContext<T>();
   const {
-    formInternal: {
-      registerField,
-      unregisterField,
-      handleOnChange: handleChange,
-      handleOnBlur: handleBlur,
-      updateValidationStatus,
-    },
+    formInternal: { handleOnChange: handleChange, handleOnBlur: handleBlur, updateValidationStatus },
   } = form;
   const { ruleContext, rules, debouncedRules } = useRules();
 
-  const [value, setValue] = useState<T[K] | undefined>(undefined);
+  const value = useSyncExternalStore(
+    useCallback(
+      (callback: () => void) => {
+        form.formInternal.registerField(name, callback);
+
+        return () => {
+          form.formInternal.unregisterField(name, callback);
+        };
+      },
+      [form, name],
+    ),
+    useCallback(() => {
+      return form.formInternal.getFormValuesForNames([name])[name];
+    }, [form, name]),
+  );
+
   const [isPristine, setIsPristine] = useState<boolean>(true);
   const validationStatus = useFieldValidation(rules, debouncedRules, value);
 
   const hasFocusRef = useRef(false);
   const hasBeenFocusedRef = useRef(false);
-
-  useEffect(() => {
-    registerField(name, setValue);
-    return () => unregisterField(name);
-  }, [name, registerField, unregisterField]);
 
   useEffect(() => {
     updateValidationStatus(name, validationStatus);

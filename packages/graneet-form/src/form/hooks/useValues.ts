@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import type { FieldValues } from '../../shared/types/FieldValue';
 import type { Prettify } from '../../shared/types/Prettify';
 import { CONTEXT_FORM_DEFAULT, type FormContextApi } from '../contexts/FormContext';
@@ -9,19 +9,21 @@ import { WATCH_MODE } from '../types/WatchMode';
  * Internal hook to handle watch of all field values
  */
 function useGlobalValues<T extends FieldValues>(watchMode: WATCH_MODE, form: FormContextApi<T>): Partial<T> {
-  const {
-    formInternal: { addGlobalValueSubscriber, removeGlobalValueSubscriber },
-  } = form;
-  const [currentValues, setCurrentValues] = useState<Partial<T>>({});
+  // TODO Infinite render potentially
+  const currentValues = useSyncExternalStore(
+    (callback) => {
+      form.formInternal.addGlobalValueSubscriber(callback, watchMode);
+
+      return () => {
+        form.formInternal.removeGlobalValueSubscriber(callback, watchMode);
+      };
+    },
+    () => form.getFormValues(),
+  );
 
   if (form === CONTEXT_FORM_DEFAULT) {
     throw new Error('No form context could be found.');
   }
-
-  useEffect(() => {
-    addGlobalValueSubscriber(setCurrentValues, watchMode);
-    return () => removeGlobalValueSubscriber(setCurrentValues, watchMode);
-  }, [addGlobalValueSubscriber, removeGlobalValueSubscriber, watchMode]);
 
   return currentValues;
 }
@@ -34,20 +36,20 @@ function useValues<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T>,
   names: K[],
 ): FormValues<T, K> {
-  const {
-    formInternal: { addValueSubscriber, removeValueSubscriber },
-  } = form;
-  const [currentValues, setCurrentValues] = useState<FormValues<T, K>>({} as FormValues<T, K>);
+  const currentValues = useSyncExternalStore(
+    (callback) => {
+      form.formInternal.addValueSubscriber(callback, watchMode, names);
+
+      return () => {
+        form.formInternal.removeValueSubscriber(callback, watchMode, names);
+      };
+    },
+    () => form.formInternal.getFormValuesForNames(names),
+  );
 
   if (form === CONTEXT_FORM_DEFAULT) {
     throw new Error('No form context could be found.');
   }
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `names` is transformed to string to ensure consistant ref
-  useEffect(() => {
-    addValueSubscriber(setCurrentValues, watchMode, names);
-    return () => removeValueSubscriber(setCurrentValues, watchMode, names);
-  }, [addValueSubscriber, names?.join(), removeValueSubscriber, watchMode]);
 
   return currentValues;
 }

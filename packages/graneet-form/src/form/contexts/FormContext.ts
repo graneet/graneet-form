@@ -30,7 +30,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param publish Callback to publish new value
    * @param type Watch mode
    */
-  addGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
+  addGlobalValueSubscriber(publish: () => void, type: WATCH_MODE): void;
 
   /**
    * Add new subscriber watching a list of field values.
@@ -38,11 +38,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param type Watch mode
    * @param names List of field names watched
    */
-  addValueSubscriber<K extends keyof T>(
-    publish: Dispatch<SetStateAction<FormValues<T, K>>>,
-    type: WATCH_MODE,
-    names: K[],
-  ): void;
+  addValueSubscriber(publish: () => void, type: WATCH_MODE, names: (keyof T)[]): void;
 
   /**
    * Add new subscriber watching all registered field errors.
@@ -66,23 +62,24 @@ export interface FormInternal<T extends FieldValues> {
    * Register field in the form state.
    * We cannot have more than one active field for a name.
    * @param name Field name
-   * @param setValue Function to change Field value and trigger render
+   * @param publish Function to change Field value and trigger render
    */
-  registerField<K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): void;
+  registerField<K extends keyof T>(name: K, publish: () => void): void;
 
   /**
    * Unregister a field.
    * Data is still in state after un-registration but field is marked as not displayed.
    * @param name Field name
+   * @param publish Function to change Field value and trigger render
    */
-  unregisterField(name: keyof T): void;
+  unregisterField(name: keyof T, publish: () => void): void;
 
   /**
    * Remove subscriber watching all registered field values.
    * @param publish Callback used to publish new value
    * @param type Watch mode
    */
-  removeGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
+  removeGlobalValueSubscriber(publish: () => void, type: WATCH_MODE): void;
 
   /**
    * Remove subscriber watching a list of field values.
@@ -90,11 +87,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param type Watch mode
    * @param names List of field names watched
    */
-  removeValueSubscriber<K extends keyof T>(
-    publish: Dispatch<SetStateAction<FormValues<T, K>>>,
-    type: WATCH_MODE,
-    names: K[],
-  ): void;
+  removeValueSubscriber<K extends keyof T>(publish: () => void, type: WATCH_MODE, names: K[]): void;
 
   /**
    * Remove subscriber watching all registered field errors.
