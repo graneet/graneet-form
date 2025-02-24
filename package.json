@@ -17,6 +17,7 @@
     "build:docs": "pnpm --filter graneet-form-documentation build",
     "format:check": "biome format .",
     "format:write": "biome format --write .",
+    "release": "pnpm --filter graneet-form build && changeset publish",
     "test": "exit 0"
   },
   "devDependencies": {
