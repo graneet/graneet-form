@@ -1,11 +1,34 @@
+import { Form, useStepForm } from 'graneet-form';
 import { useCallback, useState } from 'react';
+import { TextField } from '../components/TextField.tsx';
 import { WizardExample } from '../components/WizardExample/WizardExample.tsx';
 
 type WizardValues = {
-  step1: Record<never, never>;
+  step1: {
+    text: string;
+  };
 
   step2: Record<never, never>;
 };
+
+export function Step1() {
+  const { form } = useStepForm<WizardValues, 'step1'>({
+    defaultValues: {
+      text: 'step1',
+    },
+  });
+
+  return (
+    <Form form={form} style={{ background: '#869fa3' }}>
+      <TextField<WizardValues['step1']> name={'text'} />
+      Step 1
+    </Form>
+  );
+}
+
+export function Step2() {
+  return <div style={{ background: '#869fa3' }}>Step 2</div>;
+}
 
 export function WizardTests() {
   const [message, setMessage] = useState('');
@@ -29,11 +52,11 @@ export function WizardTests() {
           return true;
         }}
       >
-        <div style={{ background: '#869fa3' }}>Step 1</div>
+        <Step1 />
       </WizardExample.Step>
 
       <WizardExample.Step<WizardValues> name="step2">
-        <div style={{ background: '#536221' }}>Step 2</div>
+        <Step2 />
       </WizardExample.Step>
     </WizardExample>
   );

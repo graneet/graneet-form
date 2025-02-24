@@ -9,6 +9,11 @@ import { useWizardContext } from '../contexts/WizardContext';
 
 interface UseStepFormApi<T extends FieldValues> {
   form: FormContextApi<T>;
+
+  /**
+   * @deprecated use defaultValues props instead
+   * @param initialValues
+   */
   initFormValues(initialValues: Partial<T>): void;
 }
 
@@ -17,12 +22,9 @@ interface UseStepFormApi<T extends FieldValues> {
  * @return UseStepFormApi
  * @example
  * ```
- * const {form, initFormValues} = useStepForm()
- *
- * useEffect(() => {
- *   // If data is stored in wizard, this will not set data
- *   initFormValues({"foo": "foo", "bar": "bar"})
- * },[]);
+ * const {form, initFormValues} = useStepForm({
+ *  defaultValues: {"foo": "foo", "bar": "bar"}
+ * })
  *
  * return(
  *  <Form form={form}>
@@ -35,12 +37,16 @@ export function useStepForm<
   WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>,
   Step extends keyof WizardValues = '',
 >(props?: UseFormOptions<WizardValues[Step]>): UseStepFormApi<WizardValues[Step]> {
-  const form = useForm(props);
   const {
     wizardInternal: { stepStatusSetter, setValuesGetterForCurrentStep },
     getValuesOfCurrentStep,
-  } = useWizardContext();
+  } = useWizardContext<WizardValues[Step]>();
   const valuesHasBeenInitializedRef = useRef(false);
+
+  const form = useForm<WizardValues[Step]>({
+    ...props,
+    defaultValues: getValuesOfCurrentStep() ?? props?.defaultValues,
+  });
 
   const {
     formInternal: { addGlobalValidationStatusSubscriber },
