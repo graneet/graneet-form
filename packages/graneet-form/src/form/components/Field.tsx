@@ -68,6 +68,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
   } = form;
   const { ruleContext, rules, debouncedRules } = useRules();
 
+  // TODO how to deal with immutable
   const value = useSyncExternalStore(
     useCallback(
       (callback: () => void) => {

@@ -184,6 +184,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
    * @param watchMode Subscriber type
    */
   const updateValueSubscribers = useCallback((name: keyof T, watchMode: WATCH_MODE): void => {
+    // TODO Compute value to SEND
     // Update watcher for this field name
     if (formValuesSubscribersRef.current[watchMode].scoped[name]) {
       for (const publish of formValuesSubscribersRef.current[watchMode].scoped[name] || []) {

@@ -1,10 +1,25 @@
 import { Form, useForm } from 'graneet-form';
+import { useFormContext, useOnBlurValues, useOnChangeValues } from 'graneet-form/src';
 import { useEffect, useState } from 'react';
 import { TextField } from '../components/TextField.tsx';
 
 interface FormValues {
   foo: string;
 }
+
+const OnChangeWatched = () => {
+  const form = useFormContext<FormValues>();
+  const { foo } = useOnChangeValues(form, ['foo']);
+
+  return foo;
+};
+
+const OnBlurWatched = () => {
+  const form = useFormContext<FormValues>();
+  const { foo } = useOnBlurValues(form, ['foo']);
+
+  return foo;
+};
 
 export function FieldTests() {
   const [trigger, setTrigger] = useState('');
@@ -34,6 +49,9 @@ export function FieldTests() {
       <br />
       <br />
       <br />
+
+      <OnChangeWatched />
+      <OnBlurWatched />
 
       <button type="submit">Get values</button>
     </Form>

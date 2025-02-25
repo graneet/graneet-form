@@ -1,57 +1,46 @@
-import { useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 import type { FieldValues } from '../../shared/types/FieldValue';
 import type { Prettify } from '../../shared/types/Prettify';
-import { CONTEXT_FORM_DEFAULT, type FormContextApi } from '../contexts/FormContext';
+import type { FormContextApi } from '../contexts/FormContext';
 import type { FormValues } from '../types/FormValues';
 import { WATCH_MODE } from '../types/WatchMode';
 
-/**
- * Internal hook to handle watch of all field values
- */
-function useGlobalValues<T extends FieldValues>(watchMode: WATCH_MODE, form: FormContextApi<T>): Partial<T> {
-  // TODO Infinite render potentially
-  const currentValues = useSyncExternalStore(
-    (callback) => {
-      form.formInternal.addGlobalValueSubscriber(callback, watchMode);
-
-      return () => {
-        form.formInternal.removeGlobalValueSubscriber(callback, watchMode);
-      };
-    },
-    () => form.getFormValues(),
-  );
-
-  if (form === CONTEXT_FORM_DEFAULT) {
-    throw new Error('No form context could be found.');
-  }
-
-  return currentValues;
-}
-
-/**
- * Internal hook to handle watch for a list of fields
- */
 function useValues<T extends FieldValues, K extends keyof T>(
-  watchMode: WATCH_MODE,
   form: FormContextApi<T>,
-  names: K[],
-): FormValues<T, K> {
-  const currentValues = useSyncExternalStore(
-    (callback) => {
-      form.formInternal.addValueSubscriber(callback, watchMode, names);
+  names: K[] | undefined,
+  watchMode: WATCH_MODE,
+  // biome-ignore lint/suspicious/noExplicitAny: cannot return a good type :(
+): any {
+  return useSyncExternalStore(
+    // biome-ignore lint/correctness/useExhaustiveDependencies: TODO remove toString
+    useCallback(
+      (callback) => {
+        console.log('ici');
+        if (names) {
+          form.formInternal.addValueSubscriber(callback, watchMode, names);
+        } else {
+          form.formInternal.addGlobalValueSubscriber(callback, watchMode);
+        }
 
-      return () => {
-        form.formInternal.removeValueSubscriber(callback, watchMode, names);
-      };
-    },
-    () => form.formInternal.getFormValuesForNames(names),
+        return () => {
+          if (names) {
+            form.formInternal.removeValueSubscriber(callback, watchMode, names);
+          } else {
+            form.formInternal.removeGlobalValueSubscriber(callback, watchMode);
+          }
+        };
+      },
+      [form, names?.toString(), watchMode],
+    ),
+    // biome-ignore lint/correctness/useExhaustiveDependencies: TODO remove toString
+    useCallback(() => {
+      // TODO how to deal with immutable
+      if (names) {
+        return form.formInternal.getFormValuesForNames(names);
+      }
+      return form.getFormValues();
+    }, [form, names?.toString()]),
   );
-
-  if (form === CONTEXT_FORM_DEFAULT) {
-    throw new Error('No form context could be found.');
-  }
-
-  return currentValues;
 }
 
 /**
@@ -103,11 +92,7 @@ export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T>,
   names: K[] | undefined,
 ) {
-  if (names === undefined) {
-    return useGlobalValues(WATCH_MODE.ON_CHANGE, form);
-  }
-
-  return useValues(WATCH_MODE.ON_CHANGE, form, names);
+  return useValues(form, names, WATCH_MODE.ON_CHANGE);
 }
 
 /**
@@ -159,9 +144,5 @@ export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T>,
   names: K[] | undefined,
 ) {
-  if (names === undefined) {
-    return useGlobalValues(WATCH_MODE.ON_BLUR, form);
-  }
-
-  return useValues(WATCH_MODE.ON_BLUR, form, names);
+  return useValues(form, names, WATCH_MODE.ON_BLUR);
 }
