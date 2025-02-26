@@ -388,8 +388,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         throw new Error(`Field ${String(name)} is not registered`);
       }
 
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      formStateRef.current[name]!.isRegistered = false;
+      formStateRef.current[name].isRegistered = false;
       updateValueForAllTypeOfSubscribers(name);
       updateErrorForAllTypeOfSubscribers(name);
     },
@@ -441,8 +440,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       for (const name of Object.keys(newValues) as Array<keyof T>) {
         // If the field is already stored, only update the value
         if (formStateRef.current[name]) {
-          // biome-ignore lint/style/noNonNullAssertion: <explanation>
-          formStateRef.current[name]!.value = newValues[name];
+          formStateRef.current[name].value = newValues[name];
         } else {
           // Else, save a new line in the context for the given name. When the field is registered later, he will have access to the value
           formStateRef.current[name] = {
@@ -472,8 +470,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         focusedFieldNamesRef.current.add(name);
       }
       // Update value in store
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      formStateRef.current[name]!.value = value;
+      formStateRef.current[name].value = value;
       updateValueSubscribers(name, WATCH_MODE.ON_CHANGE);
     },
     [updateValueSubscribers],
@@ -489,11 +486,9 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
       if (
         focusedFieldNamesRef.current.has(name) &&
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        formStateRef.current[name]!.validation.status === VALIDATION_OUTCOME.VALID
+        formStateRef.current[name].validation.status === VALIDATION_OUTCOME.VALID
       ) {
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        await onUpdateAfterBlurRef(name, formStateRef.current[name]!.value, data, {
+        await onUpdateAfterBlurRef(name, formStateRef.current[name].value, data, {
           getFormValues,
           setFormValues,
         });
@@ -509,8 +504,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         throw new Error(`Field "${String(name)}" is not registered`);
       }
 
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      formStateRef.current[name]!.validation = validationStatus;
+      formStateRef.current[name].validation = validationStatus;
       updateErrorSubscribers(name, WATCH_MODE.ON_CHANGE);
     },
     [updateErrorSubscribers],
@@ -518,12 +512,11 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
   const resetForm = useCallback<FormContextApi<T>['resetForm']>((): void => {
     for (const fieldName of Object.keys(formStateRef.current)) {
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: TODO figure out how why this is needed
       const { name } = formStateRef.current[fieldName]!;
 
       if (formStateRef.current[name]) {
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        formStateRef.current[name]!.value = undefined;
+        formStateRef.current[name].value = undefined;
         updateValueForAllTypeOfSubscribers(name);
       }
     }

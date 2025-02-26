@@ -156,8 +156,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     }
     // Make validation for the step if one is declared
     if (validationFnsRef.current[currentStep]) {
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      const isStepValid = await validationFnsRef.current[currentStep]!(
+      const isStepValid = await validationFnsRef.current[currentStep](
         valuesStepGetterRef.current() as WizardValues[keyof WizardValues],
       );
       if (!isStepValid) {
