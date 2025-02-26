@@ -1,14 +1,8 @@
 {
   "name": "graneet-form",
   "version": "2.2.1",
-  "keywords": [
-    "react",
-    "form",
-    "forms",
-    "validation",
-    "typescript"
-  ],
   "homepage": "https://github.com/graneet/graneet-form",
+  "keywords": ["react", "form", "forms", "validation", "typescript"],
   "bugs": {
     "url": "https://github.com/graneet/graneet-form/issues"
   },
