@@ -79,18 +79,12 @@ export function Field<T extends FieldValues, K extends keyof T>({
   const validationStatus = useFieldValidation(rules, debouncedRules, value);
 
   const hasFocusRef = useRef(false);
+  const hasBeenFocusedRef = useRef(false);
 
   useEffect(() => {
     registerField(name, setValue);
     return () => unregisterField(name);
   }, [name, registerField, unregisterField]);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Update pristine state on value update
-  useEffect(() => {
-    if (isPristine && hasFocusRef.current) {
-      setIsPristine(false);
-    }
-  }, [isPristine, value]);
 
   useEffect(() => {
     updateValidationStatus(name, validationStatus);
@@ -99,6 +93,10 @@ export function Field<T extends FieldValues, K extends keyof T>({
   const onChange = useCallback(
     (newValue: T[K] | undefined): void => {
       handleChange(name, newValue, hasFocusRef.current);
+
+      if (hasBeenFocusedRef.current) {
+        setIsPristine(false);
+      }
     },
     [handleChange, name],
   );
@@ -110,6 +108,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
 
   const onFocus = useCallback(() => {
     hasFocusRef.current = true;
+    hasBeenFocusedRef.current = true;
   }, []);
 
   if (form === CONTEXT_FORM_DEFAULT) {
