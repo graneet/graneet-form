@@ -1,5 +1,11 @@
 # graneet-form
 
+## 2.2.1
+
+### Patch Changes
+
+- [#89](https://github.com/graneet/graneet-form/pull/89) [`155988b`](https://github.com/graneet/graneet-form/commit/155988bf43a7c8f065e61b046947056ce239b98b) Thanks [@victorduclos](https://github.com/victorduclos)! - Fix `isPristine` state available in the Form component
+
 ## 2.2.0
 
 ### Minor Changes
