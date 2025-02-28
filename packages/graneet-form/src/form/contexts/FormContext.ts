@@ -68,15 +68,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param name Field name
    * @param setValue Function to change Field value and trigger render
    */
-  registerField<K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): void;
-
-  /**
-   * Unregister a field.
-   * Data is still in state after un-registration but field is marked as not displayed.
-   * @param name Field name
-   */
-  unregisterField(name: keyof T): void;
-
+  registerField<K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): () => void;
   /**
    * Remove subscriber watching all registered field values.
    * @param publish Callback used to publish new value
@@ -120,14 +112,14 @@ export interface FormInternal<T extends FieldValues> {
    * @param value New value
    * @param hasFocus If the field has user focus
    */
-  handleOnChange<K extends keyof T>(name: K, value: T[K] | undefined, hasFocus: boolean): void;
+  onFieldChange<K extends keyof T>(name: K, value: T[K] | undefined, hasFocus: boolean): void;
 
   /**
    * Handle onBlur action trigger for a field.
    * @param name Field name updated
    * @param data Data injected in onUpdateAfterBlur
    */
-  handleOnBlur(name: keyof T, data: AnyRecord | undefined): Promise<void>;
+  onFieldBlur(name: keyof T, data: AnyRecord | undefined): Promise<void>;
 
   /**
    * Update validation status for a given field.
@@ -194,14 +186,13 @@ export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
   addValueSubscriber: (): void => {},
   addGlobalValidationStatusSubscriber: (): void => {},
   addValidationStatusSubscriber: (): void => {},
-  registerField: (): void => {},
-  unregisterField: (): void => {},
+  registerField: () => () => {},
   removeGlobalValueSubscriber: (): void => {},
   removeValueSubscriber: (): void => {},
   removeGlobalValidationStatusSubscriber: (): void => {},
   removeValidationStatusSubscriber: (): void => {},
-  handleOnChange: (): void => {},
-  handleOnBlur: (): Promise<void> => Promise.resolve(),
+  onFieldChange: (): void => {},
+  onFieldBlur: (): Promise<void> => Promise.resolve(),
   updateValidationStatus: (): void => {},
   getHandleFormSubmit: () => undefined,
 };
