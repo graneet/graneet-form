@@ -351,7 +351,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const registerField = useCallback<FormInternal<T>['registerField']>(
-    <K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): void => {
+    <K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): (() => void) => {
       const previousValueStored = formStateRef.current[name]?.value;
       if (formStateRef.current[name]?.isRegistered) {
         throw new Error(`Attempting to register field "${String(name)}" a second time`);
@@ -364,35 +364,31 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         validation: VALIDATION_STATE_UNDETERMINED,
       };
 
+      const watcher = (publish: SetStateAction<FormValues<T, K>>) => {
+        // FIXME publish({} as FormValues<T, K>)
+        const values = typeof publish === 'function' ? publish({} as FormValues<T, K>) : publish;
+        setValue(values?.[name]);
+      };
+
       /*
      Add subscriber has to be setValue saving array. Here, the publisher needs only the first value
      (and the only one) returned in values, so we created a function to do the mapping
      */
-      addValueSubscriber<K>(
-        (publish) => {
-          // FIXME publish({} as FormValues<T, K>)
-          const values = typeof publish === 'function' ? publish({} as FormValues<T, K>) : publish;
-          setValue(values?.[name]);
-        },
-        WATCH_MODE.ON_CHANGE,
-        [name],
-      );
+      addValueSubscriber<K>(watcher, WATCH_MODE.ON_CHANGE, [name]);
       updateValueForAllTypeOfSubscribers(name);
-    },
-    [addValueSubscriber, updateValueForAllTypeOfSubscribers],
-  );
 
-  const unregisterField = useCallback<FormInternal<T>['unregisterField']>(
-    (name: keyof T): void => {
-      if (!formStateRef.current[name]) {
-        throw new Error(`Field ${String(name)} is not registered`);
-      }
+      return () => {
+        if (!formStateRef.current[name]) {
+          throw new Error(`Field ${String(name)} is not registered`);
+        }
 
-      formStateRef.current[name].isRegistered = false;
-      updateValueForAllTypeOfSubscribers(name);
-      updateErrorForAllTypeOfSubscribers(name);
+        formStateRef.current[name].isRegistered = false;
+        removeValueSubscriber<K>(watcher, WATCH_MODE.ON_CHANGE, [name]);
+        updateValueForAllTypeOfSubscribers(name);
+        updateErrorForAllTypeOfSubscribers(name);
+      };
     },
-    [updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers],
+    [addValueSubscriber, updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers],
   );
 
   const removeGlobalValueSubscriber = useCallback<FormInternal<T>['removeGlobalValueSubscriber']>(
@@ -456,7 +452,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     [updateValueForAllTypeOfSubscribers],
   );
 
-  const handleOnChange = useCallback<FormInternal<T>['handleOnChange']>(
+  const onFieldChange = useCallback<FormInternal<T>['onFieldChange']>(
     <K extends keyof T>(name: K, value: T[K], hasFocus: boolean): void => {
       if (!formStateRef.current[name]) {
         throw new Error(`Field "${String(name)}" is not registered`);
@@ -476,7 +472,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     [updateValueSubscribers],
   );
 
-  const handleOnBlur = useCallback<FormInternal<T>['handleOnBlur']>(
+  const onFieldBlur = useCallback<FormInternal<T>['onFieldBlur']>(
     async (name: keyof T, data: AnyRecord = {}): Promise<void> => {
       updateValueSubscribers(name, WATCH_MODE.ON_BLUR);
 
@@ -512,12 +508,9 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
   const resetForm = useCallback<FormContextApi<T>['resetForm']>((): void => {
     for (const fieldName of Object.keys(formStateRef.current)) {
-      // biome-ignore lint/style/noNonNullAssertion: TODO figure out how why this is needed
-      const { name } = formStateRef.current[fieldName]!;
-
-      if (formStateRef.current[name]) {
-        formStateRef.current[name].value = undefined;
-        updateValueForAllTypeOfSubscribers(name);
+      if (formStateRef.current[fieldName]) {
+        formStateRef.current[fieldName].value = undefined;
+        updateValueForAllTypeOfSubscribers(fieldName);
       }
     }
   }, [updateValueForAllTypeOfSubscribers]);
@@ -533,7 +526,6 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     () => ({
       formInternal: {
         registerField,
-        unregisterField,
         addGlobalValueSubscriber,
         addValueSubscriber,
         removeGlobalValueSubscriber,
@@ -542,8 +534,8 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         addValidationStatusSubscriber,
         removeGlobalValidationStatusSubscriber,
         removeValidationStatusSubscriber,
-        handleOnChange,
-        handleOnBlur,
+        onFieldChange,
+        onFieldBlur,
         getFormValuesForNames,
         getFormErrors,
         getFormErrorsForNames,
@@ -559,7 +551,6 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     }),
     [
       registerField,
-      unregisterField,
       addGlobalValueSubscriber,
       addValueSubscriber,
       removeGlobalValueSubscriber,
@@ -568,8 +559,8 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       addValidationStatusSubscriber,
       removeGlobalValidationStatusSubscriber,
       removeValidationStatusSubscriber,
-      handleOnChange,
-      handleOnBlur,
+      onFieldChange,
+      onFieldBlur,
       getFormValuesForNames,
       getFormErrors,
       getFormErrorsForNames,

@@ -63,15 +63,6 @@ export function Field<T extends FieldValues, K extends keyof T>({
   data = undefined,
 }: FieldProps<T, K>) {
   const form = useFormContext<T>();
-  const {
-    formInternal: {
-      registerField,
-      unregisterField,
-      handleOnChange: handleChange,
-      handleOnBlur: handleBlur,
-      updateValidationStatus,
-    },
-  } = form;
   const { ruleContext, rules, debouncedRules } = useRules();
 
   const [value, setValue] = useState<T[K] | undefined>(undefined);
@@ -82,29 +73,28 @@ export function Field<T extends FieldValues, K extends keyof T>({
   const hasBeenFocusedRef = useRef(false);
 
   useEffect(() => {
-    registerField(name, setValue);
-    return () => unregisterField(name);
-  }, [name, registerField, unregisterField]);
+    return form.formInternal.registerField(name, setValue);
+  }, [name, form.formInternal]);
 
   useEffect(() => {
-    updateValidationStatus(name, validationStatus);
-  }, [name, updateValidationStatus, validationStatus]);
+    form.formInternal.updateValidationStatus(name, validationStatus);
+  }, [name, form.formInternal, validationStatus]);
 
   const onChange = useCallback(
     (newValue: T[K] | undefined): void => {
-      handleChange(name, newValue, hasFocusRef.current);
+      form.formInternal.onFieldChange(name, newValue, hasFocusRef.current);
 
       if (hasBeenFocusedRef.current) {
         setIsPristine(false);
       }
     },
-    [handleChange, name],
+    [name, form.formInternal],
   );
 
   const onBlur = useCallback((): void => {
     hasFocusRef.current = false;
-    handleBlur(name, data);
-  }, [handleBlur, name, data]);
+    form.formInternal.onFieldBlur(name, data);
+  }, [name, form.formInternal, data]);
 
   const onFocus = useCallback(() => {
     hasFocusRef.current = true;
