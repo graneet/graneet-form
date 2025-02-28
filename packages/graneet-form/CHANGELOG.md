@@ -1,5 +1,11 @@
 # graneet-form
 
+## 2.2.2
+
+### Patch Changes
+
+- [#92](https://github.com/graneet/graneet-form/pull/92) [`b42dc95`](https://github.com/graneet/graneet-form/commit/b42dc95e4ce17ede923e7d6c3223f8b0df5e94a0) Thanks [@victorduclos](https://github.com/victorduclos)! - Fix: Delete subscriber when a field is unregistered
+
 ## 2.2.1
 
 ### Patch Changes
