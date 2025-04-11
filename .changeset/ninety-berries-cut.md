@@ -2,4 +2,4 @@
 "graneet-form": patch
 ---
 
-feat: introduces defaultValue on Field component
+✨ feat: introduces defaultValue on Field component

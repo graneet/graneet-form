@@ -2,4 +2,4 @@
 "graneet-form": patch
 ---
 
-feat: deprecate hidden field and composeEventHandlers
+✨ feat: deprecate hidden field and composeEventHandlers
