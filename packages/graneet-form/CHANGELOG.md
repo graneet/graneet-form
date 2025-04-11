@@ -1,5 +1,23 @@
 # graneet-form
 
+## 2.3.0
+
+### Minor Changes
+
+- [#95](https://github.com/graneet/graneet-form/pull/95) [`a4e4aaf`](https://github.com/graneet/graneet-form/commit/a4e4aafe4048a41d3153ca58a73355645d869e07) Thanks [@victorduclos](https://github.com/victorduclos)! - chore: use modern react naming
+
+### Patch Changes
+
+- [#94](https://github.com/graneet/graneet-form/pull/94) [`11eff97`](https://github.com/graneet/graneet-form/commit/11eff97d308f1e861623504f19f5ff43ce82e2bb) Thanks [@victorduclos](https://github.com/victorduclos)! - ✨ feat: deprecate hidden field and composeEventHandlers
+
+- [#98](https://github.com/graneet/graneet-form/pull/98) [`0e06b56`](https://github.com/graneet/graneet-form/commit/0e06b56701c03741e1dfff7def4409d7817aed05) Thanks [@victorduclos](https://github.com/victorduclos)! - ✨ feat: introduces defaultValue on Field component
+
+- [#96](https://github.com/graneet/graneet-form/pull/96) [`d756422`](https://github.com/graneet/graneet-form/commit/d756422fd1061266f7957cdad96cb8a1960bae30) Thanks [@victorduclos](https://github.com/victorduclos)! - ✨ feat: introduce useStepStatus
+
+- [#97](https://github.com/graneet/graneet-form/pull/97) [`86a4e7b`](https://github.com/graneet/graneet-form/commit/86a4e7b1a12826bd652fb9730c08301805a42026) Thanks [@victorduclos](https://github.com/victorduclos)! - ✨ feat: rename handleGoBackTo => goBackTo, handleOnNext => goNext, handleOnPrevious => goPrevious
+
+- [#92](https://github.com/graneet/graneet-form/pull/92) [`b42dc95`](https://github.com/graneet/graneet-form/commit/b42dc95e4ce17ede923e7d6c3223f8b0df5e94a0) Thanks [@victorduclos](https://github.com/victorduclos)! - 🐛 fix: Delete subscriber when a field is unregistered
+
 ## 2.2.1
 
 ### Patch Changes
