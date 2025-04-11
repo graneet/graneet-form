@@ -1,8 +1,8 @@
 import { type FormEventHandler, type FormHTMLAttributes, type ReactNode, useCallback } from 'react';
-import type { FieldValues } from '../shared/types/FieldValue';
-import { VALIDATION_OUTCOME } from '../shared/types/Validation';
+import type { FieldValues } from '../shared/types/field-value';
+import { VALIDATION_OUTCOME } from '../shared/types/validation';
 import { mapValidationStatusesToOutcome } from '../shared/util/validation.util';
-import { FormContext, type FormContextApi } from './contexts/FormContext';
+import { FormContext, type FormContextApi } from './contexts/form-context';
 
 interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
   children: ReactNode;

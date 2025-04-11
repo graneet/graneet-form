@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { FieldValues } from '../../shared/types/FieldValue';
-import { VALIDATION_OUTCOME } from '../../shared/types/Validation';
+import type { FieldValues } from '../../shared/types/field-value';
+import { VALIDATION_OUTCOME } from '../../shared/types/validation';
 import { mapValidationStatusesToOutcome } from '../../shared/util/validation.util';
-import type { FormContextApi } from '../contexts/FormContext';
-import { useValidations } from './useValidations';
+import type { FormContextApi } from '../contexts/form-context';
+import { useValidations } from './use-validations';
 
 interface FormStatus {
   /**

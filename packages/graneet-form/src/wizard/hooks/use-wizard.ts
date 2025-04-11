@@ -1,10 +1,10 @@
 import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
-import type { FieldValues } from '../../shared/types/FieldValue';
-import type { PartialRecord } from '../../shared/types/PartialRecord';
-import type { VALIDATION_OUTCOME } from '../../shared/types/Validation';
-import type { ValidationStatusesSetter, WizardContextApi } from '../contexts/WizardContext';
-import type { PlaceholderContent, PlaceholderContentSetter } from '../types/PlaceholderContent';
-import type { StepValidator } from '../types/StepValidator';
+import type { FieldValues } from '../../shared/types/field-value';
+import type { PartialRecord } from '../../shared/types/partial-record';
+import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
+import type { ValidationStatusesSetter, WizardContextApi } from '../contexts/wizard-context';
+import type { PlaceholderContent, PlaceholderContentSetter } from '../types/placeholder-content';
+import type { StepValidator } from '../types/step-validator';
 
 export function useWizard<WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>>(
   onFinish: (wizardValues: WizardValues) => void | Promise<void>,

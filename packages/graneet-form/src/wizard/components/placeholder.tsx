@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect } from 'react';
-import { useWizardContext } from '../contexts/WizardContext';
+import { useWizardContext } from '../contexts/wizard-context';
 
 export interface PlaceholderProps {
   placement: string;

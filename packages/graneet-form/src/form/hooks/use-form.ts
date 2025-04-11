@@ -1,14 +1,14 @@
 import { type Dispatch, type SetStateAction, useCallback, useMemo, useRef } from 'react';
-import type { AnyRecord } from '../../shared/types/AnyRecord';
-import type { FieldValues } from '../../shared/types/FieldValue';
-import type { PartialRecord } from '../../shared/types/PartialRecord';
-import { VALIDATION_OUTCOME, type ValidationStatus } from '../../shared/types/Validation';
-import { useCallbackRef } from '../../shared/util/useCallbackRef';
-import type { FormContextApi, FormInternal } from '../contexts/FormContext';
-import type { FormValidations } from '../types/FormValidations';
-import type { FormValues } from '../types/FormValues';
-import { VALIDATION_STATE_UNDETERMINED } from '../types/Validation';
-import { WATCH_MODE } from '../types/WatchMode';
+import type { AnyRecord } from '../../shared/types/any-record';
+import type { FieldValues } from '../../shared/types/field-value';
+import type { PartialRecord } from '../../shared/types/partial-record';
+import { VALIDATION_OUTCOME, type ValidationStatus } from '../../shared/types/validation';
+import { useCallbackRef } from '../../shared/util/use-callback-ref';
+import type { FormContextApi, FormInternal } from '../contexts/form-context';
+import type { FormValidations } from '../types/form-validations';
+import type { FormValues } from '../types/form-values';
+import { VALIDATION_STATE_UNDETERMINED } from '../types/validation';
+import { WATCH_MODE } from '../types/watch-mode';
 
 export interface UseFormOptions<T extends FieldValues> {
   /**

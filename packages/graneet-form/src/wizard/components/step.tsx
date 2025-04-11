@@ -1,8 +1,8 @@
 import { type ReactNode, useEffect } from 'react';
-import type { FieldValues } from '../../shared/types/FieldValue';
-import { useCallbackRef } from '../../shared/util/useCallbackRef';
-import { CONTEXT_WIZARD_DEFAULT, useWizardContext } from '../contexts/WizardContext';
-import type { StepValidator } from '../types/StepValidator';
+import type { FieldValues } from '../../shared/types/field-value';
+import { useCallbackRef } from '../../shared/util/use-callback-ref';
+import { CONTEXT_WIZARD_DEFAULT, useWizardContext } from '../contexts/wizard-context';
+import type { StepValidator } from '../types/step-validator';
 
 export interface StepProps<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues> {
   children: ReactNode;

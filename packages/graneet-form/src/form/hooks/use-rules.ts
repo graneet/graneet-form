@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { RuleContextApi } from '../contexts/RuleContext';
-import type { Validator } from '../types/Validation';
+import type { RuleContextApi } from '../contexts/rule-context';
+import type { Validator } from '../types/validation';
 
 export interface IRule {
   validatorFn: Validator;

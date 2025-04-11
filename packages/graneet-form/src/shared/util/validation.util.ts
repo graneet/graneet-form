@@ -1,6 +1,6 @@
-import type { FieldValues } from '../types/FieldValue';
-import type { PartialRecord } from '../types/PartialRecord';
-import { VALIDATION_OUTCOME, type ValidationStatus } from '../types/Validation';
+import type { FieldValues } from '../types/field-value';
+import type { PartialRecord } from '../types/partial-record';
+import { VALIDATION_OUTCOME, type ValidationStatus } from '../types/validation';
 
 export function mapValidationStatusesToOutcome<T extends FieldValues>(
   validationStatuses: PartialRecord<keyof T, ValidationStatus>,

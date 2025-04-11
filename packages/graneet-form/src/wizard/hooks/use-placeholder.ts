@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { VALIDATION_OUTCOME } from '../../shared/types/Validation';
-import { useWizardContext } from '../contexts/WizardContext';
-import type { PlaceholderContent } from '../types/PlaceholderContent';
+import { VALIDATION_OUTCOME } from '../../shared/types/validation';
+import { useWizardContext } from '../contexts/wizard-context';
+import type { PlaceholderContent } from '../types/placeholder-content';
 
 interface UsePlaceholder {
   handleOnNext(): void;

@@ -1,4 +1,4 @@
-import type { FieldValues } from './FieldValue';
+import type { FieldValues } from './field-value';
 
 export enum VALIDATION_OUTCOME {
   VALID = 'VALID',

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import type { FieldValues } from '../../shared/types/FieldValue';
-import type { FormContextApi } from '../contexts/FormContext';
-import { useOnChangeValues } from './useValues';
+import type { FieldValues } from '../../shared/types/field-value';
+import type { FormContextApi } from '../contexts/form-context';
+import { useOnChangeValues } from './use-values';
 
 export interface UseHiddenField<T extends FieldValues, K extends keyof T> {
   /**

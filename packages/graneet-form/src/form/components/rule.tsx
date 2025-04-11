@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useRuleContext } from '../contexts/RuleContext';
-import type { Validator } from '../types/Validation';
+import { useRuleContext } from '../contexts/rule-context';
+import type { Validator } from '../types/validation';
 
 interface RuleProps {
   /**
