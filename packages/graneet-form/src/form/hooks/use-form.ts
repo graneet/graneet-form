@@ -351,7 +351,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const registerField = useCallback<FormInternal<T>['registerField']>(
-    <K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): (() => void) => {
+    <K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void, defaultValue?: T[K]): (() => void) => {
       const previousValueStored = formStateRef.current[name]?.value;
       if (formStateRef.current[name]?.isRegistered) {
         throw new Error(`Attempting to register field "${String(name)}" a second time`);
@@ -360,7 +360,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       formStateRef.current[name] = {
         name,
         isRegistered: true,
-        value: previousValueStored,
+        value: previousValueStored ?? defaultValue,
         validation: VALIDATION_STATE_UNDETERMINED,
       };
 

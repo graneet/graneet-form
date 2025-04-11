@@ -37,6 +37,8 @@ export interface FieldProps<T extends FieldValues, K extends keyof T> {
   render(fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState): ReactNode | null;
 
   data?: AnyRecord;
+
+  defaultValue?: T[K];
 }
 
 /**
@@ -61,6 +63,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
   children = null,
   render,
   data = undefined,
+  defaultValue,
 }: FieldProps<T, K>) {
   const form = useFormContext<T>();
   const { ruleContext, rules, debouncedRules } = useRules();
@@ -73,8 +76,8 @@ export function Field<T extends FieldValues, K extends keyof T>({
   const hasBeenFocusedRef = useRef(false);
 
   useEffect(() => {
-    return form.formInternal.registerField(name, setValue);
-  }, [name, form.formInternal]);
+    return form.formInternal.registerField(name, setValue, defaultValue);
+  }, [name, form.formInternal, defaultValue]);
 
   useEffect(() => {
     form.formInternal.updateValidationStatus(name, validationStatus);
