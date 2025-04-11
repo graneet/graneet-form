@@ -1,11 +1,11 @@
 import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useRef } from 'react';
-import type { FormContextApi } from '../../form/contexts/FormContext';
-import { type UseFormOptions, useForm } from '../../form/hooks/useForm';
-import type { FieldValues } from '../../shared/types/FieldValue';
-import type { PartialRecord } from '../../shared/types/PartialRecord';
-import { VALIDATION_OUTCOME, type ValidationStatus, type ValidationStatuses } from '../../shared/types/Validation';
+import type { FormContextApi } from '../../form/contexts/form-context';
+import { type UseFormOptions, useForm } from '../../form/hooks/use-form';
+import type { FieldValues } from '../../shared/types/field-value';
+import type { PartialRecord } from '../../shared/types/partial-record';
+import { VALIDATION_OUTCOME, type ValidationStatus, type ValidationStatuses } from '../../shared/types/validation';
 import { mapValidationStatusesToOutcome } from '../../shared/util/validation.util';
-import { useWizardContext } from '../contexts/WizardContext';
+import { useWizardContext } from '../contexts/wizard-context';
 
 interface UseStepFormApi<T extends FieldValues> {
   form: FormContextApi<T>;

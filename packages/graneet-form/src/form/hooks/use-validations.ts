@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import type { FieldValues } from '../../shared/types/FieldValue';
-import type { PartialRecord } from '../../shared/types/PartialRecord';
-import type { Prettify } from '../../shared/types/Prettify';
-import type { ValidationStatus } from '../../shared/types/Validation';
-import { CONTEXT_FORM_DEFAULT, type FormContextApi } from '../contexts/FormContext';
-import type { FormValidations } from '../types/FormValidations';
+import type { FieldValues } from '../../shared/types/field-value';
+import type { PartialRecord } from '../../shared/types/partial-record';
+import type { Prettify } from '../../shared/types/prettify';
+import type { ValidationStatus } from '../../shared/types/validation';
+import { CONTEXT_FORM_DEFAULT, type FormContextApi } from '../contexts/form-context';
+import type { FormValidations } from '../types/form-validations';
 
 function useGlobalValidationInternal<T extends FieldValues>(
   form: FormContextApi<T>,

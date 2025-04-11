@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import type { FieldValues } from '../../shared/types/FieldValue';
-import { Field } from './Field';
+import type { FieldValues } from '../../shared/types/field-value';
+import { Field } from './field';
 
 interface HiddenFieldProps<T extends FieldValues, K extends keyof T> {
   /**

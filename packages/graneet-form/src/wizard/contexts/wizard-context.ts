@@ -1,8 +1,8 @@
 import { type Dispatch, type ReactNode, type SetStateAction, createContext, useContext } from 'react';
-import type { FieldValues } from '../../shared/types/FieldValue';
-import type { VALIDATION_OUTCOME } from '../../shared/types/Validation';
-import type { PlaceholderContentSetter } from '../types/PlaceholderContent';
-import type { StepValidator } from '../types/StepValidator';
+import type { FieldValues } from '../../shared/types/field-value';
+import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
+import type { PlaceholderContentSetter } from '../types/placeholder-content';
+import type { StepValidator } from '../types/step-validator';
 
 export type ValidationStatusesSetter = Dispatch<SetStateAction<VALIDATION_OUTCOME>>;
 

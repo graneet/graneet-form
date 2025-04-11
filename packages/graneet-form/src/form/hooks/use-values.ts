@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import type { FieldValues } from '../../shared/types/FieldValue';
-import type { Prettify } from '../../shared/types/Prettify';
-import { CONTEXT_FORM_DEFAULT, type FormContextApi } from '../contexts/FormContext';
-import type { FormValues } from '../types/FormValues';
-import { WATCH_MODE } from '../types/WatchMode';
+import type { FieldValues } from '../../shared/types/field-value';
+import type { Prettify } from '../../shared/types/prettify';
+import { CONTEXT_FORM_DEFAULT, type FormContextApi } from '../contexts/form-context';
+import type { FormValues } from '../types/form-values';
+import { WATCH_MODE } from '../types/watch-mode';
 
 /**
  * Internal hook to handle watch of all field values

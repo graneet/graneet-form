@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { FieldValue } from '../../shared/types/FieldValue';
-import { VALIDATION_OUTCOME, type ValidationStatus } from '../../shared/types/Validation';
-import { VALIDATION_STATE_UNDETERMINED, VALIDATION_STATE_VALID } from '../types/Validation';
-import type { IRule } from './useRules';
+import type { FieldValue } from '../../shared/types/field-value';
+import { VALIDATION_OUTCOME, type ValidationStatus } from '../../shared/types/validation';
+import { VALIDATION_STATE_UNDETERMINED, VALIDATION_STATE_VALID } from '../types/validation';
+import type { IRule } from './use-rules';
 
 const DEBOUNCE_TIME = 500;
 

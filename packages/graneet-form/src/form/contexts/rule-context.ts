@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { Validator } from '../types/Validation';
+import type { Validator } from '../types/validation';
 
 export interface RuleContextApi {
   registerRule(testFn: Validator, errorMessage: string, isDebounced: boolean): void;
