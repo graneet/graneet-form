@@ -132,7 +132,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     [hasNextStep, hasPreviousStep],
   );
 
-  const handleGoBackTo = useCallback<WizardContextApi<WizardValues>['handleGoBackTo']>(
+  const goBackTo = useCallback<WizardContextApi<WizardValues>['goBackTo']>(
     (previousStep) => {
       if (!currentStep) {
         return;
@@ -150,7 +150,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     [currentStep, saveValuesOfCurrentStepInWizardValues, steps],
   );
 
-  const handleOnNext = useCallback<WizardContextApi<WizardValues>['handleOnNext']>(async (): Promise<void> => {
+  const goNext = useCallback<WizardContextApi<WizardValues>['goNext']>(async (): Promise<void> => {
     if (!currentStep) {
       return;
     }
@@ -176,7 +176,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     await onFinish(wizardValuesRef.current);
   }, [currentStep, hasNextStep, onFinish, saveValuesOfCurrentStepInWizardValues, steps]);
 
-  const handleOnPrevious = useCallback<WizardContextApi<WizardValues>['handleOnPrevious']>((): void => {
+  const goPrevious = useCallback<WizardContextApi<WizardValues>['goPrevious']>((): void => {
     if (!currentStep) {
       return;
     }
@@ -265,9 +265,12 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       },
       steps,
       currentStep,
-      handleOnNext,
-      handleOnPrevious,
-      handleGoBackTo,
+      handleOnNext: goNext,
+      goNext,
+      handleOnPrevious: goPrevious,
+      goPrevious,
+      handleGoBackTo: goBackTo,
+      goBackTo: goBackTo,
       isStepReady,
       getValuesOfCurrentStep,
       getValuesOfStep,
@@ -296,9 +299,9 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       setValuesGetterForCurrentStep,
       steps,
       currentStep,
-      handleOnNext,
-      handleOnPrevious,
-      handleGoBackTo,
+      goNext,
+      goPrevious,
+      goBackTo,
       isStepReady,
       getValuesOfCurrentStep,
       getValuesOfStep,
