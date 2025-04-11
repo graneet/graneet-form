@@ -98,18 +98,36 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
 
   /**
    * Go to a previous step
+   * @deprecated use `goBackTo`
    */
   handleGoBackTo(previousStep: keyof WizardValues): void;
 
   /**
+   * Go to a previous step
+   */
+  goBackTo(previousStep: keyof WizardValues): void;
+
+  /**
    * Go to the next step if there is one or run onFinish function.
+   * @deprecated use `goNext`
    */
   handleOnNext(): Promise<void>;
 
   /**
+   * Go to the next step if there is one or run onFinish function.
+   */
+  goNext(): Promise<void>;
+
+  /**
    * Go to the previous step if there is one or run onQuit function.
+   * @deprecated use `goPrevious`
    */
   handleOnPrevious(): void;
+
+  /**
+   * Go to the previous step if there is one or run onQuit function.
+   */
+  goPrevious(): void;
 
   /**
    * Steps name
@@ -165,6 +183,9 @@ export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
   handleGoBackTo: () => {},
   handleOnNext: async () => {},
   handleOnPrevious: () => {},
+  goNext: async () => {},
+  goBackTo: () => {},
+  goPrevious: () => {},
   steps: [],
   currentStep: undefined,
   isLastStep: false,
