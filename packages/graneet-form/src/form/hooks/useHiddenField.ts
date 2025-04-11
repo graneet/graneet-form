@@ -28,6 +28,7 @@ export interface UseHiddenField<T extends FieldValues, K extends keyof T> {
  * const fooHiddenField = useHiddenField('foo');
  * return <HiddenField {...fooHiddenField} />
  * ```
+ * @deprecated use HiddenField instead
  */
 export function useHiddenField<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T>,
