@@ -2,4 +2,4 @@
 "graneet-form": patch
 ---
 
-feat: introduce useStepStatus
+✨ feat: introduce useStepStatus

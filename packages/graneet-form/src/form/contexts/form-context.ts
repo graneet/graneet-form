@@ -67,8 +67,13 @@ export interface FormInternal<T extends FieldValues> {
    * We cannot have more than one active field for a name.
    * @param name Field name
    * @param setValue Function to change Field value and trigger render
+   * @param defaultValue The default value
    */
-  registerField<K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void): () => void;
+  registerField<K extends keyof T>(
+    name: K,
+    setValue: (value: T[K] | undefined) => void,
+    defaultValue?: T[K],
+  ): () => void;
   /**
    * Remove subscriber watching all registered field values.
    * @param publish Callback used to publish new value
