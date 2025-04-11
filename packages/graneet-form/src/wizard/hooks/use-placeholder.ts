@@ -11,6 +11,9 @@ interface UsePlaceholder {
   stepStatus: VALIDATION_OUTCOME;
 }
 
+/**
+ * @deprecated use `useStepStatus` instead or `useWizardContext`
+ */
 export function usePlaceholder(): UsePlaceholder {
   const {
     handleOnNext,
