@@ -33,6 +33,7 @@ interface HiddenFieldProps<T extends FieldValues, K extends keyof T> {
  *  id="hidden-field"
  * />
  * ```
+ * @deprecated create you custom hidden field instead
  */
 export function HiddenField<T extends FieldValues, K extends keyof T = keyof T>({
   children = null,
