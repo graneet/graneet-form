@@ -18,7 +18,7 @@ export interface UseFormOptions<T extends FieldValues> {
     name: K,
     value: T[K] | undefined,
     data: AnyRecord,
-    formPartial: Pick<FormContextApi<T>, 'getFormValues' | 'setFormValues'>,
+    formPartial: Pick<FormContextApi<T>, 'getFormValues' | 'setFormValues' | 'resetForm'>,
   ): Promise<void> | void;
 
   /**
@@ -472,6 +472,15 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     [updateValueSubscribers],
   );
 
+  const resetForm = useCallback<FormContextApi<T>['resetForm']>((): void => {
+    for (const fieldName of Object.keys(formStateRef.current)) {
+      if (formStateRef.current[fieldName]) {
+        formStateRef.current[fieldName].value = undefined;
+        updateValueForAllTypeOfSubscribers(fieldName);
+      }
+    }
+  }, [updateValueForAllTypeOfSubscribers]);
+
   const onFieldBlur = useCallback<FormInternal<T>['onFieldBlur']>(
     async (name: keyof T, data: AnyRecord = {}): Promise<void> => {
       updateValueSubscribers(name, WATCH_MODE.ON_BLUR);
@@ -487,11 +496,12 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         await onUpdateAfterBlurRef(name, formStateRef.current[name].value, data, {
           getFormValues,
           setFormValues,
+          resetForm,
         });
       }
       focusedFieldNamesRef.current.delete(name);
     },
-    [updateValueSubscribers, onUpdateAfterBlurRef, getFormValues, setFormValues],
+    [updateValueSubscribers, onUpdateAfterBlurRef, getFormValues, setFormValues, resetForm],
   );
 
   const updateValidationStatus = useCallback<FormInternal<T>['updateValidationStatus']>(
@@ -505,15 +515,6 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     },
     [updateErrorSubscribers],
   );
-
-  const resetForm = useCallback<FormContextApi<T>['resetForm']>((): void => {
-    for (const fieldName of Object.keys(formStateRef.current)) {
-      if (formStateRef.current[fieldName]) {
-        formStateRef.current[fieldName].value = undefined;
-        updateValueForAllTypeOfSubscribers(fieldName);
-      }
-    }
-  }, [updateValueForAllTypeOfSubscribers]);
 
   const handleSubmit = useCallback<FormContextApi<T>['handleSubmit']>(
     (submitCallback: (formValues: T) => void | Promise<void>) => () => {
