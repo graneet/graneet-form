@@ -1,5 +1,11 @@
 # graneet-form
 
+## 2.3.1
+
+### Patch Changes
+
+- [#99](https://github.com/graneet/graneet-form/pull/99) [`77f81be`](https://github.com/graneet/graneet-form/commit/77f81be138577913550d135d3f5fe8576ab8f6cc) Thanks [@victorduclos](https://github.com/victorduclos)! - feat: add `resetForm` access in `onUpdateAfterBlur`
+
 ## 2.3.0
 
 ### Minor Changes
