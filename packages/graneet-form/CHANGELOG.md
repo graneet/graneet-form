@@ -1,5 +1,13 @@
 # graneet-form
 
+## 3.0.0-next.0
+
+### Major Changes
+
+- [#109](https://github.com/graneet/graneet-form/pull/109) [`8cc58d7`](https://github.com/graneet/graneet-form/commit/8cc58d744eda3169580d9e763dac3961bde63685) Thanks [@victorduclos](https://github.com/victorduclos)! - Remove `composeEventHandlers`, `HiddenField` and `useHiddenField`
+
+- [#106](https://github.com/graneet/graneet-form/pull/106) [`e4d6e10`](https://github.com/graneet/graneet-form/commit/e4d6e1081404caf3445819d0b7d392805478beb1) Thanks [@victorduclos](https://github.com/victorduclos)! - Migrate target to ES2020 and to ESM only
+
 ## 2.3.3
 
 ### Patch Changes
