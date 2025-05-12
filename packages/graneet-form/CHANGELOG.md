@@ -1,5 +1,11 @@
 # graneet-form
 
+## 2.3.3
+
+### Patch Changes
+
+- [#104](https://github.com/graneet/graneet-form/pull/104) [`771fbbb`](https://github.com/graneet/graneet-form/commit/771fbbba447ba4ea47ef1c239804d2d650c08bb7) Thanks [@victorduclos](https://github.com/victorduclos)! - Change useWizard props to be optional
+
 ## 2.3.2
 
 ### Patch Changes
