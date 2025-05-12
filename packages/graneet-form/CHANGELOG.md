@@ -1,5 +1,11 @@
 # graneet-form
 
+## 2.3.2
+
+### Patch Changes
+
+- [#101](https://github.com/graneet/graneet-form/pull/101) [`b2090a4`](https://github.com/graneet/graneet-form/commit/b2090a4d6e3f81e8eaf177ce3d40b94902005a25) Thanks [@victorduclos](https://github.com/victorduclos)! - Allow passing steps as `useWizard` property
+
 ## 2.3.1
 
 ### Patch Changes
