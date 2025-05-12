@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
 import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
@@ -6,9 +6,19 @@ import type { ValidationStatusesSetter, WizardContextApi } from '../contexts/wiz
 import type { PlaceholderContent, PlaceholderContentSetter } from '../types/placeholder-content';
 import type { StepValidator } from '../types/step-validator';
 
+type StepConfig<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues> = {
+  name: Step;
+  onNext?: StepValidator<WizardValues, Step>;
+};
+
+type Steps<WizardValues extends Record<string, FieldValues>> = {
+  [K in keyof WizardValues]: StepConfig<WizardValues, K>;
+}[keyof WizardValues][];
+
 export function useWizard<WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>>(
   onFinish: (wizardValues: WizardValues) => void | Promise<void>,
   onQuit: () => void,
+  experimental_defaultSteps: Steps<WizardValues> = [],
 ): WizardContextApi<WizardValues> {
   // -- VALUES --
   const wizardValuesRef = useRef<WizardValues>({} as WizardValues);
@@ -16,9 +26,22 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
 
   // -- STEP --
   const [currentStep, setCurrentStep] = useState<keyof WizardValues>();
-  const [steps, setSteps] = useState<Array<keyof WizardValues>>([]);
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  const validationFnsRef = useRef<PartialRecord<keyof WizardValues, StepValidator<WizardValues, any>>>({});
+  const [steps, setSteps] = useState<Array<keyof WizardValues>>(experimental_defaultSteps.map((v) => v.name));
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    setSteps(experimental_defaultSteps.map((v) => v.name));
+  }, [experimental_defaultSteps.toString()]);
+
+  const validationFnsRef = useRef(
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    experimental_defaultSteps.reduce<PartialRecord<keyof WizardValues, StepValidator<WizardValues, any>>>(
+      (acc, step) => {
+        acc[step.name] = step.onNext;
+        return acc;
+      },
+      {},
+    ),
+  );
 
   const stepsWithoutFooterRef = useRef<Set<keyof WizardValues>>(new Set());
   const [isStepReady, setIsStepReady] = useState(false);
