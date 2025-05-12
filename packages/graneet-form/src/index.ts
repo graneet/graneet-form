@@ -30,6 +30,7 @@ export { Placeholder } from './wizard/components/placeholder';
 export type { PlaceholderProps } from './wizard/components/placeholder';
 export { useWizardContext, WizardContext } from './wizard/contexts/wizard-context';
 export { useWizard } from './wizard/hooks/use-wizard';
+export type { Steps } from './wizard/hooks/use-wizard';
 export { useStepForm } from './wizard/hooks/use-step-form';
 export { usePlaceholder } from './wizard/hooks/use-placeholder';
 export type { StepValidator } from './wizard/types/step-validator';

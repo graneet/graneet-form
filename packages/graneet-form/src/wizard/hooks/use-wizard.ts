@@ -11,13 +11,13 @@ type StepConfig<WizardValues extends Record<string, FieldValues>, Step extends k
   onNext?: StepValidator<WizardValues, Step>;
 };
 
-type Steps<WizardValues extends Record<string, FieldValues>> = {
+export type Steps<WizardValues extends Record<string, FieldValues>> = {
   [K in keyof WizardValues]: StepConfig<WizardValues, K>;
 }[keyof WizardValues][];
 
 export function useWizard<WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>>(
-  onFinish: (wizardValues: WizardValues) => void | Promise<void>,
-  onQuit: () => void,
+  onFinish: (wizardValues: WizardValues) => void | Promise<void> = () => {},
+  onQuit: () => void = () => {},
   experimental_defaultSteps: Steps<WizardValues> = [],
 ): WizardContextApi<WizardValues> {
   // -- VALUES --
