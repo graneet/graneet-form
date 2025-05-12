@@ -127,19 +127,3 @@ export function Field<T extends FieldValues, K extends keyof T>({
     </RuleContext.Provider>
   );
 }
-
-/**
- * @deprecated create your own one instead
- */
-export function composeEventHandlers<Args extends unknown[]>(
-  originalEventHandler: ((...args: Args) => void) | undefined,
-  formEventHandler: (...args: Args) => void,
-) {
-  return async (...args: Args): Promise<void> => {
-    if (originalEventHandler) {
-      originalEventHandler(...args);
-    }
-
-    formEventHandler(...args);
-  };
-}
