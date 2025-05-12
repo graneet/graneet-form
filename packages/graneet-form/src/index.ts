@@ -5,17 +5,14 @@ export type { FieldValue, FieldValues } from './shared/types/field-value';
 export type { AnyRecord } from './shared/types/any-record';
 
 /* Field */
-export { Field, composeEventHandlers } from './form/components/field';
+export { Field } from './form/components/field';
 export type { FieldRenderState, FieldRenderProps } from './form/components/field';
-export { HiddenField } from './form/components/hidden-field';
 export { Rule } from './form/components/rule';
 export { useFormContext } from './form/contexts/form-context';
 export type { FormContextApi } from './form/contexts/form-context';
 export { useForm } from './form/hooks/use-form';
 export type { UseFormOptions } from './form/hooks/use-form';
 export { useFormStatus } from './form/hooks/use-form-status';
-export { useHiddenField } from './form/hooks/use-hidden-field';
-export type { UseHiddenField } from './form/hooks/use-hidden-field';
 export { useValidations } from './form/hooks/use-validations';
 export { useOnBlurValues, useOnChangeValues } from './form/hooks/use-values';
 export { WATCH_MODE } from './form/types/watch-mode';
