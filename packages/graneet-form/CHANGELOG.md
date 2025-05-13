@@ -1,5 +1,11 @@
 # graneet-form
 
+## 3.0.0-next.2
+
+### Minor Changes
+
+- [#112](https://github.com/graneet/graneet-form/pull/112) [`f395a78`](https://github.com/graneet/graneet-form/commit/f395a789fb3a8c57f3481be819ad5d6fb9144bb2) Thanks [@victorduclos](https://github.com/victorduclos)! - Fix ESM build
+
 ## 3.0.0-next.1
 
 ### Minor Changes
