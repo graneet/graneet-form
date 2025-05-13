@@ -2,13 +2,7 @@
   "name": "graneet-form",
   "version": "3.0.0-next.1",
   "homepage": "https://github.com/graneet/graneet-form",
-  "keywords": [
-    "react",
-    "form",
-    "forms",
-    "validation",
-    "typescript"
-  ],
+  "keywords": ["react", "form", "forms", "validation", "typescript"],
   "bugs": {
     "url": "https://github.com/graneet/graneet-form/issues"
   },
@@ -18,8 +12,15 @@
   },
   "sideEffects": false,
   "license": "MIT",
+  "type": "module",
   "module": "dist/index.mjs",
   "types": "dist/index.d.mts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    }
+  },
   "scripts": {
     "dev": "tsup --config tsup.config.ts --env.NODE_ENV development",
     "build": "tsup --config tsup.config.ts --env.NODE_ENV production",

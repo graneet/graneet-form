@@ -6,9 +6,5 @@
     "graneet-form-testing": "0.0.1",
     "graneet-form": "2.3.3"
   },
-  "changesets": [
-    "early-doors-push",
-    "great-walls-dress",
-    "spicy-taxis-try"
-  ]
+  "changesets": ["early-doors-push", "great-walls-dress", "spicy-taxis-try"]
 }
