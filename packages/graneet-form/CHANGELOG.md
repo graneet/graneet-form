@@ -1,5 +1,11 @@
 # graneet-form
 
+## 3.0.0-next.4
+
+### Major Changes
+
+- [#116](https://github.com/graneet/graneet-form/pull/116) [`0c4617d`](https://github.com/graneet/graneet-form/commit/0c4617d5486ea03f51ed68bb18fcc1b199c9490e) Thanks [@victorduclos](https://github.com/victorduclos)! - Remove `usePlaceholder`, deprecated methods in `useWizard`, `WizardLabels` and `Placeholder`
+
 ## 3.0.0-next.3
 
 ### Minor Changes
