@@ -29,6 +29,5 @@ export { useWizardContext, WizardContext } from './wizard/contexts/wizard-contex
 export { useWizard } from './wizard/hooks/use-wizard';
 export type { Steps } from './wizard/hooks/use-wizard';
 export { useStepForm } from './wizard/hooks/use-step-form';
-export { usePlaceholder } from './wizard/hooks/use-placeholder';
 export type { StepValidator } from './wizard/types/step-validator';
-export type { WizardLabels } from './wizard/types/wizard-labels';
+export { useStepStatus } from './wizard/hooks/use-step-status';
