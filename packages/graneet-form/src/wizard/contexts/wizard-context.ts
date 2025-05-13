@@ -1,14 +1,13 @@
-import { type Dispatch, type ReactNode, type SetStateAction, createContext, useContext } from 'react';
+import { type Dispatch, type SetStateAction, createContext, useContext } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
-import type { PlaceholderContentSetter } from '../types/placeholder-content';
 import type { StepValidator } from '../types/step-validator';
 
 export type ValidationStatusesSetter = Dispatch<SetStateAction<VALIDATION_OUTCOME>>;
 
 export interface WizardContextApi<WizardValues extends Record<string, FieldValues>> {
   /**
-   * Get values for specified step.
+   * Get values for a specified step.
    * @param stepName Step name
    */
   getValuesOfStep<Step extends keyof WizardValues>(stepName: Step): WizardValues[Step] | undefined;
@@ -49,37 +48,16 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
     unregisterStep(name: keyof WizardValues): void;
 
     /**
-     * Register a placeholder.
-     * @param placeholderContentSetter Setter to update placeholder content
+     * Register a step status listener.
      * @param stepStatusSetter Setter to update placeholder validations
      */
-    registerPlaceholder(
-      placeholderContentSetter: PlaceholderContentSetter,
-      stepStatusSetter: ValidationStatusesSetter,
-    ): void;
+    registerStepStatusListener(stepStatusSetter: ValidationStatusesSetter): void;
 
     /**
-     * Unregister a placeholder.
-     * @param placeholderContentSetter Setter to update placeholder content
+     * Unregister a step status listener.
      * @param stepStatusSetter Setter to update placeholder validations
      */
-    unregisterPlaceholder(
-      placeholderContentSetter: PlaceholderContentSetter,
-      stepStatusSetter: ValidationStatusesSetter,
-    ): void;
-
-    /**
-     * Set component in the placeholder.
-     * @param placement Placement of the element added
-     * @param children Component to add
-     */
-    updatePlaceholderContent(placement: string, children: ReactNode): void;
-
-    /**
-     * Reset placeholder content.
-     * @param placement Placement of the deleted element
-     */
-    resetPlaceholderContent(placement?: string): void;
+    unregisterStepStatusListener(stepStatusSetter: ValidationStatusesSetter): void;
 
     /**
      * Set callback used to get form values for the current step.
@@ -98,31 +76,13 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
 
   /**
    * Go to a previous step
-   * @deprecated use `goBackTo`
-   */
-  handleGoBackTo(previousStep: keyof WizardValues): void;
-
-  /**
-   * Go to a previous step
    */
   goBackTo(previousStep: keyof WizardValues): void;
 
   /**
    * Go to the next step if there is one or run onFinish function.
-   * @deprecated use `goNext`
-   */
-  handleOnNext(): Promise<void>;
-
-  /**
-   * Go to the next step if there is one or run onFinish function.
    */
   goNext(): Promise<void>;
-
-  /**
-   * Go to the previous step if there is one or run onQuit function.
-   * @deprecated use `goPrevious`
-   */
-  handleOnPrevious(): void;
 
   /**
    * Go to the previous step if there is one or run onQuit function.
@@ -170,19 +130,14 @@ export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
   getValuesOfCurrentStep: () => undefined,
   getValuesOfSteps: () => ({}),
   wizardInternal: {
-    updatePlaceholderContent: () => {},
-    resetPlaceholderContent: () => {},
     registerStep: () => {},
     unregisterStep: () => {},
-    registerPlaceholder: () => {},
-    unregisterPlaceholder: () => {},
+    registerStepStatusListener: () => {},
+    unregisterStepStatusListener: () => {},
     stepStatusSetter: () => {},
     setIsStepReady: () => {},
     setValuesGetterForCurrentStep: () => {},
   },
-  handleGoBackTo: () => {},
-  handleOnNext: async () => {},
-  handleOnPrevious: () => {},
   goNext: async () => {},
   goBackTo: () => {},
   goPrevious: () => {},

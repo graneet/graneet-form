@@ -4,16 +4,15 @@ import { useWizardContext } from '../contexts/wizard-context';
 
 export function useStepStatus() {
   const {
-    wizardInternal: { registerPlaceholder, unregisterPlaceholder },
+    wizardInternal: { registerStepStatusListener, unregisterStepStatusListener },
   } = useWizardContext();
 
   const [stepStatus, setStepStatus] = useState<VALIDATION_OUTCOME>(VALIDATION_OUTCOME.VALID);
 
   useEffect(() => {
-    const noop = () => {};
-    registerPlaceholder(noop, setStepStatus);
-    return () => unregisterPlaceholder(noop, setStepStatus);
-  }, [registerPlaceholder, unregisterPlaceholder]);
+    registerStepStatusListener(setStepStatus);
+    return () => unregisterStepStatusListener(setStepStatus);
+  }, [registerStepStatusListener, unregisterStepStatusListener]);
 
   return stepStatus;
 }

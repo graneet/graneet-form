@@ -1,9 +1,8 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
 import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
 import type { ValidationStatusesSetter, WizardContextApi } from '../contexts/wizard-context';
-import type { PlaceholderContent, PlaceholderContentSetter } from '../types/placeholder-content';
 import type { StepValidator } from '../types/step-validator';
 
 type StepConfig<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues> = {
@@ -46,8 +45,6 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
   const stepsWithoutFooterRef = useRef<Set<keyof WizardValues>>(new Set());
   const [isStepReady, setIsStepReady] = useState(false);
 
-  // -- PLACEHOLDER --
-  const placeholderContentSetterRef = useRef<Set<PlaceholderContentSetter>>(new Set());
   const stepStatusSetterRef = useRef<Set<ValidationStatusesSetter>>(new Set());
 
   // -- TITLE --
@@ -62,7 +59,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
   );
 
   const saveValuesOfCurrentStepInWizardValues = useCallback(() => {
-    // Add form values to values stored in wizard
+    // Add form values to values stored in the wizard
     if (currentStep) {
       // add values only if getter returns values
       const stepValues = valuesStepGetterRef.current();
@@ -216,47 +213,17 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     }
   }, [currentStep, hasPreviousStep, onQuit, saveValuesOfCurrentStepInWizardValues, steps]);
 
-  const registerPlaceholder = useCallback<WizardContextApi<WizardValues>['wizardInternal']['registerPlaceholder']>(
-    (placeholderContentSetter: PlaceholderContentSetter, stepStatusSetter: ValidationStatusesSetter): void => {
-      placeholderContentSetterRef.current.add(placeholderContentSetter);
-      stepStatusSetterRef.current.add(stepStatusSetter);
-    },
-    [],
-  );
-
-  const unregisterPlaceholder = useCallback<WizardContextApi<WizardValues>['wizardInternal']['unregisterPlaceholder']>(
-    (placeholderContentSetter: PlaceholderContentSetter, stepStatusSetter: ValidationStatusesSetter): void => {
-      placeholderContentSetterRef.current.delete(placeholderContentSetter);
-      stepStatusSetterRef.current.delete(stepStatusSetter);
-    },
-    [],
-  );
-
-  const updatePlaceholderContent = useCallback<
-    WizardContextApi<WizardValues>['wizardInternal']['updatePlaceholderContent']
-  >((placement: string, children: ReactNode): void => {
-    for (const placeholderContentSetter of placeholderContentSetterRef.current) {
-      placeholderContentSetter((previous: PlaceholderContent) => ({
-        ...previous,
-        [placement]: children,
-      }));
-    }
+  const registerStepStatusListener = useCallback<
+    WizardContextApi<WizardValues>['wizardInternal']['registerStepStatusListener']
+  >((stepStatusSetter: ValidationStatusesSetter): void => {
+    stepStatusSetterRef.current.add(stepStatusSetter);
   }, []);
 
-  const resetPlaceholderContent = useCallback<
-    WizardContextApi<WizardValues>['wizardInternal']['resetPlaceholderContent']
-  >(
-    (placement?: string): void => {
-      if (placement) {
-        updatePlaceholderContent(placement, undefined);
-      } else {
-        for (const placeholderContentSetter of placeholderContentSetterRef.current) {
-          placeholderContentSetter({} as PlaceholderContent);
-        }
-      }
-    },
-    [updatePlaceholderContent],
-  );
+  const unregisterStepStatusListener = useCallback<
+    WizardContextApi<WizardValues>['wizardInternal']['unregisterStepStatusListener']
+  >((stepStatusSetter: ValidationStatusesSetter): void => {
+    stepStatusSetterRef.current.delete(stepStatusSetter);
+  }, []);
 
   const setValuesGetterForCurrentStep = useCallback<
     WizardContextApi<WizardValues>['wizardInternal']['setValuesGetterForCurrentStep']
@@ -276,24 +243,19 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
   return useMemo<WizardContextApi<WizardValues>>(
     () => ({
       wizardInternal: {
-        updatePlaceholderContent,
-        resetPlaceholderContent,
         registerStep,
         unregisterStep,
-        registerPlaceholder,
-        unregisterPlaceholder,
+        registerStepStatusListener,
+        unregisterStepStatusListener,
         stepStatusSetter,
         setIsStepReady,
         setValuesGetterForCurrentStep,
       },
       steps,
       currentStep,
-      handleOnNext: goNext,
       goNext,
-      handleOnPrevious: goPrevious,
       goPrevious,
-      handleGoBackTo: goBackTo,
-      goBackTo: goBackTo,
+      goBackTo,
       isStepReady,
       getValuesOfCurrentStep,
       getValuesOfStep,
@@ -312,12 +274,10 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       },
     }),
     [
-      updatePlaceholderContent,
-      resetPlaceholderContent,
       registerStep,
       unregisterStep,
-      registerPlaceholder,
-      unregisterPlaceholder,
+      registerStepStatusListener,
+      unregisterStepStatusListener,
       stepStatusSetter,
       setValuesGetterForCurrentStep,
       steps,
