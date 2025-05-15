@@ -25,11 +25,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
 
   // -- STEP --
   const [currentStep, setCurrentStep] = useState<keyof WizardValues>();
-  const [steps, setSteps] = useState<Array<keyof WizardValues>>(experimental_defaultSteps.map((v) => v.name));
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(() => {
-    setSteps(experimental_defaultSteps.map((v) => v.name));
-  }, [experimental_defaultSteps.toString()]);
+  const [steps, setSteps] = useState<Array<keyof WizardValues>>(() => experimental_defaultSteps.map((v) => v.name));
 
   const validationFnsRef = useRef(
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
