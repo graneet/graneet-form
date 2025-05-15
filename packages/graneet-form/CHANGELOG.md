@@ -1,5 +1,11 @@
 # graneet-form
 
+## 3.0.0-next.5
+
+### Minor Changes
+
+- [#118](https://github.com/graneet/graneet-form/pull/118) [`1a9056f`](https://github.com/graneet/graneet-form/commit/1a9056f5969b365a6b8413e7ef83fb451fcb2fb7) Thanks [@victorduclos](https://github.com/victorduclos)! - Fix: wizard steps are always reset with side effects
+
 ## 3.0.0-next.4
 
 ### Major Changes
