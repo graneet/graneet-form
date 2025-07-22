@@ -13,5 +13,10 @@
     "type": "dir",
     "name": "wizard",
     "label": "Wizard"
+  },
+  {
+    "type": "dir",
+    "name": "advanced",
+    "label": "Advanced"
   }
 ]

@@ -1,210 +1,228 @@
-# Markdown & MDX
+# Wizard
 
-Rspress supports not only Markdown but also [MDX](https://mdxjs.com/), a powerful way to develop content.
+The wizard system in graneet-form allows you to create multi-step forms with ease. Each step maintains its own form state while sharing data across the entire wizard flow.
 
-## Markdown
+## Core Concepts
 
-MDX is a superset of Markdown, which means you can write Markdown files as usual. For example:
+A wizard consists of:
+- **Steps**: Individual form sections with their own validation
+- **Step Navigation**: Automatic progression based on validation
+- **Data Persistence**: Form data is preserved across steps
+- **Custom Validation**: Per-step validation logic
 
-```md
-# Hello World
+## Basic Usage
+
+```tsx
+import { useWizard, Step, useStepForm, Field } from 'graneet-form';
+
+interface WizardData {
+  personal: {
+    firstName: string;
+    lastName: string;
+  };
+  contact: {
+    email: string;
+    phone: string;
+  };
+}
+
+function PersonalInfoStep() {
+  const { form } = useStepForm<WizardData, 'personal'>();
+
+  return (
+    <Step name="personal" title="Personal Information">
+      <Field
+        name="firstName"
+        render={({ value, onChange, onBlur, onFocus }) => (
+          <input
+            placeholder="First Name"
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
+            onFocus={onFocus}
+          />
+        )}
+      />
+      <Field
+        name="lastName"
+        render={({ value, onChange, onBlur, onFocus }) => (
+          <input
+            placeholder="Last Name"
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
+            onFocus={onFocus}
+          />
+        )}
+      />
+    </Step>
+  );
+}
+
+function ContactInfoStep() {
+  const { form } = useStepForm<WizardData, 'contact'>();
+
+  return (
+    <Step name="contact" title="Contact Information">
+      <Field
+        name="email"
+        render={({ value, onChange, onBlur, onFocus }) => (
+          <input
+            type="email"
+            placeholder="Email"
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
+            onFocus={onFocus}
+          />
+        )}
+      />
+      <Field
+        name="phone"
+        render={({ value, onChange, onBlur, onFocus }) => (
+          <input
+            placeholder="Phone"
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
+            onFocus={onFocus}
+          />
+        )}
+      />
+    </Step>
+  );
+}
+
+function MyWizard() {
+  const wizard = useWizard<WizardData>(
+    (wizardValues) => {
+      console.log('Wizard completed:', wizardValues);
+    },
+    () => {
+      console.log('Wizard cancelled');
+    }
+  );
+
+  return (
+    <WizardContext.Provider value={wizard}>
+      <PersonalInfoStep />
+      <ContactInfoStep />
+    </WizardContext.Provider>
+  );
+}
 ```
 
-## Use Component
+## Step Validation
 
-When you want to use React components in Markdown files, you should name your files with `.mdx` extension. For example:
+You can add custom validation logic to control when users can proceed to the next step:
 
-```mdx
-// docs/index.mdx
-import { CustomComponent } from './custom';
+```tsx
+function PersonalInfoStep() {
+  const { form } = useStepForm<WizardData, 'personal'>();
 
-# Hello World
+  const validateStep = async (stepValues: WizardData['personal'] | undefined) => {
+    if (!stepValues?.firstName || !stepValues?.lastName) {
+      return false;
+    }
+    return true;
+  };
 
-<CustomComponent />
+  return (
+    <Step name="personal" title="Personal Information" onNext={validateStep}>
+      {/* Field components */}
+    </Step>
+  );
+}
 ```
 
-## Front Matter
+## Wizard Navigation
 
-You can add Front Matter at the beginning of your Markdown file, which is a YAML-formatted object that defines some metadata. For example:
+The wizard provides several navigation methods:
 
-```yaml
----
-title: Hello World
----
+```tsx
+function CustomNavigation() {
+  const wizard = useWizardContext<WizardData>();
+
+  return (
+    <div>
+      <button onClick={wizard.goPrevious} disabled={wizard.isFirstStep}>
+        Previous
+      </button>
+      <button onClick={wizard.goNext} disabled={!wizard.isStepReady}>
+        {wizard.isLastStep ? 'Finish' : 'Next'}
+      </button>
+      
+      {/* Jump to specific step */}
+      <button onClick={() => wizard.goBackTo('personal')}>
+        Go to Personal Info
+      </button>
+    </div>
+  );
+}
 ```
 
-> Note: By default, Rspress uses h1 headings as html headings.
+## Accessing Step Data
 
-You can also access properties defined in Front Matter in the body, for example:
+You can access data from any step within the wizard:
 
-```markdown
----
-title: Hello World
----
+```tsx
+function SummaryStep() {
+  const wizard = useWizardContext<WizardData>();
+  
+  const personalInfo = wizard.getValuesOfStep('personal');
+  const contactInfo = wizard.getValuesOfStep('contact');
+  const allData = wizard.getValuesOfSteps();
 
-# {frontmatter.title}
+  return (
+    <Step name="summary" title="Summary" noFooter>
+      <h3>Personal Information</h3>
+      <p>Name: {personalInfo?.firstName} {personalInfo?.lastName}</p>
+      
+      <h3>Contact Information</h3>
+      <p>Email: {contactInfo?.email}</p>
+      <p>Phone: {contactInfo?.phone}</p>
+    </Step>
+  );
+}
 ```
 
-The previously defined properties will be passed to the component as `frontmatter` properties. So the final output will be:
+## Advanced Features
 
-```html
-<h1>Hello World</h1>
+### Custom Step Footer
+
+You can disable the default navigation footer and create your own:
+
+```tsx
+<Step name="custom" title="Custom Step" noFooter>
+  <div>
+    {/* Your form fields */}
+  </div>
+  
+  <div className="custom-footer">
+    <button onClick={wizard.goPrevious}>Back</button>
+    <button onClick={wizard.goNext}>Continue</button>
+  </div>
+</Step>
 ```
 
-## Custom Container
+### Pre-configured Steps
 
-You can use the `:::` syntax to create custom containers and support custom titles. For example:
+You can initialize the wizard with predefined steps:
 
-**Input:**
+```tsx
+const defaultSteps = [
+  { name: 'personal' as const },
+  { name: 'contact' as const, onNext: validateContactInfo },
+  { name: 'summary' as const }
+];
 
-```markdown
-:::tip
-This is a `block` of type `tip`
-:::
-
-:::info
-This is a `block` of type `info`
-:::
-
-:::warning
-This is a `block` of type `warning`
-:::
-
-:::danger
-This is a `block` of type `danger`
-:::
-
-::: details
-This is a `block` of type `details`
-:::
-
-:::tip Custom Title
-This is a `block` of `Custom Title`
-:::
-
-:::tip{title="Custom Title"}
-This is a `block` of `Custom Title`
-:::
+const wizard = useWizard<WizardData>(onFinish, onQuit, defaultSteps);
 ```
 
-**Output:**
+## Best Practices
 
-:::tip
-This is a `block` of type `tip`
-:::
-
-:::info
-This is a `block` of type `info`
-:::
-
-:::warning
-This is a `block` of type `warning`
-:::
-
-:::danger
-This is a `block` of type `danger`
-:::
-
-::: details
-This is a `block` of type `details`
-:::
-
-:::tip Custom Title
-This is a `block` of `Custom Title`
-:::
-
-:::tip{title="Custom Title"}
-This is a `block` of `Custom Title`
-:::
-
-## Code Block
-
-### Basic Usage
-
-You can use the \`\`\` syntax to create code blocks and support custom titles. For example:
-
-**Input:**
-
-````md
-```js
-console.log('Hello World');
-```
-
-```js title="hello.js"
-console.log('Hello World');
-```
-````
-
-**Output:**
-
-```js
-console.log('Hello World');
-```
-
-```js title="hello.js"
-console.log('Hello World');
-```
-
-### Show Line Numbers
-
-If you want to display line numbers, you can enable the `showLineNumbers` option in the config file:
-
-```ts title="rspress.config.ts"
-export default {
-  // ...
-  markdown: {
-    showLineNumbers: true,
-  },
-};
-```
-
-### Wrap Code
-
-If you want to wrap long code line by default, you can enable the `defaultWrapCode` option in the config file:
-
-```ts title="rspress.config.ts"
-export default {
-  // ...
-  markdown: {
-    defaultWrapCode: true,
-  },
-};
-```
-
-### Line Highlighting
-
-You can also apply line highlighting and code block title at the same time, for example:
-
-**Input:**
-
-````md
-```js title="hello.js" {1,3-5}
-console.log('Hello World');
-
-const a = 1;
-
-console.log(a);
-
-const b = 2;
-
-console.log(b);
-```
-````
-
-**Ouput:**
-
-```js title="hello.js" {1,3-5}
-console.log('Hello World');
-
-const a = 1;
-
-console.log(a);
-
-const b = 2;
-
-console.log(b);
-```
-
-## Rustify MDX compiler
-
-You can enable Rustify MDX compiler by following config:
+1. **Type Safety**: Always type your wizard data structure for better TypeScript support
+2. **Validation**: Use `onNext` validators for complex validation logic
+3. **Data Persistence**: Leverage the automatic data persistence across steps
+4. **Step Isolation**: Keep each step's logic contained within its component
+5. **Custom Navigation**: Use `noFooter` when you need custom navigation controls

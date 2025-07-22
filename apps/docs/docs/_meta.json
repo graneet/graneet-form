@@ -2,10 +2,11 @@
   {
     "text": "Guide",
     "link": "/guide/start/quick-start.html",
-    "activeMatch": "/guide/start/^"
+    "activeMatch": "/guide/^"
   },
   {
-    "text": "API BUT TODO",
-    "link": "https://rspress.dev/api/index.html"
+    "text": "API Reference",
+    "link": "/api/hooks.html",
+    "activeMatch": "/api/^"
   }
 ]

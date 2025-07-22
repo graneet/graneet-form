@@ -1,0 +1,22 @@
+[
+  {
+    "type": "file",
+    "name": "examples",
+    "label": "Advanced Examples"
+  },
+  {
+    "type": "file",
+    "name": "performance",
+    "label": "Performance Guide"
+  },
+  {
+    "type": "file",
+    "name": "troubleshooting",
+    "label": "Troubleshooting"
+  },
+  {
+    "type": "file",
+    "name": "migration",
+    "label": "Migration Guide"
+  }
+]
