@@ -46,7 +46,64 @@ You can use the rule inside each `Field` of the library. Rule will be checked on
 
 ## Hooks
 
-TODO useValidations & useFormStatus
+### useValidations
+
+The `useValidations` hook allows you to watch the validation status of specific fields or all fields in a form.
+
+```tsx
+import { useValidations, useFormContext } from 'graneet-form';
+
+function ValidationDisplay() {
+  const form = useFormContext();
+  
+  // Watch specific fields
+  const validations = useValidations(form, ['email', 'password']);
+  
+  // Watch all fields
+  const allValidations = useValidations(form);
+
+  return (
+    <div>
+      {Object.entries(validations).map(([fieldName, validation]) => (
+        <div key={fieldName}>
+          <strong>{fieldName}:</strong>
+          <span className={validation?.status === 'VALID' ? 'valid' : 'invalid'}>
+            {validation?.status} - {validation?.message}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+### useFormStatus
+
+The `useFormStatus` hook provides the overall validation status of the form.
+
+```tsx
+import { useFormStatus, useFormContext } from 'graneet-form';
+
+function FormStatus() {
+  const form = useFormContext();
+  const { formStatus, isValid } = useFormStatus(form);
+
+  return (
+    <div>
+      <p>Form Status: {formStatus}</p>
+      <p>Is Valid: {isValid ? 'Yes' : 'No'}</p>
+      <button disabled={!isValid} type="submit">
+        Submit Form
+      </button>
+    </div>
+  );
+}
+```
+
+The form status can have three values:
+- **VALID**: All fields are valid
+- **INVALID**: At least one field is invalid
+- **UNDETERMINED**: Some fields haven't been validated yet
 
 ## Example
 
