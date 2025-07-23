@@ -73,6 +73,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
   const validationStatus = useFieldValidation(rules, debouncedRules, value);
 
   const hasFocusRef = useRef(false);
+  const hasBeenUpdatedRef = useRef(false);
   const hasBeenFocusedRef = useRef(false);
 
   useEffect(() => {
@@ -88,7 +89,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
       form.formInternal.onFieldChange(name, newValue, hasFocusRef.current);
 
       if (hasBeenFocusedRef.current) {
-        setIsPristine(false);
+        hasBeenUpdatedRef.current = true;
       }
     },
     [name, form.formInternal],
@@ -97,6 +98,10 @@ export function Field<T extends FieldValues, K extends keyof T>({
   const onBlur = useCallback((): void => {
     hasFocusRef.current = false;
     form.formInternal.onFieldBlur(name, data);
+
+    if (hasBeenUpdatedRef.current) {
+      setIsPristine(false);
+    }
   }, [name, form.formInternal, data]);
 
   const onFocus = useCallback(() => {
