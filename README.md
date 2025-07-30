@@ -1,5 +1,9 @@
 # graneet-form
 
+<p align="center">
+  <img src="apps/docs/docs/public/graneet-form-logo.png" alt="Graneet Form Logo" width="200">
+</p>
+
 **[Documentation](https://graneet-form.vercel.app/)**
 
 
