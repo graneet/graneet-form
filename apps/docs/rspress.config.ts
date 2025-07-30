@@ -24,7 +24,6 @@ export default defineConfig({
     enableContentAnimation: true,
     footer: {
       message: 'Publié sous licence MIT.',
-      copyright: 'Copyright © 2024-present Graneet'
-    }
+    },
   },
 });
