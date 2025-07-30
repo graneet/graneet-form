@@ -1,5 +1,11 @@
 # graneet-form
 
+## 3.0.0-next.6
+
+### Patch Changes
+
+- [#120](https://github.com/graneet/graneet-form/pull/120) [`e7a6ab6`](https://github.com/graneet/graneet-form/commit/e7a6ab6aa0bbf9bf9b085f123f8f79c2b2aeb80c) Thanks [@grollec](https://github.com/grollec)! - Added API + some guide into the docs
+
 ## 3.0.0-next.5
 
 ### Minor Changes
