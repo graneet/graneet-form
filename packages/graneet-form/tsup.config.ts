@@ -1,4 +1,5 @@
 import { type Options, defineConfig } from 'tsup';
+import { copyFileSync } from 'node:fs';
 
 const isProduction = (options: Options) => options.env?.NODE_ENV === 'production';
 
@@ -13,4 +14,7 @@ export default defineConfig((options) => ({
   sourcemap: !isProduction(options),
   minify: isProduction(options),
   dts: true,
+  onSuccess: async () => {
+    copyFileSync('../../README.md', 'dist/README.md');
+  },
 }));
