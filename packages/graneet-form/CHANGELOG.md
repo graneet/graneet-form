@@ -1,5 +1,11 @@
 # graneet-form
 
+## 3.0.0-next.7
+
+### Patch Changes
+
+- [#127](https://github.com/graneet/graneet-form/pull/127) [`c6a30f5`](https://github.com/graneet/graneet-form/commit/c6a30f5b48b5ddfb942fa6e37bc66eae1ab60361) Thanks [@victorduclos](https://github.com/victorduclos)! - initialize first step
+
 ## 3.0.0-next.6
 
 ### Major Changes
