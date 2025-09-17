@@ -16,9 +16,6 @@ export interface StepProps<WizardValues extends Record<string, FieldValues>, Ste
  * Step used in Wizard
  * @param children Node
  * @param name Step name
- * @param onNext (optional) Function ran at click on next
- * @param noFooter (optional) has footer if not specified`
- * @param title Title of the step
  * @example
  * ```
  * <Wizard>
@@ -34,12 +31,12 @@ export interface StepProps<WizardValues extends Record<string, FieldValues>, Ste
 export function Step<
   WizardValues extends Record<string, FieldValues> = Record<never, FieldValues>,
   Step extends keyof WizardValues = keyof WizardValues,
->({ children, name, onNext, noFooter, title }: StepProps<WizardValues, Step>) {
+>({ children, name }: StepProps<WizardValues, Step>) {
   const wizard = useWizardContext<WizardValues>();
 
   const {
     currentStep,
-    wizardInternal: { registerStep, unregisterStep, setIsStepReady },
+    wizardInternal: { setIsStepReady },
   } = wizard;
 
   // When Step is used outside wizard context, it will throw an error
@@ -47,13 +44,6 @@ export function Step<
   if (wizard === CONTEXT_WIZARD_DEFAULT) {
     throw new Error('Step not in wizard');
   }
-
-  const onNextRef = useCallbackRef(onNext ?? (() => true));
-
-  useEffect(() => {
-    registerStep(name, onNextRef, noFooter, title);
-    return () => unregisterStep(name);
-  }, [registerStep, unregisterStep, name, noFooter, title, onNextRef]);
 
   useEffect(() => {
     if (currentStep === name) {

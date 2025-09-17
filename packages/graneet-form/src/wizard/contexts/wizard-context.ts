@@ -28,26 +28,6 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
    */
   wizardInternal: {
     /**
-     * Register step in the Wizard.
-     * @param name Step name
-     * @param validationFn Function triggered to validate switch to next step
-     * @param noFooter If not specified, footer is displayed
-     * @param title Step title
-     */
-    registerStep<Step extends keyof WizardValues>(
-      name: Step,
-      validationFn?: StepValidator<WizardValues, Step>,
-      noFooter?: boolean,
-      title?: string,
-    ): void;
-
-    /**
-     * Unregister a Wizard step.
-     * @param name Step name
-     */
-    unregisterStep(name: keyof WizardValues): void;
-
-    /**
      * Register a step status listener.
      * @param stepStatusSetter Setter to update placeholder validations
      */
@@ -110,19 +90,9 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
   isFirstStep: boolean;
 
   /**
-   * Boolean to know is the current step has a footer
-   */
-  hasNoFooter: boolean;
-
-  /**
    * Boolean to know is the current step is ready
    */
   isStepReady: boolean;
-
-  /**
-   * Array of step titles
-   */
-  stepsTitles: { name: keyof WizardValues; title: string | undefined }[];
 }
 
 export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
@@ -130,8 +100,6 @@ export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
   getValuesOfCurrentStep: () => undefined,
   getValuesOfSteps: () => ({}),
   wizardInternal: {
-    registerStep: () => {},
-    unregisterStep: () => {},
     registerStepStatusListener: () => {},
     unregisterStepStatusListener: () => {},
     stepStatusSetter: () => {},
@@ -145,9 +113,7 @@ export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
   currentStep: undefined,
   isLastStep: false,
   isFirstStep: false,
-  hasNoFooter: true,
   isStepReady: false,
-  stepsTitles: [],
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
