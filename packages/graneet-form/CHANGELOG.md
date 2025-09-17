@@ -1,5 +1,15 @@
 # graneet-form
 
+## 3.0.0-next.6
+
+### Major Changes
+
+- [#126](https://github.com/graneet/graneet-form/pull/126) [`780732b`](https://github.com/graneet/graneet-form/commit/780732bed7b0074fb22cecf2fa5b4233c422d907) Thanks [@victorduclos](https://github.com/victorduclos)! - Pass wizard Steps through prop
+
+### Patch Changes
+
+- [#120](https://github.com/graneet/graneet-form/pull/120) [`e7a6ab6`](https://github.com/graneet/graneet-form/commit/e7a6ab6aa0bbf9bf9b085f123f8f79c2b2aeb80c) Thanks [@grollec](https://github.com/grollec)! - Added API + some guide into the docs
+
 ## 3.0.0-next.5
 
 ### Minor Changes
