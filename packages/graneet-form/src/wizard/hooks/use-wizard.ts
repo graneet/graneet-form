@@ -24,7 +24,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
   const valuesStepGetterRef = useRef<() => FieldValues | undefined>(() => undefined);
 
   // -- STEPS --
-  const [currentStep, setCurrentStep] = useState<keyof WizardValues>();
+  const [currentStep, setCurrentStep] = useState<keyof WizardValues>(steps[0]?.name);
 
   const [isStepReady, setIsStepReady] = useState(false);
 
