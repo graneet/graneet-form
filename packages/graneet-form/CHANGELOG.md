@@ -1,5 +1,11 @@
 # graneet-form
 
+## 3.0.0-next.8
+
+### Major Changes
+
+- [#130](https://github.com/graneet/graneet-form/pull/130) [`a9c0888`](https://github.com/graneet/graneet-form/commit/a9c08886986bb9f2eeb9f5e178d44c7e65997749) Thanks [@victorduclos](https://github.com/victorduclos)! - Migrate tsup to tsdown to reduce package size
+
 ## 3.0.0-next.7
 
 ### Patch Changes
