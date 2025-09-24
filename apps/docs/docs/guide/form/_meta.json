@@ -16,11 +16,6 @@
   },
   {
     "type": "file",
-    "name": "hidden-field",
-    "label": "Hidden Field"
-  },
-  {
-    "type": "file",
     "name": "complex-typescript",
     "label": "Complex Typescript"
   }

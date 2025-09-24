@@ -1,6 +1,12 @@
 {
   "name": "graneet-form",
-  "keywords": ["react", "form", "forms", "validation", "typescript"],
+  "keywords": [
+    "react",
+    "form",
+    "forms",
+    "validation",
+    "typescript"
+  ],
   "homepage": "https://github.com/graneet/graneet-form",
   "bugs": {
     "url": "https://github.com/graneet/graneet-form/issues"
@@ -21,10 +27,10 @@
     "test": "exit 0"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@changesets/cli": "2.29.4",
+    "@biomejs/biome": "2.2.4",
+    "@changesets/cli": "2.29.7",
     "@changesets/changelog-github": "0.5.1",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -35,10 +35,12 @@
   --rp-aside-width: 260px;
 
   /* Typography */
-  --rp-font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --rp-font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco,
-    Consolas, "Liberation Mono", "Courier New", monospace;
+  --rp-font-family-base:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --rp-font-family-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 }
 
 /* Dark Theme Override */
