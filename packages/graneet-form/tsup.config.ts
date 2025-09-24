@@ -15,6 +15,6 @@ export default defineConfig((options) => ({
   minify: isProduction(options),
   dts: true,
   onSuccess: async () => {
-    copyFileSync('../../README.md', 'dist/README.md');
+    copyFileSync('../../README.md', 'README.md');
   },
 }));
