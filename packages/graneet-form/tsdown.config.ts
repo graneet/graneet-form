@@ -1,4 +1,4 @@
-import { type Options, defineConfig } from 'tsup';
+import { type Options, defineConfig } from 'tsdown';
 import { copyFileSync } from 'node:fs';
 
 const isProduction = (options: Options) => options.env?.NODE_ENV === 'production';
