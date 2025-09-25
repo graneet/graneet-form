@@ -1,0 +1,751 @@
+import { IFrame } from "../../../src/components/IFrame";
+
+# Field Management
+
+Deep dive into field handling, registration, and lifecycle management in graneet-form.
+
+## Field Registration System
+
+### How Field Registration Works
+
+When a `Field` component is rendered, it automatically registers itself with the form:
+
+1. **Registration**: Field registers its name and receives a cleanup function
+2. **Value Management**: Field subscribes to value changes from the form state
+3. **Validation**: Field runs its validation rules and reports status to form
+4. **Cleanup**: Field unregisters when unmounted
+
+```tsx
+// Field registration happens automatically
+<Field<FormData, 'username'>
+  name="username"
+  render={(fieldProps, fieldState) => (
+    <input {...fieldProps} />
+  )}
+/>
+```
+
+### Field Lifecycle
+
+```tsx
+function FieldLifecycleExample() {
+  const [showField, setShowField] = useState(false);
+  const form = useForm<{ dynamicField?: string }>();
+
+  return (
+    <Form form={form}>
+      <button onClick={() => setShowField(!showField)}>
+        {showField ? 'Hide' : 'Show'} Dynamic Field
+      </button>
+      
+      {showField && (
+        <Field<FormData, 'dynamicField'>
+          name="dynamicField"
+          render={(fieldProps) => (
+            <input 
+              placeholder="This field registers when mounted"
+              {...fieldProps}
+            />
+          )}
+        />
+      )}
+      
+      {/* Field automatically unregisters when unmounted */}
+    </Form>
+  );
+}
+```
+
+## Field Component Anatomy
+
+### Field Props Interface
+
+```tsx
+interface FieldProps<T extends FieldValues, K extends keyof T> {
+  name: K;                    // Field name (required)
+  children?: ReactNode;       // Rules and other child components
+  render: RenderFunction;     // Render function for the input
+  data?: AnyRecord;          // Additional data passed to onBlur
+  defaultValue?: T[K];       // Default value for this field
+}
+```
+
+### Render Function Props
+
+The render function receives two parameters:
+
+**fieldProps:**
+```tsx
+interface FieldRenderProps<T, K extends keyof T> {
+  name: K;                           // Field name
+  value: T[K] | undefined;          // Current field value
+  onChange(value: T[K]): void;      // Value change handler
+  onFocus(): void;                  // Focus handler
+  onBlur(): void;                   // Blur handler
+}
+```
+
+**fieldState:**
+```tsx
+interface FieldRenderState {
+  isPristine: boolean;              // true if field hasn't been focused
+  validationStatus: {
+    status: 'VALID' | 'INVALID' | 'PENDING';
+    message?: string;               // Error message if invalid
+  };
+}
+```
+
+## Field Types and Patterns
+
+### Text Input
+
+```tsx
+<Field<FormData, 'name'>
+  name="name"
+  render={(fieldProps, fieldState) => (
+    <div className="field-group">
+      <label htmlFor="name">Full Name</label>
+      <input
+        id="name"
+        type="text"
+        value={fieldProps.value || ''}
+        onChange={(e) => fieldProps.onChange(e.target.value)}
+        onBlur={fieldProps.onBlur}
+        onFocus={fieldProps.onFocus}
+        className={!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' ? 'error' : ''}
+      />
+      {!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' && (
+        <span className="error-message">{fieldState.validationStatus.message}</span>
+      )}
+    </div>
+  )}
+>
+  <Rule validationFn={(value) => !!value} message="Name is required" />
+</Field>
+```
+
+### Number Input with Formatting
+
+```tsx
+<Field<FormData, 'price'>
+  name="price"
+  render={(fieldProps, fieldState) => (
+    <div className="field-group">
+      <label>Price</label>
+      <div className="input-with-prefix">
+        <span className="prefix">$</span>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          value={fieldProps.value || ''}
+          onChange={(e) => fieldProps.onChange(parseFloat(e.target.value) || 0)}
+          onBlur={fieldProps.onBlur}
+          onFocus={fieldProps.onFocus}
+        />
+      </div>
+      {/* Display formatted value */}
+      {fieldProps.value && (
+        <div className="formatted-value">
+          Formatted: ${fieldProps.value.toFixed(2)}
+        </div>
+      )}
+    </div>
+  )}
+>
+  <Rule validationFn={(value) => value > 0} message="Price must be greater than 0" />
+</Field>
+```
+
+### Select Dropdown
+
+```tsx
+interface FormData {
+  country: string;
+  state?: string;
+}
+
+const countries = [
+  { value: 'us', label: 'United States' },
+  { value: 'ca', label: 'Canada' },
+  { value: 'uk', label: 'United Kingdom' }
+];
+
+<Field<FormData, 'country'>
+  name="country"
+  render={(fieldProps) => (
+    <div className="field-group">
+      <label>Country</label>
+      <select
+        value={fieldProps.value || ''}
+        onChange={(e) => fieldProps.onChange(e.target.value)}
+        onBlur={fieldProps.onBlur}
+        onFocus={fieldProps.onFocus}
+      >
+        <option value="">Select a country</option>
+        {countries.map(country => (
+          <option key={country.value} value={country.value}>
+            {country.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  )}
+>
+  <Rule validationFn={(value) => !!value} message="Please select a country" />
+</Field>
+```
+
+### Checkbox
+
+```tsx
+<Field<FormData, 'terms'>
+  name="terms"
+  render={(fieldProps, fieldState) => (
+    <div className="checkbox-field">
+      <label className="checkbox-label">
+        <input
+          type="checkbox"
+          checked={fieldProps.value || false}
+          onChange={(e) => fieldProps.onChange(e.target.checked)}
+          onBlur={fieldProps.onBlur}
+          onFocus={fieldProps.onFocus}
+        />
+        I agree to the terms and conditions
+      </label>
+      {!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' && (
+        <span className="error-message">{fieldState.validationStatus.message}</span>
+      )}
+    </div>
+  )}
+>
+  <Rule validationFn={(value) => value === true} message="You must agree to the terms" />
+</Field>
+```
+
+### Radio Button Group
+
+```tsx
+interface FormData {
+  subscription: 'basic' | 'premium' | 'enterprise';
+}
+
+<Field<FormData, 'subscription'>
+  name="subscription"
+  render={(fieldProps) => (
+    <div className="field-group">
+      <label>Subscription Plan</label>
+      <div className="radio-group">
+        {[
+          { value: 'basic', label: 'Basic ($10/month)' },
+          { value: 'premium', label: 'Premium ($25/month)' },
+          { value: 'enterprise', label: 'Enterprise ($50/month)' }
+        ].map(option => (
+          <label key={option.value} className="radio-label">
+            <input
+              type="radio"
+              value={option.value}
+              checked={fieldProps.value === option.value}
+              onChange={() => fieldProps.onChange(option.value as any)}
+              onBlur={fieldProps.onBlur}
+              onFocus={fieldProps.onFocus}
+            />
+            {option.label}
+          </label>
+        ))}
+      </div>
+    </div>
+  )}
+>
+  <Rule validationFn={(value) => !!value} message="Please select a subscription plan" />
+</Field>
+```
+
+### Textarea
+
+```tsx
+<Field<FormData, 'description'>
+  name="description"
+  render={(fieldProps, fieldState) => (
+    <div className="field-group">
+      <label>Description</label>
+      <textarea
+        rows={4}
+        value={fieldProps.value || ''}
+        onChange={(e) => fieldProps.onChange(e.target.value)}
+        onBlur={fieldProps.onBlur}
+        onFocus={fieldProps.onFocus}
+        placeholder="Enter a description..."
+      />
+      {/* Character counter */}
+      <div className="char-counter">
+        {(fieldProps.value || '').length} / 500 characters
+      </div>
+      {!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' && (
+        <span className="error-message">{fieldState.validationStatus.message}</span>
+      )}
+    </div>
+  )}
+>
+  <Rule 
+    validationFn={(value) => !value || value.length <= 500} 
+    message="Description must be less than 500 characters" 
+  />
+</Field>
+```
+
+### File Upload
+
+```tsx
+<Field<FormData, 'avatar'>
+  name="avatar"
+  render={(fieldProps, fieldState) => (
+    <div className="field-group">
+      <label>Profile Picture</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          fieldProps.onChange(file);
+        }}
+        onBlur={fieldProps.onBlur}
+        onFocus={fieldProps.onFocus}
+      />
+      
+      {/* Preview uploaded file */}
+      {fieldProps.value && (
+        <div className="file-preview">
+          <img 
+            src={URL.createObjectURL(fieldProps.value)} 
+            alt="Preview"
+            style={{ maxWidth: 200, maxHeight: 200 }}
+          />
+          <button 
+            type="button"
+            onClick={() => fieldProps.onChange(undefined)}
+          >
+            Remove
+          </button>
+        </div>
+      )}
+      
+      {!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' && (
+        <span className="error-message">{fieldState.validationStatus.message}</span>
+      )}
+    </div>
+  )}
+>
+  <Rule
+    validationFn={(file) => {
+      if (!file) return true;
+      return file.size <= 5 * 1024 * 1024; // 5MB limit
+    }}
+    message="File size must be less than 5MB"
+  />
+</Field>
+```
+
+## Complex Field Types
+
+### Array Fields (Multiple Values)
+
+```tsx
+interface FormData {
+  tags: string[];
+}
+
+function TagsField() {
+  return (
+    <Field<FormData, 'tags'>
+      name="tags"
+      defaultValue={[]}
+      render={(fieldProps) => {
+        const tags = fieldProps.value || [];
+        
+        const addTag = (tag: string) => {
+          if (tag && !tags.includes(tag)) {
+            fieldProps.onChange([...tags, tag]);
+          }
+        };
+        
+        const removeTag = (index: number) => {
+          fieldProps.onChange(tags.filter((_, i) => i !== index));
+        };
+        
+        return (
+          <div className="field-group">
+            <label>Tags</label>
+            
+            {/* Display existing tags */}
+            <div className="tags-list">
+              {tags.map((tag, index) => (
+                <span key={index} className="tag">
+                  {tag}
+                  <button 
+                    type="button"
+                    onClick={() => removeTag(index)}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+            
+            {/* Add new tag input */}
+            <input
+              type="text"
+              placeholder="Add a tag..."
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addTag(e.currentTarget.value);
+                  e.currentTarget.value = '';
+                }
+              }}
+              onBlur={fieldProps.onBlur}
+              onFocus={fieldProps.onFocus}
+            />
+          </div>
+        );
+      }}
+    >
+      <Rule
+        validationFn={(tags) => tags && tags.length > 0}
+        message="At least one tag is required"
+      />
+    </Field>
+  );
+}
+```
+
+### Nested Object Fields
+
+```tsx
+interface FormData {
+  address: {
+    street: string;
+    city: string;
+    zipCode: string;
+  };
+}
+
+function AddressField() {
+  return (
+    <Field<FormData, 'address'>
+      name="address"
+      defaultValue={{ street: '', city: '', zipCode: '' }}
+      render={(fieldProps) => {
+        const address = fieldProps.value || { street: '', city: '', zipCode: '' };
+        
+        const updateAddress = (field: keyof typeof address, value: string) => {
+          fieldProps.onChange({
+            ...address,
+            [field]: value
+          });
+        };
+        
+        return (
+          <div className="field-group">
+            <label>Address</label>
+            
+            <input
+              type="text"
+              placeholder="Street"
+              value={address.street}
+              onChange={(e) => updateAddress('street', e.target.value)}
+              onBlur={fieldProps.onBlur}
+              onFocus={fieldProps.onFocus}
+            />
+            
+            <div className="row">
+              <input
+                type="text"
+                placeholder="City"
+                value={address.city}
+                onChange={(e) => updateAddress('city', e.target.value)}
+              />
+              
+              <input
+                type="text"
+                placeholder="ZIP Code"
+                value={address.zipCode}
+                onChange={(e) => updateAddress('zipCode', e.target.value)}
+              />
+            </div>
+          </div>
+        );
+      }}
+    >
+      <Rule
+        validationFn={(address) => 
+          address && address.street && address.city && address.zipCode
+        }
+        message="All address fields are required"
+      />
+    </Field>
+  );
+}
+```
+
+## Field State Management
+
+### Default Values
+
+Field-level default values override form-level defaults:
+
+```tsx
+const form = useForm<FormData>({
+  defaultValues: {
+    name: 'Form Default'
+  }
+});
+
+// This field will start with 'Field Default', not 'Form Default'
+<Field<FormData, 'name'>
+  name="name"
+  defaultValue="Field Default"
+  render={(fieldProps) => <input {...fieldProps} />}
+/>
+```
+
+### Controlled vs Uncontrolled
+
+graneet-form fields are controlled by design, but you can create uncontrolled patterns:
+
+```tsx
+// Controlled (standard)
+<Field<FormData, 'email'>
+  name="email"
+  render={(fieldProps) => (
+    <input
+      value={fieldProps.value || ''}
+      onChange={(e) => fieldProps.onChange(e.target.value)}
+      {...fieldProps}
+    />
+  )}
+/>
+
+// Semi-uncontrolled (for performance in large forms)
+<Field<FormData, 'notes'>
+  name="notes"
+  render={(fieldProps) => (
+    <input
+      defaultValue={fieldProps.value || ''}
+      onBlur={(e) => {
+        fieldProps.onChange(e.target.value);
+        fieldProps.onBlur();
+      }}
+      onFocus={fieldProps.onFocus}
+    />
+  )}
+/>
+```
+
+## Field Data and Custom Events
+
+### Passing Additional Data
+
+Use the `data` prop to pass additional information to the `onUpdateAfterBlur` callback:
+
+```tsx
+<Field<FormData, 'email'>
+  name="email"
+  data={{ source: 'registration_form', priority: 'high' }}
+  render={(fieldProps) => <input {...fieldProps} />}
+/>
+
+// In useForm configuration
+const form = useForm<FormData>({
+  onUpdateAfterBlur: async (fieldName, value, data) => {
+    console.log('Field data:', data); // { source: 'registration_form', priority: 'high' }
+    
+    if (data.priority === 'high') {
+      // Handle high priority field updates differently
+    }
+  }
+});
+```
+
+### Custom Field Behaviors
+
+```tsx
+function SmartEmailField() {
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  
+  return (
+    <Field<FormData, 'email'>
+      name="email"
+      render={(fieldProps, fieldState) => (
+        <div className="smart-email-field">
+          <input
+            type="email"
+            value={fieldProps.value || ''}
+            onChange={(e) => {
+              fieldProps.onChange(e.target.value);
+              
+              // Generate email suggestions
+              if (e.target.value.includes('@')) {
+                const [username] = e.target.value.split('@');
+                setSuggestions([
+                  `${username}@gmail.com`,
+                  `${username}@hotmail.com`,
+                  `${username}@yahoo.com`
+                ].filter(suggestion => suggestion !== e.target.value));
+              }
+            }}
+            onBlur={fieldProps.onBlur}
+            onFocus={fieldProps.onFocus}
+          />
+          
+          {/* Email suggestions dropdown */}
+          {suggestions.length > 0 && (
+            <div className="suggestions">
+              {suggestions.map(suggestion => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => {
+                    fieldProps.onChange(suggestion);
+                    setSuggestions([]);
+                  }}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          )}
+          
+          {!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' && (
+            <span className="error">{fieldState.validationStatus.message}</span>
+          )}
+        </div>
+      )}
+    >
+      <Rule
+        validationFn={(email) => !!email && email.includes('@')}
+        message="Please enter a valid email"
+      />
+    </Field>
+  );
+}
+```
+
+## Reusable Field Components
+
+### Generic Field Wrapper
+
+```tsx
+interface GenericFieldProps<T extends FieldValues, K extends keyof T> {
+  name: K;
+  label: string;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+  children?: React.ReactNode;
+}
+
+function GenericField<T extends FieldValues, K extends keyof T>({
+  name,
+  label,
+  type = 'text',
+  placeholder,
+  required = false,
+  children
+}: GenericFieldProps<T, K>) {
+  return (
+    <Field<T, K>
+      name={name}
+      render={(fieldProps, fieldState) => (
+        <div className="generic-field">
+          <label>
+            {label}
+            {required && <span className="required">*</span>}
+          </label>
+          
+          <input
+            type={type}
+            placeholder={placeholder}
+            value={fieldProps.value as string || ''}
+            onChange={(e) => fieldProps.onChange(e.target.value as T[K])}
+            onBlur={fieldProps.onBlur}
+            onFocus={fieldProps.onFocus}
+            className={
+              !fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' 
+                ? 'error' : ''
+            }
+          />
+          
+          {!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' && (
+            <span className="error-message">
+              {fieldState.validationStatus.message}
+            </span>
+          )}
+        </div>
+      )}
+    >
+      {required && (
+        <Rule
+          validationFn={(value) => !!value}
+          message={`${label} is required`}
+        />
+      )}
+      {children}
+    </Field>
+  );
+}
+
+// Usage
+<GenericField<FormData, 'name'>
+  name="name"
+  label="Full Name"
+  placeholder="Enter your full name"
+  required={true}
+/>
+```
+
+## Performance Considerations
+
+### Lazy Field Registration
+
+```tsx
+function LazyFieldSection({ visible }: { visible: boolean }) {
+  if (!visible) return null;
+  
+  // Fields only register when section is visible
+  return (
+    <div>
+      <Field name="expensiveField1" render={/* ... */} />
+      <Field name="expensiveField2" render={/* ... */} />
+      <Field name="expensiveField3" render={/* ... */} />
+    </div>
+  );
+}
+```
+
+### Memoized Field Components
+
+```tsx
+const MemoizedField = React.memo(<T extends FieldValues, K extends keyof T>({
+  name,
+  ...props
+}: FieldProps<T, K>) => {
+  return (
+    <Field<T, K> name={name} {...props} />
+  );
+});
+
+// Use memoized version for fields that don't need frequent re-renders
+<MemoizedField name="staticData" render={/* ... */} />
+```
+
+## Live Examples
+
+<IFrame model="field-management-demo" />
+
+## Next Steps
+
+- [Watching Values](./watching-values) - Learn how to efficiently watch field changes
+- [Form Validation](./validation) - Add validation rules to your fields
+- [Advanced Features](./advanced-features) - Explore complex field behaviors

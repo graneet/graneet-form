@@ -1,415 +1,81 @@
-import { IFrame } from "../../../src/components/IFrame";
-
 # Usage
 
-You can build strongly typed forms with a simple and powerful syntax using `@graneet-form`. This library provides a complete form management solution with automatic field registration, real-time validation, and subscription-based updates for optimal performance.
+:::info Documentation Moved
+This page has been restructured. Please visit our new comprehensive documentation:
 
-## Core Concepts
+- **[Basic Usage](./basic-usage)** - Get started with graneet-form fundamentals
+- **[Form API Reference](./form-api)** - Complete API documentation
+- **[Field Management](./field-management)** - Deep dive into field handling
+- **[Watching Values](./watching-values)** - Learn about value subscription system
+- **[Form Validation](./validation)** - Comprehensive validation guide
+- **[Advanced Features](./advanced-features)** - Complex patterns and techniques
 
-### Field Registration
+The documentation has been completely reorganized for better learning experience and easier navigation.
+:::
 
-The library uses a concept of **registered fields**. When a field component (wrapped with the library's `Field` component) is rendered, it is automatically registered with the form and can:
-- Access and update its value
-- Watch for changes in real-time
-- Validate its content
-- Subscribe to form-wide state changes
-
-### Form State Management
-
-The form state is managed through a subscription system that allows:
-- **Selective updates**: Components only re-render when their watched fields change
-- **Performance optimization**: Global watchers use debouncing to prevent excessive re-renders
-- **Real-time sync**: Changes propagate immediately to all subscribers
-
-## Basic Usage
-
-### Creating a Form
-
-Use the `useForm` hook to create a form instance:
+## Quick Start
 
 ```tsx
-import { useForm, Form, Field } from 'graneet-form';
+import { useForm, Form, Field, Rule } from 'graneet-form';
 
-interface UserFormData {
+interface ContactForm {
   name: string;
   email: string;
-  age: number;
 }
 
-function UserForm() {
-  const form = useForm<UserFormData>({
-    defaultValues: {
-      name: '',
-      email: '',
-      age: 18
-    }
+function MyForm() {
+  const form = useForm<ContactForm>();
+
+  const handleSubmit = form.handleSubmit(async (data) => {
+    console.log('Form data:', data);
   });
 
   return (
-    <Form form={form}>
-      <Field<UserFormData, 'name'>
-        name="name"
-        render={(fieldProps, fieldState) => (
-          <input
-            type="text"
-            value={fieldProps.value || ''}
-            onChange={(e) => fieldProps.onChange(e.target.value)}
-            onBlur={fieldProps.onBlur}
-            onFocus={fieldProps.onFocus}
-            placeholder="Enter your name"
+    <form onSubmit={handleSubmit}>
+      <Form form={form}>
+        <Field<ContactForm, 'name'>
+          name="name"
+          render={(fieldProps) => (
+            <input
+              type="text"
+              placeholder="Name"
+              value={fieldProps.value || ''}
+              onChange={(e) => fieldProps.onChange(e.target.value)}
+              onBlur={fieldProps.onBlur}
+              onFocus={fieldProps.onFocus}
+            />
+          )}
+        >
+          <Rule
+            validationFn={(value) => !!value}
+            message="Name is required"
           />
-        )}
-      />
-      {/* More fields... */}
-    </Form>
-  );
-}
-```
+        </Field>
 
-### Simple Example
-
-Here's a complete working example:
-
-<IFrame model="simple-form" />
-
-## Form Methods and Properties
-
-The `useForm` hook returns a form instance with the following methods:
-
-### Core Methods
-
-#### `getFormValues()`
-Returns all current form values for registered fields:
-
-```tsx
-const form = useForm<{ name: string; email: string }>();
-const values = form.getFormValues(); // { name?: string, email?: string }
-```
-
-#### `setFormValues(values)`
-Updates one or more form field values:
-
-```tsx
-form.setFormValues({ 
-  name: 'John Doe', 
-  email: 'john@example.com' 
-});
-```
-
-#### `resetForm()`
-Resets all form fields to `undefined`:
-
-```tsx
-form.resetForm();
-```
-
-#### `handleSubmit(callback)`
-Creates a submit handler for your form:
-
-```tsx
-const handleSubmit = form.handleSubmit(async (formData) => {
-  // formData contains all form values
-  await saveUser(formData);
-});
-
-// Use with a form element
-<form onSubmit={handleSubmit}>
-  {/* Form content */}
-</form>
-```
-
-## Watching Form Values
-
-### `useOnChangeValues` - Real-time Updates
-
-Watch form values that update immediately on every change:
-
-```tsx
-import { useOnChangeValues } from '@graneet-form';
-
-function FormWatcher() {
-  const form = useFormContext<{ name: string; email: string }>();
-  
-  // Watch all fields
-  const allValues = useOnChangeValues(form, undefined);
-  
-  // Watch specific fields (better performance)
-  const { name, email } = useOnChangeValues(form, ['name', 'email']);
-  
-  return (
-    <div>
-      <p>Name: {name}</p>
-      <p>Email: {email}</p>
-    </div>
-  );
-}
-```
-
-### `useOnBlurValues` - Update on Blur
-
-Watch form values that update only when fields lose focus:
-
-```tsx
-// Updates only when fields lose focus
-const { name } = useOnBlurValues(form, ['name']);
-```
-
-## Validation and Error Handling
-
-### Adding Validation Rules
-
-Use the `Rule` component inside `Field` to add validation:
-
-```tsx
-<Field<FormData, 'email'>
-  name="email"
-  render={(fieldProps, fieldState) => (
-    <div>
-      <input
-        type="email"
-        value={fieldProps.value || ''}
-        onChange={(e) => fieldProps.onChange(e.target.value)}
-        onBlur={fieldProps.onBlur}
-        onFocus={fieldProps.onFocus}
-      />
-      {!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' && (
-        <span className="error">
-          {fieldState.validationStatus.message}
-        </span>
-      )}
-    </div>
-  )}
->
-  <Rule
-    validationFn={(value) => !!value && value.includes('@')}
-    message="Please enter a valid email address"
-  />
-  <Rule
-    validationFn={(value) => !value || value.length <= 100}
-    message="Email must be less than 100 characters"
-  />
-</Field>
-```
-
-### Debounced Validation
-
-For expensive validation (like API calls), use debounced rules:
-
-```tsx
-<Rule
-  validationFn={async (value) => {
-    if (!value) return true;
-    const response = await fetch(`/api/check-username/${value}`);
-    return response.ok;
-  }}
-  message="Username is already taken"
-  isDebounced={true}
-/>
-```
-
-### Watching Validation Status
-
-Use `useValidations` to watch field validation states:
-
-```tsx
-import { useValidations } from '@graneet-form';
-
-function ValidationSummary() {
-  const form = useFormContext<FormData>();
-  
-  // Watch all field validations
-  const allValidations = useValidations(form, undefined);
-  
-  // Watch specific fields
-  const { email, name } = useValidations(form, ['email', 'name']);
-  
-  const hasErrors = Object.values(allValidations).some(
-    validation => validation?.status === 'INVALID'
-  );
-  
-  return (
-    <div>
-      {hasErrors && <p>Please fix the errors above</p>}
-    </div>
-  );
-}
-```
-
-## Advanced Features
-
-### Dynamic Default Values
-
-Use function-based default values for dynamic initialization:
-
-```tsx
-const form = useForm<UserFormData>({
-  defaultValues: () => ({
-    name: user?.name || '',
-    email: user?.email || '',
-    timestamp: Date.now(),
-    theme: localStorage.getItem('theme') || 'light'
-  })
-});
-```
-
-### Auto-save on Blur
-
-Implement auto-save functionality with `onUpdateAfterBlur`:
-
-```tsx
-const form = useForm<FormData>({
-  onUpdateAfterBlur: async (fieldName, value, data, { getFormValues, setFormValues }) => {
-    // Auto-save when field is valid and loses focus
-    if (fieldName === 'email' && value) {
-      await saveEmailDraft(value);
-    }
-    
-    // Auto-populate related fields
-    if (fieldName === 'zipCode' && value) {
-      const cityInfo = await fetchCityByZip(value);
-      if (cityInfo) {
-        setFormValues({ 
-          city: cityInfo.city, 
-          state: cityInfo.state 
-        });
-      }
-    }
-  }
-});
-```
-
-### Field State Information
-
-Each field provides detailed state information:
-
-```tsx
-<Field
-  name="username"
-  render={(fieldProps, fieldState) => {
-    const {
-      isPristine,        // true if field hasn't been focused/modified
-      validationStatus   // { status: 'VALID' | 'INVALID' | 'PENDING', message?: string }
-    } = fieldState;
-    
-    return (
-      <div>
-        <input {...fieldProps} />
-        {!isPristine && validationStatus.status === 'PENDING' && (
-          <span>Validating...</span>
-        )}
-        {!isPristine && validationStatus.status === 'INVALID' && (
-          <span className="error">{validationStatus.message}</span>
-        )}
-      </div>
-    );
-  }}
-/>
-```
-
-## Accessing Form Context in Nested Components
-
-To avoid prop drilling the form instance from `useForm`, you can use `useFormContext` inside any component that is a child of the `Form` component:
-
-```tsx
-import { useFormContext } from '@graneet-form';
-
-function NestedFormComponent() {
-  const form = useFormContext<UserFormData>();
-  
-  // Access all form methods
-  const currentValues = form.getFormValues();
-  
-  const handleReset = () => {
-    form.resetForm();
-  };
-  
-  const handleUpdate = () => {
-    form.setFormValues({ name: 'Updated Name' });
-  };
-
-  return (
-    <div>
-      <button onClick={handleReset}>Reset Form</button>
-      <button onClick={handleUpdate}>Update Name</button>
-      <pre>{JSON.stringify(currentValues, null, 2)}</pre>
-    </div>
-  );
-}
-
-// Use inside Form component
-<Form form={form}>
-  <NestedFormComponent />
-</Form>
-```
-
-## TypeScript Support
-
-The library provides full TypeScript support with strict typing:
-
-```tsx
-interface UserForm {
-  name: string;
-  email: string;
-  age: number;
-  preferences: {
-    newsletter: boolean;
-    theme: 'light' | 'dark';
-  };
-}
-
-// Fully typed form
-const form = useForm<UserForm>();
-
-// Type-safe field access
-<Field<UserForm, 'preferences'>
-  name="preferences"
-  render={(fieldProps) => {
-    // fieldProps.value is properly typed as UserForm['preferences']
-    const prefs = fieldProps.value;
-    return (
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={prefs?.newsletter || false}
-            onChange={(e) => fieldProps.onChange({
-              ...prefs,
-              newsletter: e.target.checked
-            })}
+        <Field<ContactForm, 'email'>
+          name="email"
+          render={(fieldProps) => (
+            <input
+              type="email"
+              placeholder="Email"
+              value={fieldProps.value || ''}
+              onChange={(e) => fieldProps.onChange(e.target.value)}
+              onBlur={fieldProps.onBlur}
+              onFocus={fieldProps.onFocus}
+            />
+          )}
+        >
+          <Rule
+            validationFn={(value) => !!value && value.includes('@')}
+            message="Valid email is required"
           />
-          Subscribe to newsletter
-        </label>
-      </div>
-    );
-  }}
-/>
+        </Field>
+
+        <button type="submit">Submit</button>
+      </Form>
+    </form>
+  );
+}
 ```
 
-## Performance Tips
-
-1. **Use specific field watching**: Instead of watching all fields, watch only the ones you need:
-   ```tsx
-   // ❌ Watches all fields
-   const allValues = useOnChangeValues(form, undefined);
-   
-   // ✅ Only watches needed fields
-   const { name, email } = useOnChangeValues(form, ['name', 'email']);
-   ```
-
-2. **Choose appropriate watch mode**: Use `useOnBlurValues` for less frequent updates:
-   ```tsx
-   // For real-time display
-   const liveValues = useOnChangeValues(form, ['searchQuery']);
-   
-   // For validation or auto-save
-   const stableValues = useOnBlurValues(form, ['email', 'name']);
-   ```
-
-3. **Use debounced validation**: For expensive validation operations:
-   ```tsx
-   <Rule
-     validationFn={expensiveAsyncValidation}
-     message="Validation failed"
-     isDebounced={true}  // Debounces the validation call
-   />
-   ```
+**[Continue to Basic Usage →](./basic-usage)**
