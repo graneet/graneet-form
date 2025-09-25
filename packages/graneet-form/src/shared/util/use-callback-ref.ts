@@ -8,5 +8,6 @@ export function useCallbackRef<T extends (...args: any[]) => any>(callback: T | 
     callbackRef.current = callback;
   }, [callback]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   return useCallback(((...args) => callbackRef.current?.(...args)) as T, deps);
 }

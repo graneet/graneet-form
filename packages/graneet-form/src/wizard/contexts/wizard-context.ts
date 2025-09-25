@@ -1,7 +1,6 @@
-import { type Dispatch, type SetStateAction, createContext, useContext } from 'react';
+import { createContext, type Dispatch, type SetStateAction, useContext } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
-import type { StepValidator } from '../types/step-validator';
 
 export type ValidationStatusesSetter = Dispatch<SetStateAction<VALIDATION_OUTCOME>>;
 

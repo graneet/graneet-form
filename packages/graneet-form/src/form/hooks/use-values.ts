@@ -37,6 +37,7 @@ function useValues<T extends FieldValues, K extends keyof T>(
   const {
     formInternal: { addValueSubscriber, removeValueSubscriber },
   } = form;
+  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   const [currentValues, setCurrentValues] = useState<FormValues<T, K>>({} as FormValues<T, K>);
 
   if (form === CONTEXT_FORM_DEFAULT) {
@@ -44,6 +45,7 @@ function useValues<T extends FieldValues, K extends keyof T>(
   }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: `names` is transformed to string to ensure consistant ref
+  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   useEffect(() => {
     addValueSubscriber(setCurrentValues, watchMode, names);
     return () => removeValueSubscriber(setCurrentValues, watchMode, names);
@@ -102,9 +104,11 @@ export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
   names: K[] | undefined,
 ) {
   if (names === undefined) {
+    // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
     return useGlobalValues(WATCH_MODE.ON_CHANGE, form);
   }
 
+  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   return useValues(WATCH_MODE.ON_CHANGE, form, names);
 }
 
@@ -158,8 +162,10 @@ export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
   names: K[] | undefined,
 ) {
   if (names === undefined) {
+    // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
     return useGlobalValues(WATCH_MODE.ON_BLUR, form);
   }
 
+  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   return useValues(WATCH_MODE.ON_BLUR, form, names);
 }
