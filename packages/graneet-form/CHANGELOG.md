@@ -1,5 +1,18 @@
 # graneet-form
 
+## 3.0.0-next.10
+
+### Major Changes
+
+- [#136](https://github.com/graneet/graneet-form/pull/136) [`86630bf`](https://github.com/graneet/graneet-form/commit/86630bf0e2bb118ed696c36159d013dc7920ed7d) Thanks [@victorduclos](https://github.com/victorduclos)! - **Breaking Change**: Replace enums with union types for better type safety
+
+  - Replaced `WATCH_MODE` enum with `WatchMode` union type (`'onChange' | 'onBlur'`)
+  - Replaced `VALIDATION_OUTCOME` enum with `ValidationOutcome` union type (`'valid' | 'invalid' | 'undetermined'`)
+  - Updated all imports and usages throughout the codebase to use the new union types
+  - Enforced stricter TypeScript checks with `exactOptionalPropertyTypes: true`
+
+  This change improves type safety and follows modern TypeScript best practices by using literal union types instead of enums.
+
 ## 3.0.0-next.9
 
 ### Major Changes
