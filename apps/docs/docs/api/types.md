@@ -1,6 +1,6 @@
 # Types API Reference
 
-Complete reference for all types, interfaces, and enums used in graneet-form, based on JSDoc documentation extracted from the source code.
+Complete reference for all types, interfaces, and union types used in graneet-form, based on JSDoc documentation extracted from the source code.
 
 ## Core Foundation Types
 
@@ -62,44 +62,40 @@ Makes complex types more readable in IDE tooltips and error messages.
 
 ## Validation Types
 
-### `VALIDATION_OUTCOME`
+### `ValidationStatus`
 
-Enum representing the validation state of a field or form.
+Union type representing the validation state of a field or form.
 
 ```tsx
-enum VALIDATION_OUTCOME {
-  VALID = 'VALID',
-  INVALID = 'INVALID', 
-  UNDETERMINED = 'UNDETERMINED'
-}
+type ValidationStatus = 'valid' | 'invalid' | 'undetermined';
 ```
 
 **Values:**
-- **`VALID`** - Validation passed successfully
-- **`INVALID`** - Validation failed with error message
-- **`UNDETERMINED`** - Validation hasn't been performed yet or is pending
+- **`'valid'`** - Validation passed successfully
+- **`'invalid'`** - Validation failed with error message
+- **`'undetermined'`** - Validation hasn't been performed yet or is pending
 
-### `ValidationStatus`
+### `ValidationState`
 
 Object containing complete validation information for a field.
 
 ```tsx
-interface ValidationStatus {
-  status: VALIDATION_OUTCOME;
+interface ValidationState {
+  status: ValidationStatus;
   message: string | undefined;
 }
 ```
 
 **Properties:**
 - **`status`** - Current validation outcome
-- **`message`** - Error message when status is `INVALID`, `undefined` for valid/undetermined states
+- **`message`** - Error message when status is `'invalid'`, `undefined` for valid/undetermined states
 
 ### `ValidationStatuses<T>`
 
 Type mapping field names to their validation statuses for a complete form.
 
 ```tsx
-type ValidationStatuses<T extends FieldValues> = Record<keyof T, ValidationStatus | undefined>;
+type ValidationStatuses<T extends FieldValues> = Record<keyof T, ValidationState | undefined>;
 ```
 
 ### `Validator`
@@ -232,7 +228,7 @@ Type representing validation statuses for specific form fields.
 
 ```tsx
 type FormValidations<T extends FieldValues, Keys extends keyof T> = {
-  [K in Keys]: ValidationStatus | undefined;
+  [K in Keys]: ValidationState | undefined;
 };
 ```
 
@@ -247,7 +243,7 @@ interface FormStatus {
   /**
    * The current status of a form's validation outcome.
    */
-  formStatus: VALIDATION_OUTCOME;
+  formStatus: ValidationStatus;
 
   /**
    * Indicates whether the form is considered valid or not.
@@ -262,20 +258,17 @@ Returned by `useFormStatus` hook for form-wide validation state.
 
 ## Watch Mode Types
 
-### `WATCH_MODE`
+### `WatchMode`
 
-Enum for different value watching modes in form subscriptions.
+Union type for different value watching modes in form subscriptions.
 
 ```tsx
-enum WATCH_MODE {
-  ON_CHANGE = 'ON_CHANGE',
-  ON_BLUR = 'ON_BLUR'
-}
+type WatchMode = 'onChange' | 'onBlur';
 ```
 
 **Values:**
-- **`ON_CHANGE`** - Values update immediately on every field change
-- **`ON_BLUR`** - Values update only when fields lose focus
+- **`'onChange'`** - Values update immediately on every field change
+- **`'onBlur'`** - Values update only when fields lose focus
 
 Used internally by `useOnChangeValues` and `useOnBlurValues` hooks.
 
@@ -311,7 +304,7 @@ State information passed to the Field component's render function.
 ```tsx
 interface FieldRenderState {
   isPristine: boolean;
-  validationStatus: ValidationStatus;
+  validationStatus: ValidationState;
 }
 ```
 
@@ -555,14 +548,14 @@ Utility function to determine overall validation outcome from multiple field val
 
 ```tsx
 function mapValidationStatusesToOutcome<T extends FieldValues>(
-  validationStatuses: PartialRecord<keyof T, ValidationStatus>,
-): VALIDATION_OUTCOME;
+  validationStatuses: PartialRecord<keyof T, ValidationState>,
+): ValidationStatus;
 ```
 
 **Logic:**
-- Returns `INVALID` if any field is invalid
-- Returns `UNDETERMINED` if any field is undetermined and none are invalid
-- Returns `VALID` if all fields are valid
+- Returns `'invalid'` if any field is invalid
+- Returns `'undetermined'` if any field is undetermined and none are invalid
+- Returns `'valid'` if all fields are valid
 
 Used internally by form status calculations and step validation.
 
@@ -610,7 +603,7 @@ const form = useForm<UserForm>({
 
 // Type-safe field watching (only valid keys allowed)
 const { email, password } = useOnChangeValues(form, ['email', 'password']);
-const validations = useValidations(form, ['email']); // validations.email is ValidationStatus | undefined
+const validations = useValidations(form, ['email']); // validations.email is ValidationState | undefined
 
 // TypeScript ensures field names match form structure
 <Field<UserForm, 'email'>  // ✅ Valid
