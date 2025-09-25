@@ -94,31 +94,17 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
   isStepReady: boolean;
 }
 
-export const CONTEXT_WIZARD_DEFAULT: WizardContextApi<Record<string, never>> = {
-  getValuesOfStep: () => undefined,
-  getValuesOfCurrentStep: () => undefined,
-  getValuesOfSteps: () => ({}),
-  wizardInternal: {
-    registerStepStatusListener: () => {},
-    unregisterStepStatusListener: () => {},
-    stepStatusSetter: () => {},
-    setIsStepReady: () => {},
-    setValuesGetterForCurrentStep: () => {},
-  },
-  goNext: async () => {},
-  goBackTo: () => {},
-  goPrevious: () => {},
-  steps: [],
-  currentStep: undefined,
-  isLastStep: false,
-  isFirstStep: false,
-  isStepReady: false,
-};
-
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export const WizardContext = createContext<WizardContextApi<any>>(CONTEXT_WIZARD_DEFAULT);
+export const WizardContext = createContext<WizardContextApi<any> | null>(null);
+
 export function useWizardContext<
   WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>,
 >(): WizardContextApi<WizardValues> {
-  return useContext(WizardContext);
+  const wizardContext = useContext(WizardContext);
+
+  if (wizardContext === null) {
+    throw new Error('useWizardContext must be used within a wizard.');
+  }
+
+  return wizardContext;
 }

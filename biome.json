@@ -18,7 +18,6 @@
     "enabled": true,
     "indentStyle": "space"
   },
-
   "javascript": {
     "formatter": {
       "lineWidth": 120,
@@ -28,7 +27,10 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "correctness": {
+        "noUnusedImports": "error"
+      }
     }
   }
 }
