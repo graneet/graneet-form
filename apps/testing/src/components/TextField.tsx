@@ -1,5 +1,4 @@
-import { Field, type FieldValues } from 'graneet-form';
-import { Rule } from 'graneet-form';
+import { Field, type FieldValues, Rule } from 'graneet-form';
 import type { ChangeEventHandler } from 'react';
 
 type KeysMatching<T, V> = {

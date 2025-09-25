@@ -332,6 +332,28 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     [getFormErrors],
   );
 
+  const removeGlobalValueSubscriber = useCallback<FormInternal<T>['removeGlobalValueSubscriber']>(
+    (publish: Dispatch<SetStateAction<Partial<T>>>, watchMode: WATCH_MODE): void => {
+      formValuesSubscribersRef.current[watchMode].global.delete(publish as Dispatch<SetStateAction<Partial<T>>>);
+    },
+    [],
+  );
+
+  const removeValueSubscriber = useCallback<FormInternal<T>['removeValueSubscriber']>(
+    <K extends keyof T>(
+      publish: Dispatch<SetStateAction<FormValues<T, K>>>,
+      watchMode: WATCH_MODE,
+      names: K[],
+    ): void => {
+      for (const name of names) {
+        formValuesSubscribersRef.current[watchMode].scoped[name]?.delete(
+          publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>,
+        );
+      }
+    },
+    [],
+  );
+
   const addValidationStatusSubscriber = useCallback<FormInternal<T>['addValidationStatusSubscriber']>(
     <K extends keyof T>(publish: Dispatch<SetStateAction<FormValidations<T, K>>>, names: K[]): void => {
       for (const name of names) {
@@ -388,29 +410,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         updateErrorForAllTypeOfSubscribers(name);
       };
     },
-    [addValueSubscriber, updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers],
-  );
-
-  const removeGlobalValueSubscriber = useCallback<FormInternal<T>['removeGlobalValueSubscriber']>(
-    (publish: Dispatch<SetStateAction<Partial<T>>>, watchMode: WATCH_MODE): void => {
-      formValuesSubscribersRef.current[watchMode].global.delete(publish as Dispatch<SetStateAction<Partial<T>>>);
-    },
-    [],
-  );
-
-  const removeValueSubscriber = useCallback<FormInternal<T>['removeValueSubscriber']>(
-    <K extends keyof T>(
-      publish: Dispatch<SetStateAction<FormValues<T, K>>>,
-      watchMode: WATCH_MODE,
-      names: K[],
-    ): void => {
-      for (const name of names) {
-        formValuesSubscribersRef.current[watchMode].scoped[name]?.delete(
-          publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>,
-        );
-      }
-    },
-    [],
+    [addValueSubscriber, updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers, removeValueSubscriber],
   );
 
   const removeGlobalValidationStatusSubscriber = useCallback<FormInternal<T>['removeGlobalValidationStatusSubscriber']>(

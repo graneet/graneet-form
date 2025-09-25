@@ -35,6 +35,7 @@ function useValidationsInternal<T extends FieldValues, K extends keyof T>(
   const {
     formInternal: { addValidationStatusSubscriber, removeValidationStatusSubscriber },
   } = form;
+  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   const [currentValidations, setCurrentValidations] = useState<FormValidations<T, K>>({} as FormValidations<T, K>);
 
   if (form === CONTEXT_FORM_DEFAULT) {
@@ -42,6 +43,7 @@ function useValidationsInternal<T extends FieldValues, K extends keyof T>(
   }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: names as string to avoid infinite re-render
+  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   useEffect(() => {
     addValidationStatusSubscriber(setCurrentValidations, names);
     return () => removeValidationStatusSubscriber(setCurrentValidations, names);
@@ -99,8 +101,10 @@ export function useValidations<T extends FieldValues, K extends keyof T>(
   names: K[] | undefined,
 ) {
   if (names === undefined) {
+    // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
     return useGlobalValidationInternal(form);
   }
 
+  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   return useValidationsInternal(form, names);
 }

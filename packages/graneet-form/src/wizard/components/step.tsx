@@ -40,7 +40,7 @@ export function Step<
   } = wizard;
 
   // When Step is used outside wizard context, it will throw an error
-  // @ts-ignore
+  // @ts-expect-error
   if (wizard === CONTEXT_WIZARD_DEFAULT) {
     throw new Error('Step not in wizard');
   }
