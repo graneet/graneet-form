@@ -1,26 +1,26 @@
 import type { FieldValues } from '../types/field-value';
 import type { PartialRecord } from '../types/partial-record';
-import { VALIDATION_OUTCOME, type ValidationStatus } from '../types/validation';
+import type { ValidationState, ValidationStatus } from '../types/validation';
 
 export function mapValidationStatusesToOutcome<T extends FieldValues>(
-  validationStatuses: PartialRecord<keyof T, ValidationStatus>,
-): VALIDATION_OUTCOME {
+  validationStatuses: PartialRecord<keyof T, ValidationState>,
+): ValidationStatus {
   let hasInvalid = false;
   let hasUndetermined = false;
 
   for (const validation of Object.values(validationStatuses)) {
-    if (validation?.status === VALIDATION_OUTCOME.UNDETERMINED) {
+    if (validation?.status === 'undetermined') {
       hasUndetermined = true;
-    } else if (validation?.status === VALIDATION_OUTCOME.INVALID) {
+    } else if (validation?.status === 'invalid') {
       hasInvalid = true;
     }
   }
 
   if (hasInvalid) {
-    return VALIDATION_OUTCOME.INVALID;
+    return 'invalid';
   }
   if (hasUndetermined) {
-    return VALIDATION_OUTCOME.UNDETERMINED;
+    return 'undetermined';
   }
-  return VALIDATION_OUTCOME.VALID;
+  return 'valid';
 }

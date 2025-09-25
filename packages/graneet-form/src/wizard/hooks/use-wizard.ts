@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
-import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
+import type { ValidationStatus } from '../../shared/types/validation';
 import type { ValidationStatusesSetter, WizardContextApi } from '../contexts/wizard-context';
 import type { StepValidator } from '../types/step-validator';
 
@@ -23,7 +23,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
   const valuesStepGetterRef = useRef<() => FieldValues | undefined>(() => undefined);
 
   // -- STEPS --
-  const [currentStep, setCurrentStep] = useState<keyof WizardValues>(steps[0]?.name);
+  const [currentStep, setCurrentStep] = useState<keyof WizardValues>(steps[0]!.name);
 
   const [isStepReady, setIsStepReady] = useState(false);
 
@@ -78,7 +78,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       if (currentStepIndex > targetStepIndex) {
         setIsStepReady(false);
         saveValuesOfCurrentStepInWizardValues();
-        setTimeout(() => setCurrentStep(steps[targetStepIndex].name), 0);
+        setTimeout(() => setCurrentStep(steps[targetStepIndex]!.name), 0);
       }
     },
     [currentStep, saveValuesOfCurrentStepInWizardValues, steps],
@@ -105,7 +105,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     if (hasNextStep(index, steps)) {
       setIsStepReady(false);
       // Ensure that current step change is done after isStepReady
-      setTimeout(() => setCurrentStep(steps[index + 1].name), 0);
+      setTimeout(() => setCurrentStep(steps[index + 1]!.name), 0);
       return;
     }
     await onFinish(wizardValuesRef.current);
@@ -121,7 +121,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
         setIsStepReady(false);
 
         saveValuesOfCurrentStepInWizardValues();
-        setTimeout(() => setCurrentStep(steps[index - 1].name), 0);
+        setTimeout(() => setCurrentStep(steps[index - 1]!.name), 0);
         return;
       }
       onQuit();
@@ -147,7 +147,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
   }, []);
 
   const stepStatusSetter = useCallback<WizardContextApi<WizardValues>['wizardInternal']['stepStatusSetter']>(
-    (status: VALIDATION_OUTCOME) => {
+    (status: ValidationStatus) => {
       for (const stepStatusSetterFunc of stepStatusSetterRef.current) {
         stepStatusSetterFunc(status);
       }
@@ -174,10 +174,10 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       getValuesOfStep,
       getValuesOfSteps,
       get isLastStep() {
-        return !steps.length || currentStep === steps[steps.length - 1].name;
+        return !steps.length || currentStep === steps[steps.length - 1]?.name;
       },
       get isFirstStep() {
-        return !steps.length || currentStep === steps[0].name;
+        return !steps.length || currentStep === steps[0]?.name;
       },
     }),
     [

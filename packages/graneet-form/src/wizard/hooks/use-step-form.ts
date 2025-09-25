@@ -3,7 +3,7 @@ import type { FormContextApi } from '../../form/contexts/form-context';
 import { type UseFormOptions, useForm } from '../../form/hooks/use-form';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
-import { VALIDATION_OUTCOME, type ValidationStatus, type ValidationStatuses } from '../../shared/types/validation';
+import type { ValidationState, ValidationStatuses } from '../../shared/types/validation';
 import { mapValidationStatusesToOutcome } from '../../shared/util/validation.util';
 import { useWizardContext } from '../contexts/wizard-context';
 
@@ -103,9 +103,10 @@ export function useStepForm<
   } = useWizardContext<WizardValues[Step]>();
   const valuesHasBeenInitializedRef = useRef(false);
 
+  const defaultValues = getValuesOfCurrentStep() ?? props?.defaultValues;
   const form = useForm<WizardValues[Step]>({
     ...props,
-    defaultValues: getValuesOfCurrentStep() ?? props?.defaultValues,
+    ...(defaultValues && { defaultValues }),
   });
 
   const {
@@ -117,11 +118,11 @@ export function useStepForm<
   useEffect(() => {
     // Form validation is async.
     // So by then, set step status to undefined, the user will not be able to go to next step
-    stepStatusSetter(VALIDATION_OUTCOME.UNDETERMINED);
+    stepStatusSetter('undetermined');
 
     const setFormStatusFromValidationStatuses = ((validationStatuses: ValidationStatuses<WizardValues[Step]>) => {
       stepStatusSetter(mapValidationStatusesToOutcome(validationStatuses));
-    }) as Dispatch<SetStateAction<PartialRecord<keyof WizardValues[Step], ValidationStatus | undefined>>>;
+    }) as Dispatch<SetStateAction<PartialRecord<keyof WizardValues[Step], ValidationState | undefined>>>;
     /*
       Put function onto the queue. The action will be done only pending render is done
       In case of big step with many inputs, stepStatus will stay UNDETERMINED until that the render
@@ -132,7 +133,7 @@ export function useStepForm<
     return () => {
       setValuesGetterForCurrentStep(() => undefined);
       // On step switch, switch stepStatus, user will not be stuck on not clickable button
-      stepStatusSetter(VALIDATION_OUTCOME.VALID);
+      stepStatusSetter('valid');
     };
   }, [stepStatusSetter, setValuesGetterForCurrentStep, addGlobalValidationStatusSubscriber]);
 

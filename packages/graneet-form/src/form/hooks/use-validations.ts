@@ -2,19 +2,17 @@ import { useEffect, useState } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
 import type { Prettify } from '../../shared/types/prettify';
-import type { ValidationStatus } from '../../shared/types/validation';
+import type { ValidationState } from '../../shared/types/validation';
 import type { FormContextApi } from '../contexts/form-context';
 import type { FormValidations } from '../types/form-validations';
 
 function useGlobalValidationInternal<T extends FieldValues>(
   form: FormContextApi<T>,
-): PartialRecord<keyof T, ValidationStatus | undefined> {
+): PartialRecord<keyof T, ValidationState | undefined> {
   const {
     formInternal: { addGlobalValidationStatusSubscriber, removeGlobalValidationStatusSubscriber },
   } = form;
-  const [currentValidations, setCurrentValidations] = useState<PartialRecord<keyof T, ValidationStatus | undefined>>(
-    {},
-  );
+  const [currentValidations, setCurrentValidations] = useState<PartialRecord<keyof T, ValidationState | undefined>>({});
 
   useEffect(() => {
     addGlobalValidationStatusSubscriber(setCurrentValidations);
@@ -64,7 +62,7 @@ function useValidationsInternal<T extends FieldValues, K extends keyof T>(
 export function useValidations<T extends FieldValues>(
   form: FormContextApi<T>,
   names: undefined,
-): PartialRecord<keyof T, ValidationStatus | undefined>;
+): PartialRecord<keyof T, ValidationState | undefined>;
 
 /**
  * Watch a list of fields errors

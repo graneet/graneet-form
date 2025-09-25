@@ -1,7 +1,7 @@
 import { copyFileSync } from 'node:fs';
 import { defineConfig, type Options } from 'tsdown';
 
-const isProduction = (options: Options) => options.env?.NODE_ENV === 'production';
+const isProduction = (options: Options) => options.env?.['NODE_ENV'] === 'production';
 
 export default defineConfig((options) => ({
   entry: ['src/index.ts'],
