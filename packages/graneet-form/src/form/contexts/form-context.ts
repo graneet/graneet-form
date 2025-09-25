@@ -1,4 +1,4 @@
-import { createContext, type Dispatch, type SetStateAction, useContext } from 'react';
+import { createContext, type Dispatch, type SetStateAction, use } from 'react';
 import type { AnyRecord } from '../../shared/types/any-record';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
@@ -7,36 +7,58 @@ import type { FormValidations } from '../types/form-validations';
 import type { FormValues } from '../types/form-values';
 import type { WATCH_MODE } from '../types/watch-mode';
 
+/**
+ * Internal API for form implementation details.
+ *
+ * **⚠️ WARNING: DO NOT use outside this library.**
+ * This interface may have breaking changes in minor or patch versions.
+ *
+ * @internal
+ * @template T - The form field values type
+ */
 export interface FormInternal<T extends FieldValues> {
   /**
-   * Return displayed fields values for a list of names.
-   * @param names Array of field names
+   * Retrieves form values for specific field names.
+   * @param names - Array of field names to get values for
+   * @returns Object containing values for the specified fields
+   * @example
+   * ```ts
+   * const values = getFormValuesForNames(['name', 'email']);
+   * // Returns: { name: 'John', email: 'john@example.com' }
+   * ```
    */
   getFormValuesForNames<K extends keyof T>(names: K[]): FormValues<T, K>;
 
   /**
-   * Return all displayed fields validation statuses.
+   * Retrieves validation statuses for all registered form fields.
+   * @returns Object mapping field names to their validation status
+   * @example
+   * ```ts
+   * const errors = getFormErrors();
+   * // Returns: { name: { status: 'VALID', message: undefined }, email: { status: 'INVALID', message: 'Required' } }
+   * ```
    */
   getFormErrors(): PartialRecord<keyof T, ValidationStatus>;
 
   /**
-   * Return displayed fields errors for a list of names.
-   * @param names Array of field names
+   * Retrieves validation statuses for specific field names.
+   * @param names - Array of field names to get validation statuses for
+   * @returns Object containing validation statuses for the specified fields
    */
   getFormErrorsForNames<K extends keyof T>(names: K[]): Record<K, ValidationStatus | undefined>;
 
   /**
-   * Add new subscriber watching all registered field values.
-   * @param publish Callback to publish new value
-   * @param type Watch mode
+   * Registers a subscriber to watch changes in all form field values.
+   * @param publish - React state setter callback to update with new values
+   * @param type - Watch mode determining when updates are triggered
    */
   addGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
 
   /**
-   * Add new subscriber watching a list of field values.
-   * @param publish Callback to publish new value
-   * @param type Watch mode
-   * @param names List of field names watched
+   * Registers a subscriber to watch changes in specific form field values.
+   * @param publish - React state setter callback to update with new values
+   * @param type - Watch mode determining when updates are triggered
+   * @param names - Array of field names to watch
    */
   addValueSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
@@ -45,17 +67,17 @@ export interface FormInternal<T extends FieldValues> {
   ): void;
 
   /**
-   * Add new subscriber watching all registered field errors.
-   * @param publish Callback to publish new value
+   * Registers a subscriber to watch validation status changes for all fields.
+   * @param publish - React state setter callback to update with new validation statuses
    */
   addGlobalValidationStatusSubscriber(
     publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>,
   ): void;
 
   /**
-   * Add new subscriber watching a list of field errors.
-   * @param publish Callback to publish new value
-   * @param names List of field names watched
+   * Registers a subscriber to watch validation status changes for specific fields.
+   * @param publish - React state setter callback to update with new validation statuses
+   * @param names - Array of field names to watch for validation changes
    */
   addValidationStatusSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
@@ -63,29 +85,33 @@ export interface FormInternal<T extends FieldValues> {
   ): void;
 
   /**
-   * Register field in the form state.
-   * We cannot have more than one active field for a name.
-   * @param name Field name
-   * @param setValue Function to change Field value and trigger render
-   * @param defaultValue The default value
+   * Registers a field in the form state management system.
+   *
+   * **Note:** Only one active field per name is allowed at a time.
+   *
+   * @param name - Unique field name identifier
+   * @param setValue - Function to update the field value and trigger re-renders
+   * @param defaultValue - Optional default value for the field
+   * @returns Cleanup function to unregister the field
    */
   registerField<K extends keyof T>(
     name: K,
     setValue: (value: T[K] | undefined) => void,
     defaultValue?: T[K],
   ): () => void;
+
   /**
-   * Remove subscriber watching all registered field values.
-   * @param publish Callback used to publish new value
-   * @param type Watch mode
+   * Removes a subscriber that was watching all form field values.
+   * @param publish - The same callback function that was used to register
+   * @param type - The same watch mode that was used to register
    */
   removeGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
 
   /**
-   * Remove subscriber watching a list of field values.
-   * @param publish Callback used to publish new value
-   * @param type Watch mode
-   * @param names List of field names watched
+   * Removes a subscriber that was watching specific form field values.
+   * @param publish - The same callback function that was used to register
+   * @param type - The same watch mode that was used to register
+   * @param names - The same field names that were used to register
    */
   removeValueSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
@@ -94,17 +120,17 @@ export interface FormInternal<T extends FieldValues> {
   ): void;
 
   /**
-   * Remove subscriber watching all registered field errors.
-   * @param publish Callback used to publish new value
+   * Removes a subscriber that was watching validation statuses for all fields.
+   * @param publish - The same callback function that was used to register
    */
   removeGlobalValidationStatusSubscriber(
     publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>,
   ): void;
 
   /**
-   * Remove validation status subscriber for given fields.
-   * @param publish Callback used to publish new value
-   * @param names Field names
+   * Removes a subscriber that was watching validation statuses for specific fields.
+   * @param publish - The same callback function that was used to register
+   * @param names - The field names that were being watched
    */
   removeValidationStatusSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
@@ -112,111 +138,168 @@ export interface FormInternal<T extends FieldValues> {
   ): void;
 
   /**
-   * Handle `onChange` action trigger for a field.
-   * @param name Field name
-   * @param value New value
-   * @param hasFocus If the field has user focus
+   * Handles field value changes triggered by user input.
+   * @param name - Name of the field that changed
+   * @param value - New value for the field
+   * @param hasFocus - Whether the field currently has user focus
    */
   onFieldChange<K extends keyof T>(name: K, value: T[K] | undefined, hasFocus: boolean): void;
 
   /**
-   * Handle onBlur action trigger for a field.
-   * @param name Field name updated
-   * @param data Data injected in onUpdateAfterBlur
+   * Handles field blur events when user leaves a field.
+   * @param name - Name of the field that was blurred
+   * @param data - Optional additional data to pass to blur handlers
+   * @returns Promise that resolves when blur handling is complete
    */
   onFieldBlur(name: keyof T, data: AnyRecord | undefined): Promise<void>;
 
   /**
-   * Update validation status for a given field.
-   * @param name Field name
-   * @param validationStatus New status
+   * Updates the validation status for a specific field.
+   * @param name - Name of the field to update
+   * @param validationStatus - New validation status to set
    */
   updateValidationStatus(name: keyof T, validationStatus: ValidationStatus): void;
 
   /**
-   * Get callback initialized by used than must be run on form submitted
+   * Retrieves the form submission handler callback if one has been set.
+   * @returns Form submission callback or undefined if none is set
    */
   getHandleFormSubmit(): ((formValues: T) => void | Promise<void>) | undefined;
 }
 
+/**
+ * Public API for form context, providing form state management and interaction methods.
+ * This is the main interface developers use to interact with forms.
+ *
+ * @template T - The form field values type
+ */
 export interface FormContextApi<T extends FieldValues> {
   /**
-   * DO NOT use outside this library. It may have breaking changes in this object in a minor or patch version
+   * Internal form implementation details.
+   *
+   * **⚠️ WARNING: DO NOT use outside this library.**
+   * This object may have breaking changes in minor or patch versions.
+   *
    * @internal
    */
   formInternal: FormInternal<T>;
 
   /**
-   * Return all displayed fields values.
+   * Retrieves all current form field values.
+   * @returns Object containing all form field values
    * @example
-   * ```
+   * ```ts
    * const { getFormValues } = useForm();
-   * console.log(getFormValues());
-   * // {"input1": "value1", "input1": "value1",}
+   * const currentValues = getFormValues();
+   * console.log(currentValues);
+   * // { name: 'John', email: 'john@example.com', age: 25 }
    * ```
    */
   getFormValues(): Partial<T>;
 
   /**
-   * Update form values.
-   * @param newValues Record containing new values
+   * Updates multiple form field values at once.
+   * @param newValues - Object containing the new values to set
+   * @example
+   * ```ts
+   * const { setFormValues } = useForm();
+   *
+   * // Update multiple fields
+   * setFormValues({
+   *   name: 'Jane Doe',
+   *   email: 'jane@example.com'
+   * });
+   *
+   * // Partial updates are also supported
+   * setFormValues({ name: 'John Smith' });
+   * ```
    */
   setFormValues(newValues: Partial<T>): void;
 
   /**
-   * Reset form value and trigger form rerender.
+   * Resets all form fields to their default values and triggers a re-render.
+   * This clears all field values and validation states.
+   *
    * @example
-   * ```
+   * ```ts
    * const { resetForm } = useForm();
-   * const handleChange = () => resetForm();
+   *
+   * const handleReset = () => {
+   *   resetForm(); // All fields return to default state
+   * };
+   *
+   * return <button onClick={handleReset}>Reset Form</button>;
    * ```
    */
   resetForm(): void;
 
   /**
-   * Wrapper to handle form submit
-   * @param submitCallback Callback executed when form is sent
+   * Creates a form submission handler that validates and processes form data.
+   *
+   * @param submitCallback - Function to execute when form is successfully submitted
+   * @returns Form event handler that can be attached to form onSubmit
+   *
+   * @example
+   * ```tsx
+   * const { handleSubmit } = useForm();
+   *
+   * const onSubmit = handleSubmit((formData) => {
+   *   console.log('Form submitted:', formData);
+   *   // Handle form submission (e.g., API call)
+   * });
+   *
+   * return (
+   *   <form onSubmit={onSubmit}>
+   *     ...
+   *     <button type="submit">Submit</button>
+   *   </form>
+   * );
+   * ```
    */
   handleSubmit(submitCallback: (formValues: T) => void | Promise<void>): () => void;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export const FORM_INTERVAL_DEFAULT: FormInternal<any> = {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  getFormValuesForNames: () => ({}) as FormValues<any, any>,
-  getFormErrors: () => ({}),
-  // @ts-expect-error
-  getFormErrorsForNames: (): Record<string, ValidationStatus> => ({}),
-  addGlobalValueSubscriber: (): void => {},
-  addValueSubscriber: (): void => {},
-  addGlobalValidationStatusSubscriber: (): void => {},
-  addValidationStatusSubscriber: (): void => {},
-  registerField: () => () => {},
-  removeGlobalValueSubscriber: (): void => {},
-  removeValueSubscriber: (): void => {},
-  removeGlobalValidationStatusSubscriber: (): void => {},
-  removeValidationStatusSubscriber: (): void => {},
-  onFieldChange: (): void => {},
-  onFieldBlur: (): Promise<void> => Promise.resolve(),
-  updateValidationStatus: (): void => {},
-  getHandleFormSubmit: () => undefined,
-};
-
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export const CONTEXT_FORM_DEFAULT: FormContextApi<any> = {
-  formInternal: FORM_INTERVAL_DEFAULT,
-  getFormValues: () => ({}),
-  setFormValues: () => {},
-  resetForm: () => {},
-  handleSubmit: () => () => {},
-};
-
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export const FormContext = createContext<FormContextApi<any>>(CONTEXT_FORM_DEFAULT);
+// biome-ignore lint/suspicious/noExplicitAny: How to do differently? :-(
+export const FormContext = createContext<FormContextApi<any> | null>(null);
 
 /**
- * Returns the form context API.
+ * Hook to access the form context API within form components.
+ *
+ * This hook provides access to form state management functions and should only be used
+ * within components that are wrapped by a Form provider.
+ *
+ * @template T - The form field values type, defaults to a generic record
+ * @returns The form context API for managing form state and interactions
+ *
+ * @throws Error if used outside of a Form context provider
+ *
+ * @example
+ * ```tsx
+ * function CustomFormField() {
+ *   const { getFormValues, setFormValues } = useFormContext<{
+ *     name: string;
+ *     email: string;
+ *   }>();
+ *
+ *   const handleClearForm = () => {
+ *     setFormValues({ name: '', email: '' });
+ *   };
+ *
+ *   return (
+ *     <div>
+ *       <button onClick={handleClearForm}>Clear Form</button>
+ *       <pre>{JSON.stringify(getFormValues(), null, 2)}</pre>
+ *     </div>
+ *   );
+ * }
+ * ```
  */
 export function useFormContext<T extends FieldValues = Record<string, Record<string, unknown>>>(): FormContextApi<T> {
-  return useContext(FormContext);
+  const context = use(FormContext);
+
+  if (!context) {
+    throw new Error('useFormContext must be used within FormContext');
+  }
+
+  return context as FormContextApi<T>;
 }

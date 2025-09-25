@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
-import type { PartialRecord } from '../../shared/types/partial-record';
 import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
 import type { ValidationStatusesSetter, WizardContextApi } from '../contexts/wizard-context';
 import type { StepValidator } from '../types/step-validator';

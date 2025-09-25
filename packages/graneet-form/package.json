@@ -48,6 +48,6 @@
     "typescript": "5.9.2"
   },
   "peerDependencies": {
-    "react": "^16.8.0 || ^17 || ^18 || ^19"
+    "react": "^19"
   }
 }

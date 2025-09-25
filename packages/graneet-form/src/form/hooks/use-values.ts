@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { Prettify } from '../../shared/types/prettify';
-import { CONTEXT_FORM_DEFAULT, type FormContextApi } from '../contexts/form-context';
+import type { FormContextApi } from '../contexts/form-context';
 import type { FormValues } from '../types/form-values';
 import { WATCH_MODE } from '../types/watch-mode';
 
@@ -13,10 +13,6 @@ function useGlobalValues<T extends FieldValues>(watchMode: WATCH_MODE, form: For
     formInternal: { addGlobalValueSubscriber, removeGlobalValueSubscriber },
   } = form;
   const [currentValues, setCurrentValues] = useState<Partial<T>>({});
-
-  if (form === CONTEXT_FORM_DEFAULT) {
-    throw new Error('No form context could be found.');
-  }
 
   useEffect(() => {
     addGlobalValueSubscriber(setCurrentValues, watchMode);
@@ -39,10 +35,6 @@ function useValues<T extends FieldValues, K extends keyof T>(
   } = form;
   // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   const [currentValues, setCurrentValues] = useState<FormValues<T, K>>({} as FormValues<T, K>);
-
-  if (form === CONTEXT_FORM_DEFAULT) {
-    throw new Error('No form context could be found.');
-  }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: `names` is transformed to string to ensure consistant ref
   // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>

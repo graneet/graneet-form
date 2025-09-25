@@ -1,3 +1,1 @@
-export type Prettify<T> = {
-  [K in keyof T]: T[K];
-} & {};
+export type Prettify<T extends Record<string, unknown>> = { [K in keyof T]: T[K] } & {};

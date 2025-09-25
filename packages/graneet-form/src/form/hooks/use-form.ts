@@ -10,9 +10,40 @@ import type { FormValues } from '../types/form-values';
 import { VALIDATION_STATE_UNDETERMINED } from '../types/validation';
 import { WATCH_MODE } from '../types/watch-mode';
 
+/**
+ * Configuration options for the useForm hook.
+ * @template T - The form field values type
+ */
 export interface UseFormOptions<T extends FieldValues> {
   /**
-   * Callback run on blur when a field is updated
+   * Callback function executed when a field loses focus after being updated.
+   *
+   * This callback is triggered only when:
+   * - The field had user focus (was actively edited)
+   * - The field passes validation (status is VALID)
+   * - The field loses focus (onBlur event)
+   *
+   * @template K - The specific field key being updated
+   * @param name - The name of the field that was updated
+   * @param value - The current value of the field after update
+   * @param data - Additional data passed from the field's blur event
+   * @param formPartial - Subset of form API methods for reading/updating form state
+   * @returns Promise or void - Can be async for operations like API calls
+   *
+   * @example
+   * ```ts
+   * const form = useForm<{ email: string; name: string }>({
+   *   onUpdateAfterBlur: async (fieldName, value, data, { getFormValues, setFormValues }) => {
+   *     if (fieldName === 'email' && value) {
+   *       // Auto-populate name based on email
+   *       const userInfo = await fetchUserByEmail(value);
+   *       if (userInfo.name) {
+   *         setFormValues({ name: userInfo.name });
+   *       }
+   *     }
+   *   }
+   * });
+   * ```
    */
   onUpdateAfterBlur?<K extends keyof T>(
     name: K,
@@ -22,28 +53,105 @@ export interface UseFormOptions<T extends FieldValues> {
   ): Promise<void> | void;
 
   /**
-   * Form default values
+   * Default values for form fields.
+   *
+   * Can be either a static object or a function that returns the default values.
+   * Using a function is useful when defaults depend on an external state or need to be computed.
+   *
+   * @example
+   * ```ts
+   * // Static defaults
+   * const form = useForm({
+   *   defaultValues: {
+   *     name: 'John Doe',
+   *     email: '',
+   *     age: 25
+   *   }
+   * });
+   *
+   * // Dynamic defaults
+   * const form = useForm({
+   *   defaultValues: () => ({
+   *     name: user?.name || '',
+   *     email: user?.email || '',
+   *     timestamp: Date.now()
+   *   })
+   * });
+   * ```
    */
   defaultValues?: Partial<T> | (() => Partial<T>);
 }
 
 /**
- * Hook to define a form
-
+ * Hook for creating and managing form state with validation, field registration, and submission handling.
+ *
+ * This hook provides a complete form management solution including:
+ * - Field registration and value management
+ * - Real-time validation status tracking
+ * - Subscription-based updates for optimal performance
+ * - Form submission with validation
+ * - Default values and reset functionality
+ *
+ * @template T - The form field values type, defaults to a generic record
+ * @param options - Configuration options for the form behavior
+ * @returns Form context API that can be passed to Form components
+ *
  * @example
  * ```tsx
- *
- * interface FormValues {
- *   name: string
+ * // Define your form data structure
+ * interface UserFormData {
+ *   name: string;
+ *   email: string;
+ *   age: number;
  * }
  *
- * // in the component
- * const form = useForm();
+ * function UserForm() {
+ *   const form = useForm<UserFormData>({
+ *     defaultValues: {
+ *       name: '',
+ *       email: '',
+ *       age: 18
+ *     },
+ *     onUpdateAfterBlur: async (fieldName, value) => {
+ *       // Auto-save on blur
+ *       if (fieldName === 'email') {
+ *         await saveEmailDraft(value);
+ *       }
+ *     }
+ *   });
  *
- * // in the JSX component
- * <Form form={form}>
- *   <TextInput<FormValues> name="name" />
- * </Form>
+ *   return (
+ *     <Form form={form}>
+ *       ...
+ *     </Form>
+ *   );
+ * }
+ * ```
+ *
+ * @example
+ * ```tsx
+ * // Form with validation and submission
+ * function LoginForm() {
+ *   const form = useForm<{ username: string; password: string }>();
+ *
+ *   const handleSubmit = form.handleSubmit(async (formData) => {
+ *     try {
+ *       await login(formData.username, formData.password);
+ *       navigate('/dashboard');
+ *     } catch (error) {
+ *       setError('Invalid credentials');
+ *     }
+ *   });
+ *
+ *   return (
+ *     <form onSubmit={handleSubmit}>
+ *       <Form form={form}>
+ *          ...
+ *         <button type="submit">Login</button>
+ *       </Form>
+ *     </form>
+ *   );
+ * }
  * ```
  */
 export function useForm<T extends FieldValues = Record<string, Record<string, unknown>>>({

@@ -2,7 +2,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import type { AnyRecord } from '../../shared/types/any-record';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { ValidationStatus } from '../../shared/types/validation';
-import { CONTEXT_FORM_DEFAULT, useFormContext } from '../contexts/form-context';
+import { useFormContext } from '../contexts/form-context';
 import { RuleContext } from '../contexts/rule-context';
 import { useFieldValidation } from '../hooks/use-field-validation';
 import { useRules } from '../hooks/use-rules';
@@ -104,12 +104,8 @@ export function Field<T extends FieldValues, K extends keyof T>({
     hasBeenFocusedRef.current = true;
   }, []);
 
-  if (form === CONTEXT_FORM_DEFAULT) {
-    throw new Error('No form context could be found.');
-  }
-
   return (
-    <RuleContext.Provider value={ruleContext}>
+    <RuleContext value={ruleContext}>
       {render(
         {
           name,
@@ -124,6 +120,6 @@ export function Field<T extends FieldValues, K extends keyof T>({
         },
       )}
       {children}
-    </RuleContext.Provider>
+    </RuleContext>
   );
 }
