@@ -1,5 +1,19 @@
 # graneet-form
 
+## 3.0.0-next.9
+
+### Major Changes
+
+- [#135](https://github.com/graneet/graneet-form/pull/135) [`e1ba0b2`](https://github.com/graneet/graneet-form/commit/e1ba0b226faaa146daf66d9263a4f19017f2cd67) Thanks [@victorduclos](https://github.com/victorduclos)! - Do not expose internals to user
+
+### Minor Changes
+
+- [#133](https://github.com/graneet/graneet-form/pull/133) [`8099bab`](https://github.com/graneet/graneet-form/commit/8099babe4e30c0da121381dca43fa39097fbea2c) Thanks [@victorduclos](https://github.com/victorduclos)! - Allow function to define default values
+
+### Patch Changes
+
+- [#135](https://github.com/graneet/graneet-form/pull/135) [`e1ba0b2`](https://github.com/graneet/graneet-form/commit/e1ba0b226faaa146daf66d9263a4f19017f2cd67) Thanks [@victorduclos](https://github.com/victorduclos)! - Improve JSDoc
+
 ## 3.0.0-next.8
 
 ### Major Changes
