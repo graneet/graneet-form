@@ -24,7 +24,7 @@ export interface UseFormOptions<T extends FieldValues> {
   /**
    * Form default values
    */
-  defaultValues?: Partial<T>;
+  defaultValues?: Partial<T> | (() => Partial<T>);
 }
 
 /**
@@ -56,6 +56,13 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     values: {},
   });
 
+  const resolvedDefaultValues = useMemo((): Partial<T> => {
+    if (typeof defaultValues === 'function') {
+      return defaultValues();
+    }
+    return defaultValues ?? {};
+  }, [defaultValues]);
+
   // -- FORM STATE --
   interface FieldState<K extends keyof T> {
     name: K;
@@ -64,11 +71,11 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     isRegistered: boolean;
   }
   const formStateRef = useRef<{ [K in keyof T]?: FieldState<K> }>(
-    (Object.keys(defaultValues ?? {}) as (keyof T)[]).reduce(
+    (Object.keys(resolvedDefaultValues) as (keyof T)[]).reduce(
       (acc, key) => {
         acc[key] = {
           name: key,
-          value: defaultValues?.[key],
+          value: resolvedDefaultValues[key],
           validation: VALIDATION_STATE_UNDETERMINED,
           isRegistered: false,
         };
