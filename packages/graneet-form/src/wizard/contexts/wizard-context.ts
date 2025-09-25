@@ -39,10 +39,10 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
 
   /**
    * Internal API for wizard implementation details.
-   * 
-   * **⚠️ WARNING: DO NOT use outside this library.** 
+   *
+   * **⚠️ WARNING: DO NOT use outside this library.**
    * This object may have breaking changes in minor or patch versions.
-   * 
+   *
    * @internal
    */
   wizardInternal: {
