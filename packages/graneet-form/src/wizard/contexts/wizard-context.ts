@@ -1,4 +1,4 @@
-import { createContext, type Dispatch, type SetStateAction, useContext } from 'react';
+import { createContext, type Dispatch, type SetStateAction, use } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
 
@@ -94,17 +94,17 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
   isStepReady: boolean;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: How to do differently? :-(
 export const WizardContext = createContext<WizardContextApi<any> | null>(null);
 
 export function useWizardContext<
   WizardValues extends Record<string, FieldValues> = Record<string, Record<string, unknown>>,
 >(): WizardContextApi<WizardValues> {
-  const wizardContext = useContext(WizardContext);
+  const wizardContext = use(WizardContext);
 
   if (wizardContext === null) {
-    throw new Error('useWizardContext must be used within a wizard.');
+    throw new Error('useWizardContext must be used within a wizard context.');
   }
 
-  return wizardContext;
+  return wizardContext as WizardContextApi<WizardValues>;
 }
