@@ -1,12 +1,12 @@
 import type { FieldValue } from '../../shared/types/field-value';
-import { VALIDATION_OUTCOME, type ValidationStatus } from '../../shared/types/validation';
+import type { ValidationState } from '../../shared/types/validation';
 
-export const VALIDATION_STATE_VALID: ValidationStatus = {
-  status: VALIDATION_OUTCOME.VALID,
+export const VALIDATION_STATE_VALID: ValidationState = {
+  status: 'valid',
   message: undefined,
 };
-export const VALIDATION_STATE_UNDETERMINED: ValidationStatus = {
-  status: VALIDATION_OUTCOME.UNDETERMINED,
+export const VALIDATION_STATE_UNDETERMINED: ValidationState = {
+  status: 'undetermined',
   message: undefined,
 };
 

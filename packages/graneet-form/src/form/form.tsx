@@ -1,6 +1,5 @@
 import { type FormEventHandler, type FormHTMLAttributes, type ReactNode, useCallback } from 'react';
 import type { FieldValues } from '../shared/types/field-value';
-import { VALIDATION_OUTCOME } from '../shared/types/validation';
 import { mapValidationStatusesToOutcome } from '../shared/util/validation.util';
 import { FormContext, type FormContextApi } from './contexts/form-context';
 
@@ -38,7 +37,7 @@ export function Form<T extends FieldValues>({ children, form, onSubmit, ...other
       event.preventDefault();
 
       const validations = getFormErrors();
-      const isFormValid = mapValidationStatusesToOutcome<T>(validations) === VALIDATION_OUTCOME.VALID;
+      const isFormValid = mapValidationStatusesToOutcome<T>(validations) === 'valid';
       if (isFormValid) {
         const handleFormSubmit = getHandleFormSubmit();
 

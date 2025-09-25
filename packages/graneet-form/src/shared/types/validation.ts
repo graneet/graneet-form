@@ -1,14 +1,10 @@
 import type { FieldValues } from './field-value';
 
-export enum VALIDATION_OUTCOME {
-  VALID = 'VALID',
-  INVALID = 'INVALID',
-  UNDETERMINED = 'UNDETERMINED',
-}
+export type ValidationStatus = 'valid' | 'invalid' | 'undetermined';
 
-export interface ValidationStatus {
-  status: VALIDATION_OUTCOME;
+export interface ValidationState {
+  status: ValidationStatus;
   message: string | undefined;
 }
 
-export type ValidationStatuses<T extends FieldValues> = Record<keyof T, ValidationStatus | undefined>;
+export type ValidationStatuses<T extends FieldValues> = Record<keyof T, ValidationState | undefined>;

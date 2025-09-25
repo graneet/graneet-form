@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
-import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
+import type { ValidationStatus } from '../../shared/types/validation';
 import type { ValidationStatusesSetter, WizardContextApi } from '../contexts/wizard-context';
 import type { StepValidator } from '../types/step-validator';
 
@@ -147,7 +147,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
   }, []);
 
   const stepStatusSetter = useCallback<WizardContextApi<WizardValues>['wizardInternal']['stepStatusSetter']>(
-    (status: VALIDATION_OUTCOME) => {
+    (status: ValidationStatus) => {
       for (const stepStatusSetterFunc of stepStatusSetterRef.current) {
         stepStatusSetterFunc(status);
       }

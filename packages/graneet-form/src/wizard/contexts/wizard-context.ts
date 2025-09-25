@@ -1,8 +1,8 @@
 import { createContext, type Dispatch, type SetStateAction, use } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
-import type { VALIDATION_OUTCOME } from '../../shared/types/validation';
+import type { ValidationStatus } from '../../shared/types/validation';
 
-export type ValidationStatusesSetter = Dispatch<SetStateAction<VALIDATION_OUTCOME>>;
+export type ValidationStatusesSetter = Dispatch<SetStateAction<ValidationStatus>>;
 
 export interface WizardContextApi<WizardValues extends Record<string, FieldValues>> {
   /**
@@ -68,7 +68,7 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
      * Updates the validation status for the current step.
      * @param status - The new validation outcome status
      */
-    stepStatusSetter(status: VALIDATION_OUTCOME): void;
+    stepStatusSetter(status: ValidationStatus): void;
 
     /**
      * React state setter to update whether the current step is ready for navigation.

@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FieldValue } from '../../shared/types/field-value';
-import { VALIDATION_OUTCOME, type ValidationStatus } from '../../shared/types/validation';
+import type { ValidationState } from '../../shared/types/validation';
 import { VALIDATION_STATE_UNDETERMINED, VALIDATION_STATE_VALID } from '../types/validation';
 import type { IRule } from './use-rules';
 
 const DEBOUNCE_TIME = 500;
 
-export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], value: FieldValue): ValidationStatus {
+export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], value: FieldValue): ValidationState {
   const numberOfRules = rules.length + debouncedRules.length;
-  const [validationStatus, setValidationStatus] = useState<ValidationStatus>(
+  const [validationStatus, setValidationStatus] = useState<ValidationState>(
     numberOfRules ? VALIDATION_STATE_UNDETERMINED : VALIDATION_STATE_VALID,
   );
   const metaStateRef = useRef({
@@ -48,8 +48,8 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
             }
           })
           .catch(({ message }) => {
-            const status: ValidationStatus = {
-              status: VALIDATION_OUTCOME.INVALID,
+            const status: ValidationState = {
+              status: 'invalid',
               message,
             };
             metaStateRef.current.hasError = true;

@@ -2,7 +2,7 @@ import { createContext, type Dispatch, type SetStateAction, use } from 'react';
 import type { AnyRecord } from '../../shared/types/any-record';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
-import type { ValidationStatus } from '../../shared/types/validation';
+import type { ValidationState } from '../../shared/types/validation';
 import type { FormValidations } from '../types/form-validations';
 import type { FormValues } from '../types/form-values';
 import type { WatchMode } from '../types/watch-mode';
@@ -38,14 +38,14 @@ export interface FormInternal<T extends FieldValues> {
    * // Returns: { name: { status: 'VALID', message: undefined }, email: { status: 'INVALID', message: 'Required' } }
    * ```
    */
-  getFormErrors(): PartialRecord<keyof T, ValidationStatus>;
+  getFormErrors(): PartialRecord<keyof T, ValidationState>;
 
   /**
    * Retrieves validation statuses for specific field names.
    * @param names - Array of field names to get validation statuses for
    * @returns Object containing validation statuses for the specified fields
    */
-  getFormErrorsForNames<K extends keyof T>(names: K[]): Record<K, ValidationStatus | undefined>;
+  getFormErrorsForNames<K extends keyof T>(names: K[]): Record<K, ValidationState | undefined>;
 
   /**
    * Registers a subscriber to watch changes in all form field values.
@@ -71,7 +71,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param publish - React state setter callback to update with new validation statuses
    */
   addGlobalValidationStatusSubscriber(
-    publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>,
+    publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationState | undefined>>>,
   ): void;
 
   /**
@@ -124,7 +124,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param publish - The same callback function that was used to register
    */
   removeGlobalValidationStatusSubscriber(
-    publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationStatus | undefined>>>,
+    publish: Dispatch<SetStateAction<PartialRecord<keyof T, ValidationState | undefined>>>,
   ): void;
 
   /**
@@ -158,7 +158,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param name - Name of the field to update
    * @param validationStatus - New validation status to set
    */
-  updateValidationStatus(name: keyof T, validationStatus: ValidationStatus): void;
+  updateValidationStatus(name: keyof T, validationStatus: ValidationState): void;
 
   /**
    * Retrieves the form submission handler callback if one has been set.

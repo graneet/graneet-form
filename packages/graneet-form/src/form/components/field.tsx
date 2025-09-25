@@ -1,7 +1,7 @@
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import type { AnyRecord } from '../../shared/types/any-record';
 import type { FieldValues } from '../../shared/types/field-value';
-import type { ValidationStatus } from '../../shared/types/validation';
+import type { ValidationState } from '../../shared/types/validation';
 import { useFormContext } from '../contexts/form-context';
 import { RuleContext } from '../contexts/rule-context';
 import { useFieldValidation } from '../hooks/use-field-validation';
@@ -17,7 +17,7 @@ export interface FieldRenderProps<T extends FieldValues, K extends keyof T> {
 
 export interface FieldRenderState {
   isPristine: boolean;
-  validationStatus: ValidationStatus;
+  validationStatus: ValidationState;
 }
 
 export interface FieldProps<T extends FieldValues, K extends keyof T> {

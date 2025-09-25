@@ -13,7 +13,6 @@ export type { FormValidations } from './form/types/form-validations';
 export type { FormValues } from './form/types/form-values';
 export type { AnyRecord } from './shared/types/any-record';
 export type { FieldValue, FieldValues } from './shared/types/field-value';
-export { VALIDATION_OUTCOME } from './shared/types/validation';
 export { mapValidationStatusesToOutcome } from './shared/util/validation.util';
 export type { StepProps } from './wizard/components/step';
 export { Step } from './wizard/components/step';
