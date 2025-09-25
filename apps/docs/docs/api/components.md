@@ -1,10 +1,12 @@
 # Components API Reference
 
-## Form Components
+Complete reference for all components provided by graneet-form, based on JSDoc documentation from the source code.
 
-### Form
+## Core Form Components
 
-The main wrapper component for forms. Provides form context to child components.
+### `Form`
+
+The main wrapper component for forms that provides form context to child components.
 
 ```tsx
 interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
@@ -14,147 +16,471 @@ interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLF
 }
 ```
 
-**Props:**
-- `children` - Child components (Fields, Rules, etc.)
-- `form` - Form context from `useForm`
-- `onSubmit` - Custom submit handler
-- All standard HTML form attributes except `onSubmit`
+This component establishes the form context that allows child Field components to register themselves and access form state management functions.
 
-**Example:**
+#### Props
+
+- **`children: ReactNode`** - Child components (Field, Rule components, or any other React elements)
+- **`form: FormContextApi<T>`** - Form context instance from `useForm` hook
+- **`onSubmit?: () => void`** - Optional custom submit handler
+- **All standard HTML form attributes except `onSubmit`** - Supports className, style, id, etc.
+
+#### Examples
+
+**Basic form with submission:**
 ```tsx
-function MyForm() {
-  const form = useForm<FormValues>();
+function UserRegistrationForm() {
+  const form = useForm<{
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }>();
 
-  const handleSubmit = () => {
-    const values = form.getFormValues();
-    console.log('Form submitted:', values);
-  };
+  const handleSubmit = form.handleSubmit(async (formData) => {
+    try {
+      await registerUser(formData);
+      toast.success('Registration successful!');
+    } catch (error) {
+      toast.error('Registration failed');
+    }
+  });
 
   return (
-    <Form form={form} onSubmit={handleSubmit}>
-      <Field
-        name="email"
-        render={({ value, onChange }) => (
-          <input
-            type="email"
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
+    <form onSubmit={handleSubmit} className="registration-form">
+      <Form form={form}>
+        <Field
+          name="email"
+          render={({ value, onChange, onBlur, onFocus }) => (
+            <input
+              type="email"
+              placeholder="Email"
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              onBlur={onBlur}
+              onFocus={onFocus}
+            />
+          )}
+        >
+          <Rule
+            validationFn={(email) => !!email && email.includes('@')}
+            message="Valid email is required"
           />
-        )}
-      />
-      <button type="submit">Submit</button>
+        </Field>
+
+        <Field
+          name="password"
+          render={({ value, onChange, onBlur, onFocus }) => (
+            <input
+              type="password"
+              placeholder="Password"
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              onBlur={onBlur}
+              onFocus={onFocus}
+            />
+          )}
+        >
+          <Rule
+            validationFn={(pwd) => !!pwd && pwd.length >= 8}
+            message="Password must be at least 8 characters"
+          />
+        </Field>
+
+        <button type="submit">Register</button>
+      </Form>
+    </form>
+  );
+}
+```
+
+**Form with custom styling and validation display:**
+```tsx
+function StyledForm() {
+  const form = useForm<{ message: string }>();
+  const { formStatus } = useFormStatus(form);
+
+  return (
+    <Form 
+      form={form} 
+      className={`styled-form ${formStatus.toLowerCase()}`}
+      style={{ padding: '20px', borderRadius: '8px' }}
+    >
+      <div className="form-header">
+        <h2>Contact Form</h2>
+        <div className={`status-indicator ${formStatus.toLowerCase()}`}>
+          {formStatus}
+        </div>
+      </div>
+      
+      <Field name="message" render={/* field render */} />
     </Form>
   );
 }
 ```
 
-### Field
+---
 
-A generic field component that uses the render prop pattern for maximum flexibility.
+### `Field`
+
+Represents a field in a form using the render prop pattern for maximum flexibility.
 
 ```tsx
 interface FieldProps<T extends FieldValues, K extends keyof T> {
   name: K;
-  children?: ReactNode; // Rules
+  children?: ReactNode; // Rules and other child components
   render(fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState): ReactNode | null;
   data?: AnyRecord;
   defaultValue?: T[K];
 }
+```
 
-interface FieldRenderProps<T, K> {
-  name: K;
-  value: T[K] | undefined;
-  onFocus(): void;
-  onBlur(): void;
-  onChange(value: T[K] | undefined): void;
-}
+The Field component automatically:
+- Registers itself with the form when mounted
+- Unregisters when unmounted
+- Manages field state and validation
+- Provides field props and state to the render function
 
-interface FieldRenderState {
-  isPristine: boolean;
-  validationStatus: ValidationStatus;
+#### Props
+
+- **`name: K`** - The field name (must match form type keys)
+- **`render: (fieldProps, fieldState) => ReactNode | null`** - Function that renders the field UI
+- **`children?: ReactNode`** - Usually Rule components for validation
+- **`data?: AnyRecord`** - Additional data passed to `onUpdateAfterBlur` callback
+- **`defaultValue?: T[K]`** - Default value for this field (overrides form-level defaults)
+
+#### Field Render Props
+
+The render function receives `fieldProps`:
+
+```tsx
+interface FieldRenderProps<T, K extends keyof T> {
+  name: K;                              // Field name
+  value: T[K] | undefined;             // Current field value
+  onFocus(): void;                     // Focus handler
+  onBlur(): void;                      // Blur handler  
+  onChange(value: T[K] | undefined): void; // Value change handler
 }
 ```
 
-**Props:**
-- `name` - Field name (must match form type)
-- `render` - Render function that receives field props and state
-- `children` - Validation rules (Rule components)
-- `data` - Additional data passed to `onUpdateAfterBlur` callback
-- `defaultValue` - Default value for the field
+#### Field Render State
 
-**Example:**
+The render function also receives `fieldState`:
+
 ```tsx
-<Field
+interface FieldRenderState {
+  isPristine: boolean;              // true if field hasn't been focused/modified
+  validationStatus: ValidationStatus; // Current validation status and message
+}
+```
+
+#### Examples
+
+**Text input with validation:**
+```tsx
+<Field<UserForm, 'username'>
   name="username"
   defaultValue="admin"
-  data={{ userId: 123 }}
+  data={{ source: 'registration', priority: 'high' }}
   render={({ value, onChange, onBlur, onFocus }, { isPristine, validationStatus }) => (
-    <div>
+    <div className="field-container">
+      <label htmlFor="username">Username</label>
       <input
+        id="username"
+        type="text"
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         onBlur={onBlur}
         onFocus={onFocus}
-        className={validationStatus.status === 'INVALID' ? 'error' : ''}
+        className={`
+          input 
+          ${!isPristine && validationStatus.status === 'INVALID' ? 'error' : ''} 
+          ${!isPristine && validationStatus.status === 'VALID' ? 'valid' : ''}
+        `}
+        placeholder="Enter username"
       />
+      
+      {/* Validation feedback */}
+      {!isPristine && validationStatus.status === 'INVALID' && (
+        <span className="error-message">
+          ❌ {validationStatus.message}
+        </span>
+      )}
+      {!isPristine && validationStatus.status === 'VALID' && (
+        <span className="success-message">✅ Looks good!</span>
+      )}
+      {validationStatus.status === 'PENDING' && (
+        <span className="pending-message">⏳ Validating...</span>
+      )}
+    </div>
+  )}
+>
+  <Rule validationFn={(name) => !!name} message="Username is required" />
+  <Rule validationFn={(name) => !name || name.length >= 3} message="Username must be at least 3 characters" />
+</Field>
+```
+
+**Select dropdown:**
+```tsx
+<Field<FormData, 'country'>
+  name="country"
+  render={({ value, onChange, onBlur, onFocus }, { validationStatus, isPristine }) => (
+    <div className="field-container">
+      <label>Country</label>
+      <select
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+        onFocus={onFocus}
+        className={!isPristine && validationStatus.status === 'INVALID' ? 'error' : ''}
+      >
+        <option value="">Select a country</option>
+        <option value="us">United States</option>
+        <option value="ca">Canada</option>
+        <option value="uk">United Kingdom</option>
+        <option value="fr">France</option>
+      </select>
+      {!isPristine && validationStatus.message && (
+        <span className="error-message">{validationStatus.message}</span>
+      )}
+    </div>
+  )}
+>
+  <Rule validationFn={(value) => !!value} message="Please select a country" />
+</Field>
+```
+
+**Checkbox field:**
+```tsx
+<Field<FormData, 'termsAccepted'>
+  name="termsAccepted"
+  render={({ value, onChange, onBlur, onFocus }, { validationStatus, isPristine }) => (
+    <div className="checkbox-field">
+      <label className="checkbox-label">
+        <input
+          type="checkbox"
+          checked={value || false}
+          onChange={(e) => onChange(e.target.checked)}
+          onBlur={onBlur}
+          onFocus={onFocus}
+        />
+        <span className="checkbox-text">
+          I agree to the <a href="/terms">Terms and Conditions</a>
+        </span>
+      </label>
       {!isPristine && validationStatus.status === 'INVALID' && (
         <span className="error-message">{validationStatus.message}</span>
       )}
     </div>
   )}
 >
-  <Rule validationFn={isRequired} message="Username is required" />
+  <Rule validationFn={(accepted) => accepted === true} message="You must accept the terms and conditions" />
 </Field>
 ```
 
-### Rule
+**File upload field:**
+```tsx
+<Field<FormData, 'avatar'>
+  name="avatar"
+  render={({ value, onChange, onBlur, onFocus }, { validationStatus, isPristine }) => (
+    <div className="file-field">
+      <label>Profile Picture</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          onChange(file);
+        }}
+        onBlur={onBlur}
+        onFocus={onFocus}
+      />
+      
+      {/* File preview */}
+      {value && (
+        <div className="file-preview">
+          <img 
+            src={URL.createObjectURL(value)} 
+            alt="Avatar preview"
+            style={{ maxWidth: '200px', maxHeight: '200px' }}
+          />
+          <button 
+            type="button"
+            onClick={() => onChange(undefined)}
+            className="remove-file"
+          >
+            Remove
+          </button>
+        </div>
+      )}
+      
+      {!isPristine && validationStatus.status === 'INVALID' && (
+        <span className="error-message">{validationStatus.message}</span>
+      )}
+    </div>
+  )}
+>
+  <Rule
+    validationFn={(file) => {
+      if (!file) return true; // Optional field
+      return file.size <= 5 * 1024 * 1024; // 5MB limit
+    }}
+    message="File size must be less than 5MB"
+  />
+  <Rule
+    validationFn={(file) => {
+      if (!file) return true;
+      return ['image/jpeg', 'image/png', 'image/gif'].includes(file.type);
+    }}
+    message="File must be a JPEG, PNG, or GIF image"
+  />
+</Field>
+```
 
-A validation rule component that defines field validation logic.
+---
+
+### `Rule`
+
+Registers a validation rule with the given message and validation function.
 
 ```tsx
 interface RuleProps {
-  validationFn: Validator;
-  message: string;
-  isDebounced?: boolean;
+  validationFn: Validator;  // Function to validate field value
+  message: string;          // Error message when validation fails
+  isDebounced?: boolean;    // Whether to debounce validation calls
 }
 
 type Validator = (value: FieldValue) => boolean | Promise<boolean>;
 ```
 
-**Props:**
-- `validationFn` - Validation function that returns true if valid
-- `message` - Error message to display when validation fails
-- `isDebounced` - Whether to debounce validation (useful for async validation)
+Rules are executed in the order they appear. The first failing rule stops execution and its message is displayed.
 
-**Example:**
+#### Props
+
+- **`validationFn: Validator`** - Function that returns `true` if valid, `false` if invalid. Can be synchronous or asynchronous.
+- **`message: string`** - Error message displayed when validation fails
+- **`isDebounced?: boolean`** - Whether to debounce validation (default: `false`). Useful for expensive async operations.
+
+#### Examples
+
+**Basic synchronous validation:**
 ```tsx
-// Sync validation
+// Required field validation
 const isRequired = (value: unknown): boolean => {
-  return value != null && value !== '';
+  if (value === null || value === undefined) return false;
+  if (typeof value === 'string') return value.trim().length > 0;
+  if (typeof value === 'number') return !isNaN(value);
+  if (Array.isArray(value)) return value.length > 0;
+  return true;
 };
 
-// Async validation
-const isUniqueEmail = async (email: string): Promise<boolean> => {
-  const response = await fetch('/api/check-email', {
-    method: 'POST',
-    body: JSON.stringify({ email })
-  });
-  return response.ok;
-};
-
-<Field name="email" render={...}>
+<Field name="email" render={/* ... */}>
   <Rule validationFn={isRequired} message="Email is required" />
+</Field>
+```
+
+**Email validation:**
+```tsx
+const isValidEmail = (email: string): boolean => {
+  if (!email) return true; // Allow empty for optional fields
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+<Field name="email" render={/* ... */}>
+  <Rule validationFn={isRequired} message="Email is required" />
+  <Rule validationFn={isValidEmail} message="Please enter a valid email address" />
+</Field>
+```
+
+**Asynchronous validation with debouncing:**
+```tsx
+// Check if username is available (API call)
+const isUniqueUsername = async (username: string): Promise<boolean> => {
+  if (!username || username.length < 3) return true; // Skip for short usernames
+  
+  try {
+    const response = await fetch('/api/check-username', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
+    const data = await response.json();
+    return data.available;
+  } catch (error) {
+    console.error('Username validation failed:', error);
+    return false; // Assume unavailable on error
+  }
+};
+
+<Field name="username" render={/* ... */}>
+  <Rule validationFn={isRequired} message="Username is required" />
   <Rule
-    validationFn={isUniqueEmail}
-    message="Email already exists"
-    isDebounced
+    validationFn={isUniqueUsername}
+    message="Username is already taken"
+    isDebounced={true}  // Debounces the API call
   />
 </Field>
 ```
 
+**Multiple validation rules:**
+```tsx
+<Field<FormData, 'password'>
+  name="password"
+  render={/* ... */}
+>
+  {/* Rules are executed in order until one fails */}
+  <Rule 
+    validationFn={(pwd) => !!pwd} 
+    message="Password is required" 
+  />
+  <Rule 
+    validationFn={(pwd) => !pwd || pwd.length >= 8} 
+    message="Password must be at least 8 characters" 
+  />
+  <Rule 
+    validationFn={(pwd) => !pwd || /[A-Z]/.test(pwd)} 
+    message="Password must contain at least one uppercase letter" 
+  />
+  <Rule 
+    validationFn={(pwd) => !pwd || /[a-z]/.test(pwd)} 
+    message="Password must contain at least one lowercase letter" 
+  />
+  <Rule 
+    validationFn={(pwd) => !pwd || /\d/.test(pwd)} 
+    message="Password must contain at least one number" 
+  />
+</Field>
+```
+
+**Complex validation with form context:**
+```tsx
+function PasswordConfirmationField() {
+  const form = useFormContext<{ password: string; confirmPassword: string }>();
+  const { password } = useOnChangeValues(form, ['password']);
+
+  return (
+    <Field<FormData, 'confirmPassword'>
+      name="confirmPassword"
+      render={/* ... */}
+    >
+      <Rule validationFn={(value) => !!value} message="Please confirm your password" />
+      <Rule
+        validationFn={(confirmPassword) => {
+          if (!confirmPassword) return false;
+          return confirmPassword === password; // Cross-field validation
+        }}
+        message="Passwords do not match"
+      />
+    </Field>
+  );
+}
+```
+
+---
+
 ## Wizard Components
 
-### Step
+### `Step`
 
 A component representing a single step in a wizard flow.
 
@@ -172,20 +498,40 @@ type StepValidator<WizardValues, Step> = (
 ) => boolean | Promise<boolean>;
 ```
 
-**Props:**
-- `children` - Form fields and other content for the step
-- `name` - Step identifier (must match wizard type)
-- `onNext` - Custom validation function called before proceeding to next step
-- `noFooter` - Disable the default navigation footer
-- `title` - Step title (displayed in step header)
+#### Props
 
-**Example:**
+- **`children: ReactNode`** - Form fields and other content for the step
+- **`name: Step`** - Step identifier that must match wizard type keys
+- **`onNext?: StepValidator`** - Custom validation function called before proceeding to next step
+- **`noFooter?: boolean`** - Disable the default navigation footer to implement custom navigation
+- **`title?: string`** - Step title displayed in the step header
+
+#### Examples
+
+**Basic step with validation:**
 ```tsx
 function PersonalInfoStep() {
-  const { form } = useStepForm<WizardData, 'personal'>();
+  const { form } = useStepForm<RegistrationWizard, 'personal'>({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      dateOfBirth: ''
+    }
+  });
 
-  const validatePersonalInfo = async (values: WizardData['personal']) => {
-    return values?.firstName && values?.lastName;
+  // Custom step validation
+  const validatePersonalInfo = async (values: RegistrationWizard['personal']) => {
+    if (!values?.firstName || !values?.lastName) {
+      return false;
+    }
+    
+    // Additional async validation if needed
+    if (values.dateOfBirth) {
+      const age = calculateAge(values.dateOfBirth);
+      return age >= 18; // Must be 18 or older
+    }
+    
+    return true;
   };
 
   return (
@@ -194,160 +540,429 @@ function PersonalInfoStep() {
       title="Personal Information"
       onNext={validatePersonalInfo}
     >
-      <Field
-        name="firstName"
-        render={({ value, onChange }) => (
-          <input
-            placeholder="First Name"
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
+      <Form form={form}>
+        <Field<RegistrationWizard['personal'], 'firstName'>
+          name="firstName"
+          render={({ value, onChange, onBlur, onFocus }) => (
+            <input
+              type="text"
+              placeholder="First Name"
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              onBlur={onBlur}
+              onFocus={onFocus}
+            />
+          )}
+        >
+          <Rule validationFn={(name) => !!name} message="First name is required" />
+        </Field>
+
+        <Field<RegistrationWizard['personal'], 'lastName'>
+          name="lastName"
+          render={({ value, onChange, onBlur, onFocus }) => (
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              onBlur={onBlur}
+              onFocus={onFocus}
+            />
+          )}
+        >
+          <Rule validationFn={(name) => !!name} message="Last name is required" />
+        </Field>
+
+        <Field<RegistrationWizard['personal'], 'dateOfBirth'>
+          name="dateOfBirth"
+          render={({ value, onChange, onBlur, onFocus }) => (
+            <input
+              type="date"
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              onBlur={onBlur}
+              onFocus={onFocus}
+            />
+          )}
+        >
+          <Rule
+            validationFn={(date) => {
+              if (!date) return true; // Optional field
+              const age = calculateAge(date);
+              return age >= 18;
+            }}
+            message="You must be at least 18 years old"
           />
-        )}
-      >
-        <Rule validationFn={isRequired} message="First name is required" />
-      </Field>
-      
-      <Field
-        name="lastName"
-        render={({ value, onChange }) => (
-          <input
-            placeholder="Last Name"
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
-          />
-        )}
-      >
-        <Rule validationFn={isRequired} message="Last name is required" />
-      </Field>
+        </Field>
+      </Form>
     </Step>
   );
 }
 ```
 
-### Custom Step Navigation
-
-When using `noFooter={true}`, you can implement custom navigation:
-
+**Step with custom navigation:**
 ```tsx
-<Step name="custom" title="Custom Step" noFooter>
-  <div className="step-content">
-    {/* Your form fields */}
-  </div>
-  
-  <div className="custom-footer">
-    <button
-      onClick={wizard.goPrevious}
-      disabled={wizard.isFirstStep}
-      className="btn-secondary"
-    >
-      Back
-    </button>
+function CustomNavigationStep() {
+  const wizard = useWizardContext<WizardData>();
+  const { form } = useStepForm<WizardData, 'custom'>();
+
+  const handleCustomNext = async () => {
+    const values = form.getFormValues();
     
-    <button
-      onClick={wizard.goNext}
-      disabled={!wizard.isStepReady}
-      className="btn-primary"
-    >
-      {wizard.isLastStep ? 'Complete' : 'Continue'}
-    </button>
-  </div>
-</Step>
+    // Custom validation logic
+    if (values.specialField === 'skip') {
+      // Skip directly to final step
+      wizard.goToStep('final');
+    } else {
+      // Normal progression
+      await wizard.goNext();
+    }
+  };
+
+  return (
+    <Step name="custom" title="Custom Step" noFooter>
+      <Form form={form}>
+        <div className="step-content">
+          <Field name="specialField" render={/* ... */} />
+          {/* More fields */}
+        </div>
+      </Form>
+      
+      {/* Custom footer navigation */}
+      <div className="custom-navigation">
+        <button
+          onClick={wizard.goPrevious}
+          disabled={wizard.isFirstStep}
+          className="btn btn-secondary"
+        >
+          ← Back
+        </button>
+        
+        <div className="step-info">
+          Step {wizard.currentStepIndex + 1} of {wizard.steps.length}
+        </div>
+        
+        <button
+          onClick={handleCustomNext}
+          disabled={!wizard.isStepReady}
+          className="btn btn-primary"
+        >
+          {wizard.isLastStep ? '✓ Complete' : 'Continue →'}
+        </button>
+      </div>
+    </Step>
+  );
+}
 ```
+
+---
 
 ## Context Providers
 
-### WizardContext
+### `WizardContext`
 
-Provides wizard context to child components. Usually used with `WizardContext.Provider`.
+Provides wizard context to child components via React Context.
 
 ```tsx
 import { WizardContext } from 'graneet-form';
 
-function MyWizard() {
-  const wizard = useWizard<WizardData>(onFinish, onQuit);
+function WizardContainer() {
+  const wizard = useWizard<WizardData>(
+    (wizardValues) => {
+      // Handle wizard completion
+      console.log('Wizard completed with values:', wizardValues);
+    },
+    () => {
+      // Handle wizard cancellation
+      console.log('Wizard was cancelled');
+    }
+  );
 
   return (
-    <WizardContext.Provider value={wizard}>
+    <div className="wizard-container">
+      <WizardContext.Provider value={wizard}>
+        <WizardHeader />
+        <WizardSteps />
+        <WizardFooter />
+      </WizardContext.Provider>
+    </div>
+  );
+}
+
+function WizardSteps() {
+  return (
+    <div className="wizard-steps">
       <PersonalInfoStep />
       <ContactInfoStep />
+      <PreferencesStep />
       <SummaryStep />
-    </WizardContext.Provider>
+    </div>
   );
 }
 ```
 
-## Component Patterns
+---
 
-### Reusable Field Components
+## Reusable Component Patterns
 
-Create reusable field components by wrapping the Field component:
+### Generic Field Wrapper
+
+Create type-safe reusable field components:
 
 ```tsx
-interface TextInputProps<T extends FieldValues, K extends keyof T> {
+interface TextFieldProps<T extends FieldValues, K extends keyof T> {
   name: K;
+  label: string;
+  type?: 'text' | 'email' | 'password' | 'tel' | 'url';
   placeholder?: string;
-  type?: string;
   required?: boolean;
+  autoComplete?: string;
 }
 
-function TextInput<T extends FieldValues, K extends keyof T>({
+function TextField<T extends FieldValues, K extends keyof T>({
   name,
-  placeholder,
+  label,
   type = 'text',
-  required = false
-}: TextInputProps<T, K>) {
+  placeholder,
+  required = false,
+  autoComplete
+}: TextFieldProps<T, K>) {
   return (
-    <Field
+    <Field<T, K>
       name={name}
       render={({ value, onChange, onBlur, onFocus }, { validationStatus, isPristine }) => (
-        <div className="form-field">
+        <div className="text-field">
+          <label htmlFor={String(name)} className="field-label">
+            {label}
+            {required && <span className="required-indicator">*</span>}
+          </label>
+          
           <input
+            id={String(name)}
             type={type}
             placeholder={placeholder}
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
+            autoComplete={autoComplete}
+            value={value as string || ''}
+            onChange={(e) => onChange(e.target.value as T[K])}
             onBlur={onBlur}
             onFocus={onFocus}
-            className={
-              !isPristine && validationStatus.status === 'INVALID' ? 'error' : ''
-            }
+            className={`
+              field-input
+              ${!isPristine && validationStatus.status === 'INVALID' ? 'error' : ''}
+              ${!isPristine && validationStatus.status === 'VALID' ? 'valid' : ''}
+            `}
           />
+          
+          {/* Validation feedback */}
           {!isPristine && validationStatus.status === 'INVALID' && (
-            <span className="error-message">{validationStatus.message}</span>
+            <div className="field-error">
+              <Icon name="error" />
+              {validationStatus.message}
+            </div>
+          )}
+          
+          {!isPristine && validationStatus.status === 'VALID' && (
+            <div className="field-success">
+              <Icon name="check" />
+              Looks good!
+            </div>
           )}
         </div>
       )}
     >
-      {required && <Rule validationFn={isRequired} message={`${String(name)} is required`} />}
+      {required && (
+        <Rule
+          validationFn={(value) => !!value && (value as string).trim().length > 0}
+          message={`${label} is required`}
+        />
+      )}
     </Field>
   );
 }
 
-// Usage
-<TextInput<FormValues, 'email'> name="email" type="email" required />
+// Usage with full type safety
+<TextField<UserForm, 'email'>
+  name="email"
+  label="Email Address"
+  type="email"
+  placeholder="Enter your email"
+  autoComplete="email"
+  required
+/>
 ```
 
-### Conditional Fields
+### Conditional Field Rendering
 
 Show/hide fields based on other field values:
 
 ```tsx
-function ConditionalFields() {
-  const form = useFormContext<FormValues>();
+function ConditionalFieldsExample() {
+  const form = useFormContext<{
+    accountType: 'personal' | 'business';
+    companyName?: string;
+    personalId?: string;
+    businessId?: string;
+  }>();
+  
   const { accountType } = useOnChangeValues(form, ['accountType']);
 
   return (
-    <>
-      <Field name="accountType" render={...} />
-      
-      {accountType === 'business' && (
-        <Field name="companyName" render={...} />
-      )}
-      
+    <div className="conditional-fields">
+      <Field<FormData, 'accountType'>
+        name="accountType"
+        render={({ value, onChange, onBlur, onFocus }) => (
+          <div className="radio-group">
+            <label>
+              <input
+                type="radio"
+                value="personal"
+                checked={value === 'personal'}
+                onChange={() => onChange('personal')}
+                onBlur={onBlur}
+                onFocus={onFocus}
+              />
+              Personal Account
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="business"
+                checked={value === 'business'}
+                onChange={() => onChange('business')}
+                onBlur={onBlur}
+                onFocus={onFocus}
+              />
+              Business Account
+            </label>
+          </div>
+        )}
+      >
+        <Rule validationFn={(type) => !!type} message="Please select an account type" />
+      </Field>
+
+      {/* Conditionally render fields based on account type */}
       {accountType === 'personal' && (
-        <Field name="dateOfBirth" render={...} />
+        <Field<FormData, 'personalId'>
+          name="personalId"
+          render={({ value, onChange, onBlur, onFocus }) => (
+            <input
+              type="text"
+              placeholder="Personal ID"
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              onBlur={onBlur}
+              onFocus={onFocus}
+            />
+          )}
+        >
+          <Rule validationFn={(id) => !!id} message="Personal ID is required" />
+        </Field>
       )}
-    </>
+
+      {accountType === 'business' && (
+        <>
+          <Field<FormData, 'companyName'>
+            name="companyName"
+            render={({ value, onChange, onBlur, onFocus }) => (
+              <input
+                type="text"
+                placeholder="Company Name"
+                value={value || ''}
+                onChange={(e) => onChange(e.target.value)}
+                onBlur={onBlur}
+                onFocus={onFocus}
+              />
+            )}
+          >
+            <Rule validationFn={(name) => !!name} message="Company name is required" />
+          </Field>
+          
+          <Field<FormData, 'businessId'>
+            name="businessId"
+            render={({ value, onChange, onBlur, onFocus }) => (
+              <input
+                type="text"
+                placeholder="Business ID"
+                value={value || ''}
+                onChange={(e) => onChange(e.target.value)}
+                onBlur={onBlur}
+                onFocus={onFocus}
+              />
+            )}
+          >
+            <Rule validationFn={(id) => !!id} message="Business ID is required" />
+          </Field>
+        </>
+      )}
+    </div>
+  );
+}
+```
+
+### Field Array Pattern
+
+Handle dynamic arrays of fields:
+
+```tsx
+function TagsField() {
+  return (
+    <Field<FormData, 'tags'>
+      name="tags"
+      defaultValue={[]}
+      render={({ value, onChange }) => {
+        const tags = value || [];
+        
+        const addTag = (tag: string) => {
+          if (tag && !tags.includes(tag)) {
+            onChange([...tags, tag]);
+          }
+        };
+        
+        const removeTag = (index: number) => {
+          onChange(tags.filter((_, i) => i !== index));
+        };
+        
+        return (
+          <div className="tags-field">
+            <label>Tags</label>
+            
+            {/* Display existing tags */}
+            <div className="tags-list">
+              {tags.map((tag, index) => (
+                <span key={index} className="tag">
+                  {tag}
+                  <button 
+                    type="button"
+                    onClick={() => removeTag(index)}
+                    className="tag-remove"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+            
+            {/* Add new tag input */}
+            <input
+              type="text"
+              placeholder="Add a tag..."
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addTag(e.currentTarget.value);
+                  e.currentTarget.value = '';
+                }
+              }}
+            />
+          </div>
+        );
+      }}
+    >
+      <Rule
+        validationFn={(tags) => tags && tags.length > 0}
+        message="At least one tag is required"
+      />
+    </Field>
   );
 }
 ```
