@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, use } from 'react';
 import type { Validator } from '../types/validation';
 
 export interface RuleContextApi {
@@ -6,10 +6,13 @@ export interface RuleContextApi {
   unregisterRule(testFn: Validator, isDebounced: boolean): void;
 }
 
-export const CONTEXT_RULE_DEFAULT: RuleContextApi = {
-  registerRule: () => {},
-  unregisterRule: () => {},
-};
+export const RuleContext = createContext<RuleContextApi | null>(null);
+export const useRuleContext = (): RuleContextApi => {
+  const context = use(RuleContext);
 
-export const RuleContext = createContext(CONTEXT_RULE_DEFAULT);
-export const useRuleContext = (): RuleContextApi => useContext(RuleContext);
+  if (!context) {
+    throw new Error('useRuleContext must be defined');
+  }
+
+  return context;
+};
