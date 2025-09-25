@@ -7,30 +7,90 @@ import { VALIDATION_OUTCOME, type ValidationStatus, type ValidationStatuses } fr
 import { mapValidationStatusesToOutcome } from '../../shared/util/validation.util';
 import { useWizardContext } from '../contexts/wizard-context';
 
+/**
+ * API returned by the useStepForm hook for managing form state within a wizard step.
+ * @template T - The field values type for this step
+ */
 interface UseStepFormApi<T extends FieldValues> {
+  /**
+   * Form context API that can be passed to Form components.
+   * Contains all form management functionality including validation, field registration, and submission handling.
+   */
   form: FormContextApi<T>;
 
   /**
-   * @deprecated use defaultValues props instead
-   * @param initialValues
+   * Initializes form values if no values have been previously set for this step.
+   *
+   * **⚠️ DEPRECATED:** Use the `defaultValues` prop in useStepForm options instead.
+   *
+   * @param initialValues - Initial values to set for the form fields
+   * @deprecated Use `defaultValues` prop instead for better performance and consistency
+   * @example
+   * ```ts
+   * // ❌ Deprecated approach
+   * const { initFormValues } = useStepForm();
+   * initFormValues({ name: 'John', email: '' });
+   *
+   * // ✅ Preferred approach
+   * const { form } = useStepForm({
+   *   defaultValues: { name: 'John', email: '' }
+   * });
+   * ```
    */
   initFormValues(initialValues: Partial<T>): void;
 }
 
 /**
- * Using Form in Wizard context. Data will be saved and get on step change.
- * @return UseStepFormApi
- * @example
- * ```
- * const {form, initFormValues} = useStepForm({
- *  defaultValues: {"foo": "foo", "bar": "bar"}
- * })
+ * Hook for integrating forms within wizard steps, providing automatic data persistence
+ * and validation status synchronization between steps.
  *
- * return(
- *  <Form form={form}>
- *    <TextField name="foo" />
- *  </Form>
- * )
+ * This hook automatically:
+ * - Preserves form data when navigating between steps
+ * - Syncs validation status with the wizard navigation
+ * - Restores previously entered values when returning to a step
+ * - Manages step readiness based on form validation
+ *
+ * @template WizardValues - Complete wizard values type (all steps combined)
+ * @template Step - The current step key
+ * @param props - Form configuration options, same as useForm
+ * @returns API for managing the step form including form context and initialization
+ *
+ * @example
+ * ```tsx
+ * // Define wizard step types
+ * type WizardData = {
+ *   userInfo: { name: string; email: string };
+ *   preferences: { theme: 'light' | 'dark'; notifications: boolean };
+ * };
+ *
+ * // In a step component
+ * function UserInfoStep() {
+ *   const { form } = useStepForm<WizardData, 'userInfo'>({
+ *     defaultValues: { name: '', email: '' }
+ *   });
+ *
+ *   return (
+ *     <Form form={form}>
+ *       ...
+ *     </Form>
+ *   );
+ * }
+ * ```
+ *
+ * @example
+ * ```tsx
+ * // With validation rules
+ * function PreferencesStep() {
+ *   const { form } = useStepForm<WizardData, 'preferences'>({
+ *     defaultValues: { theme: 'light', notifications: true }
+ *   });
+ *
+ *   return (
+ *     <Form form={form}>
+ *       ...
+ *     </Form>
+ *   );
+ * }
  * ```
  */
 export function useStepForm<
