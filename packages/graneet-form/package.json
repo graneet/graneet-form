@@ -35,6 +35,7 @@
     "release:minor": "standard-version --release-as minor",
     "release:patch": "standard-version --release-as patch",
     "release:major": "standard-version --release-as major",
+    "typecheck": "tsc --noEmit --project ./tsconfig.json",
     "test": "exit 0"
   },
   "devDependencies": {

@@ -103,9 +103,10 @@ export function useStepForm<
   } = useWizardContext<WizardValues[Step]>();
   const valuesHasBeenInitializedRef = useRef(false);
 
+  const defaultValues = getValuesOfCurrentStep() ?? props?.defaultValues;
   const form = useForm<WizardValues[Step]>({
     ...props,
-    defaultValues: getValuesOfCurrentStep() ?? props?.defaultValues,
+    ...(defaultValues && { defaultValues }),
   });
 
   const {

@@ -3,12 +3,12 @@ import type { FieldValues } from '../../shared/types/field-value';
 import type { Prettify } from '../../shared/types/prettify';
 import type { FormContextApi } from '../contexts/form-context';
 import type { FormValues } from '../types/form-values';
-import { WATCH_MODE } from '../types/watch-mode';
+import type { WatchMode } from '../types/watch-mode';
 
 /**
  * Internal hook to handle watch of all field values
  */
-function useGlobalValues<T extends FieldValues>(watchMode: WATCH_MODE, form: FormContextApi<T>): Partial<T> {
+function useGlobalValues<T extends FieldValues>(watchMode: WatchMode, form: FormContextApi<T>): Partial<T> {
   const {
     formInternal: { addGlobalValueSubscriber, removeGlobalValueSubscriber },
   } = form;
@@ -26,7 +26,7 @@ function useGlobalValues<T extends FieldValues>(watchMode: WATCH_MODE, form: For
  * Internal hook to handle watch for a list of fields
  */
 function useValues<T extends FieldValues, K extends keyof T>(
-  watchMode: WATCH_MODE,
+  watchMode: WatchMode,
   form: FormContextApi<T>,
   names: K[],
 ): FormValues<T, K> {
@@ -97,11 +97,11 @@ export function useOnChangeValues<T extends FieldValues, K extends keyof T>(
 ) {
   if (names === undefined) {
     // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
-    return useGlobalValues(WATCH_MODE.ON_CHANGE, form);
+    return useGlobalValues('onChange', form);
   }
 
   // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
-  return useValues(WATCH_MODE.ON_CHANGE, form, names);
+  return useValues('onChange', form, names);
 }
 
 /**
@@ -155,9 +155,9 @@ export function useOnBlurValues<T extends FieldValues, K extends keyof T>(
 ) {
   if (names === undefined) {
     // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
-    return useGlobalValues(WATCH_MODE.ON_BLUR, form);
+    return useGlobalValues('onBlur', form);
   }
 
   // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
-  return useValues(WATCH_MODE.ON_BLUR, form, names);
+  return useValues('onBlur', form, names);
 }

@@ -5,7 +5,7 @@ import type { PartialRecord } from '../../shared/types/partial-record';
 import type { ValidationStatus } from '../../shared/types/validation';
 import type { FormValidations } from '../types/form-validations';
 import type { FormValues } from '../types/form-values';
-import type { WATCH_MODE } from '../types/watch-mode';
+import type { WatchMode } from '../types/watch-mode';
 
 /**
  * Internal API for form implementation details.
@@ -52,7 +52,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param publish - React state setter callback to update with new values
    * @param type - Watch mode determining when updates are triggered
    */
-  addGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
+  addGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WatchMode): void;
 
   /**
    * Registers a subscriber to watch changes in specific form field values.
@@ -62,7 +62,7 @@ export interface FormInternal<T extends FieldValues> {
    */
   addValueSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
-    type: WATCH_MODE,
+    type: WatchMode,
     names: K[],
   ): void;
 
@@ -105,7 +105,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param publish - The same callback function that was used to register
    * @param type - The same watch mode that was used to register
    */
-  removeGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WATCH_MODE): void;
+  removeGlobalValueSubscriber(publish: Dispatch<SetStateAction<Partial<T>>>, type: WatchMode): void;
 
   /**
    * Removes a subscriber that was watching specific form field values.
@@ -115,7 +115,7 @@ export interface FormInternal<T extends FieldValues> {
    */
   removeValueSubscriber<K extends keyof T>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
-    type: WATCH_MODE,
+    type: WatchMode,
     names: K[],
   ): void;
 
