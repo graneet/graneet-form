@@ -376,21 +376,19 @@ function AutoSaveForm() {
 }
 ```
 
-#### Migration from Previous Hooks
+#### Mode Options
 
-:::info Migration Guide
-This hook replaces the previous `useOnChangeValues` and `useOnBlurValues` hooks:
+The `mode` option determines when values are updated:
 
 ```tsx
-// Before:
-const values = useOnChangeValues(form, ['field1', 'field2']);
-const blurValues = useOnBlurValues(form, ['field3', 'field4']);
+// Real-time updates (default)
+const values = useFieldsWatch(form, ['field1', 'field2']);
+// Equivalent to:
+const values = useFieldsWatch(form, ['field1', 'field2'], { mode: 'onChange' });
 
-// After:
-const values = useFieldsWatch(form, ['field1', 'field2']); // onChange by default
+// Update only on blur
 const blurValues = useFieldsWatch(form, ['field3', 'field4'], { mode: 'onBlur' });
 ```
-:::
 
 ---
 

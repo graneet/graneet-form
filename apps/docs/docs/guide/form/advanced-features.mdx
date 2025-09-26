@@ -253,7 +253,7 @@ interface PaymentForm {
 
 function PaymentFormWithConditionalValidation() {
   const form = useFormContext<PaymentForm>();
-  const { paymentMethod } = useOnChangeValues(form, ['paymentMethod']);
+  const { paymentMethod } = useFieldsWatch(form, ['paymentMethod']);
 
   return (
     <Form form={form}>
@@ -374,7 +374,7 @@ interface MultiStepForm {
 function MultiStepFormExample() {
   const [currentStep, setCurrentStep] = useState(1);
   const form = useForm<MultiStepForm>();
-  const { userType } = useOnChangeValues(form, ['userType']);
+  const { userType } = useFieldsWatch(form, ['userType']);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -513,7 +513,7 @@ function OrderFormWithCalculations() {
   
   // Watch relevant fields for calculations
   const { quantity, productPrice, discountCode, shippingMethod, taxRate } = 
-    useOnChangeValues(form, ['quantity', 'productPrice', 'discountCode', 'shippingMethod', 'taxRate']);
+    useFieldsWatch(form, ['quantity', 'productPrice', 'discountCode', 'shippingMethod', 'taxRate']);
 
   // Calculate totals in real-time
   const calculations = useMemo(() => {
@@ -759,10 +759,10 @@ function useOptimizedFormWatcher<T extends FieldValues>(
   nonCriticalFields: (keyof T)[]
 ) {
   // Critical fields update immediately
-  const criticalValues = useOnChangeValues(form, criticalFields);
+  const criticalValues = useFieldsWatch(form, criticalFields);
   
   // Non-critical fields update on blur only
-  const nonCriticalValues = useOnBlurValues(form, nonCriticalFields);
+  const nonCriticalValues = useFieldsWatch(form, nonCriticalFields, { mode: 'onBlur' });
   
   return useMemo(() => ({
     ...criticalValues,

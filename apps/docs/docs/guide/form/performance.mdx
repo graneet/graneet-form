@@ -10,10 +10,10 @@ Graneet-form uses a subscription system where components only re-render when the
 
 ```tsx
 // ✅ Only re-renders when 'name' or 'email' changes
-const { name, email } = useOnChangeValues(form, ['name', 'email']);
+const { name, email } = useFieldsWatch(form, ['name', 'email']);
 
 // ❌ Re-renders when ANY field changes
-const allValues = useOnChangeValues(form, undefined);
+const allValues = useFieldsWatch(form, undefined);
 ```
 
 ### Field Registration Overhead
@@ -35,7 +35,7 @@ Each field has a small registration cost, but the benefits outweigh the overhead
 // ❌ Inefficient - watches all fields
 function FormSummary() {
   const form = useFormContext<LargeFormData>();
-  const allValues = useOnChangeValues(form, undefined);
+  const allValues = useFieldsWatch(form, undefined);
   
   return <div>Name: {allValues.name}</div>;
 }
@@ -43,7 +43,7 @@ function FormSummary() {
 // ✅ Efficient - watches only needed fields
 function FormSummary() {
   const form = useFormContext<LargeFormData>();
-  const { name } = useOnChangeValues(form, ['name']);
+  const { name } = useFieldsWatch(form, ['name']);
   
   return <div>Name: {name}</div>;
 }
@@ -53,10 +53,10 @@ function FormSummary() {
 
 ```tsx
 // For real-time UI updates (search, live preview)
-const { searchQuery } = useOnChangeValues(form, ['searchQuery']);
+const { searchQuery } = useFieldsWatch(form, ['searchQuery']);
 
 // For less critical updates (summaries, auto-save)
-const { title, description } = useOnBlurValues(form, ['title', 'description']);
+const { title, description } = useFieldsWatch(form, ['title', 'description'], { mode: 'onBlur' });
 ```
 
 ### 2. Lazy Field Registration
@@ -71,7 +71,7 @@ interface ConditionalFormData {
 
 function ConditionalForm() {
   const form = useFormContext<ConditionalFormData>();
-  const { showAdvanced } = useOnChangeValues(form, ['showAdvanced']);
+  const { showAdvanced } = useFieldsWatch(form, ['showAdvanced']);
 
   return (
     <Form form={form}>
@@ -291,7 +291,7 @@ function FormDisplay() {
 // ✅ Use optimized watching hooks
 function FormDisplay() {
   const form = useFormContext();
-  const values = useOnChangeValues(form, undefined); // Optimized subscription
+  const values = useFieldsWatch(form, undefined); // Optimized subscription
   
   return <div>{JSON.stringify(values)}</div>;
 }
@@ -308,10 +308,10 @@ function useOptimizedFieldWatcher<T extends FieldValues>(
   normalFields: (keyof T)[]
 ) {
   // Critical fields update immediately (onChange)
-  const criticalValues = useOnChangeValues(form, criticalFields);
+  const criticalValues = useFieldsWatch(form, criticalFields);
   
   // Normal fields update on blur only
-  const normalValues = useOnBlurValues(form, normalFields);
+  const normalValues = useFieldsWatch(form, normalFields, { mode: 'onBlur' });
   
   return useMemo(() => ({
     ...criticalValues,
@@ -341,7 +341,7 @@ function useDebouncedFormValues<T extends FieldValues>(
   fields: (keyof T)[],
   delay: number = 300
 ) {
-  const values = useOnChangeValues(form, fields);
+  const values = useFieldsWatch(form, fields);
   const [debouncedValues, setDebouncedValues] = useState(values);
   
   useEffect(() => {

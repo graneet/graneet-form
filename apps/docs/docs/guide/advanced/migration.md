@@ -450,7 +450,7 @@ const emailRules = createValidationRules({
 **Problem**: Type errors with field names
 ```tsx
 // ❌ String literals instead of typed keys
-const values = useOnChangeValues(form, ['nonExistentField']);
+const values = useFieldsWatch(form, ['nonExistentField']);
 ```
 
 **Solution**: Proper typing
@@ -461,7 +461,7 @@ interface FormData {
   password: string;
 }
 
-const values = useOnChangeValues(form, ['email', 'password']); // Type-safe
+const values = useFieldsWatch(form, ['email', 'password']); // Type-safe
 ```
 
 ### 3. Performance Issues

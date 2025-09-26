@@ -419,7 +419,7 @@ function FormDisplay() {
 // ✅ Do this instead
 function FormDisplay() {
   const form = useFormContext();
-  const values = useOnChangeValues(form, undefined); // Optimized watching
+  const values = useFieldsWatch(form, undefined); // Optimized watching
   
   return <div>{JSON.stringify(values)}</div>;
 }

@@ -6,7 +6,7 @@ The library offers you the possibility to watch one, multiple or all values of a
 
 ## Example
 
-In this example, we are watching values of a simple form with the two hooks provider for this: `useOnChangeValues` and `useOnBlurValues`.
+In this example, we are watching values of a simple form with the `useFieldsWatch` hook.
 The watch is scoped on field name. A render will only be done when the value is updated
 
 <IFrame model="subscriber-form" />
@@ -17,12 +17,12 @@ You can also watch all values of a form by using the following code
 
 ```ts
 const form = useFormContext<FormValues>();
-const values = useOnBlurValues(form, undefined);
+const values = useFieldsWatch(form, undefined, { mode: 'onBlur' });
 
 // Or
 
 const form = useFormContext<FormValues>();
-const values = useOnChangeValues(form, undefined);
+const values = useFieldsWatch(form, undefined); // onChange by default
 ```
 
 :::warning
