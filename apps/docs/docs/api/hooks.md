@@ -248,21 +248,23 @@ function SubmitButton() {
 
 ## Value Watching Hooks
 
-### `useOnChangeValues`
+### `useFieldsWatch`
 
-Watch form values that update immediately on every change (real-time updates).
+Watch form field values with configurable update mode for optimal performance.
 
 ```tsx
 // Watch all fields
-function useOnChangeValues<T extends FieldValues = Record<string, unknown>>(
+function useFieldsWatch<T extends FieldValues = Record<string, unknown>>(
   form: FormContextApi<T>,
-  names: undefined
+  names: undefined,
+  options?: UseFormWatchOptions
 ): Partial<T>
 
 // Watch specific fields
-function useOnChangeValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
+function useFieldsWatch<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
   form: FormContextApi<T>,
-  names: K[]
+  names: K[],
+  options?: UseFormWatchOptions
 ): Prettify<FormValues<T, K>>
 ```
 
@@ -270,6 +272,8 @@ function useOnChangeValues<T extends FieldValues = Record<string, unknown>, K ex
 
 - **`form: FormContextApi<T>`** - The form context API
 - **`names: K[] | undefined`** - Array of field names to watch. If undefined, watches all fields
+- **`options?: UseFormWatchOptions`** - Configuration options:
+  - **`mode?: 'onChange' | 'onBlur'`** - When to update values (default: 'onChange')
 
 #### Returns
 
@@ -283,13 +287,13 @@ Watching all fields (`names: undefined`) causes components to re-render on every
 
 #### Examples
 
-**Watch specific fields (recommended):**
+**Watch specific fields with real-time updates (default):**
 ```tsx
 function LiveFormDisplay() {
   const form = useFormContext<{ name: string; email: string }>();
   
-  // Only re-renders when name or email changes
-  const { name, email } = useOnChangeValues(form, ['name', 'email']);
+  // Only re-renders when name or email changes - updates immediately
+  const { name, email } = useFieldsWatch(form, ['name', 'email']);
   
   return (
     <div>
@@ -300,11 +304,28 @@ function LiveFormDisplay() {
 }
 ```
 
+**Watch fields with onBlur updates:**
+```tsx
+function FormSummary() {
+  const form = useFormContext<UserForm>();
+  
+  // Updates only when fields lose focus - better for summaries
+  const { title, description } = useFieldsWatch(form, ['title', 'description'], { mode: 'onBlur' });
+  
+  return (
+    <div className="summary">
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
+}
+```
+
 **Watch all fields (use sparingly):**
 ```tsx
 function FormDebugger() {
   const form = useFormContext<FormData>();
-  const allValues = useOnChangeValues(form, undefined);
+  const allValues = useFieldsWatch(form, undefined);
   
   return (
     <pre>{JSON.stringify(allValues, null, 2)}</pre>
@@ -316,7 +337,7 @@ function FormDebugger() {
 ```tsx
 function SearchableForm() {
   const form = useFormContext<{ searchQuery: string }>();
-  const { searchQuery } = useOnChangeValues(form, ['searchQuery']);
+  const { searchQuery } = useFieldsWatch(form, ['searchQuery']); // onChange by default
   
   // Updates immediately as user types
   const searchResults = useMemo(() => 
@@ -332,60 +353,6 @@ function SearchableForm() {
 }
 ```
 
----
-
-### `useOnBlurValues`
-
-Watch form values that update only when fields lose focus.
-
-```tsx
-// Watch all fields
-function useOnBlurValues<T extends FieldValues = Record<string, unknown>>(
-  form: FormContextApi<T>,
-  names: undefined
-): Partial<T>
-
-// Watch specific fields
-function useOnBlurValues<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
-  form: FormContextApi<T>,
-  names: K[]
-): Prettify<FormValues<T, K>>
-```
-
-#### Parameters
-
-- **`form: FormContextApi<T>`** - The form context API
-- **`names: K[] | undefined`** - Array of field names to watch. If undefined, watches all fields
-
-#### Returns
-
-**`Partial<T>` | `FormValues<T, K>`** - Object with current field values (updated on blur)
-
-#### Use Cases
-
-Perfect for:
-- Form summaries and previews
-- Auto-save functionality
-- Validation displays
-- Less critical updates that don't need real-time feedback
-
-#### Examples
-
-**Form summary (updates on field blur):**
-```tsx
-function FormSummary() {
-  const form = useFormContext<UserForm>();
-  const { title, description } = useOnBlurValues(form, ['title', 'description']);
-  
-  return (
-    <div className="summary">
-      <h3>{title}</h3>
-      <p>{description}</p>
-    </div>
-  );
-}
-```
-
 **Auto-save on blur:**
 ```tsx
 function AutoSaveForm() {
@@ -393,7 +360,7 @@ function AutoSaveForm() {
   const [saveStatus, setSaveStatus] = useState('saved');
   
   // Only triggers save when user finishes editing fields
-  const { content, title } = useOnBlurValues(form, ['content', 'title']);
+  const { content, title } = useFieldsWatch(form, ['content', 'title'], { mode: 'onBlur' });
   
   useEffect(() => {
     setSaveStatus('saving');
@@ -408,6 +375,22 @@ function AutoSaveForm() {
   return <div>Status: {saveStatus}</div>;
 }
 ```
+
+#### Migration from Previous Hooks
+
+:::info Migration Guide
+This hook replaces the previous `useOnChangeValues` and `useOnBlurValues` hooks:
+
+```tsx
+// Before:
+const values = useOnChangeValues(form, ['field1', 'field2']);
+const blurValues = useOnBlurValues(form, ['field3', 'field4']);
+
+// After:
+const values = useFieldsWatch(form, ['field1', 'field2']); // onChange by default
+const blurValues = useFieldsWatch(form, ['field3', 'field4'], { mode: 'onBlur' });
+```
+:::
 
 ---
 
@@ -775,10 +758,10 @@ function OptimizedComponent() {
   const form = useFormContext<FormData>();
   
   // Critical fields that need immediate updates
-  const { searchQuery } = useOnChangeValues(form, ['searchQuery']);
+  const { searchQuery } = useFieldsWatch(form, ['searchQuery']); // onChange by default
   
   // Less critical fields that can update on blur
-  const { title, description } = useOnBlurValues(form, ['title', 'description']);
+  const { title, description } = useFieldsWatch(form, ['title', 'description'], { mode: 'onBlur' });
   
   return (
     <div>
@@ -791,7 +774,7 @@ function OptimizedComponent() {
 // ❌ Avoid watching all fields unless necessary
 function IneffientComponent() {
   const form = useFormContext<FormData>();
-  const allValues = useOnChangeValues(form, undefined); // Re-renders on every change
+  const allValues = useFieldsWatch(form, undefined); // Re-renders on every change
   
   return <div>{allValues.searchQuery}</div>; // Only needs searchQuery
 }
@@ -805,7 +788,7 @@ function useFormProgress<T extends FieldValues>(
   form: FormContextApi<T>, 
   requiredFields: (keyof T)[]
 ) {
-  const values = useOnBlurValues(form, requiredFields);
+  const values = useFieldsWatch(form, requiredFields, { mode: 'onBlur' });
   
   return useMemo(() => {
     const completedFields = requiredFields.filter(

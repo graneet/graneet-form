@@ -107,10 +107,10 @@
 2. **Field name type safety**:
    ```tsx
    // ❌ Wrong - hardcoded strings
-   const values = useOnChangeValues(form, ['nonexistentField']);
+   const values = useFieldsWatch(form, ['nonexistentField']);
 
    // ✅ Correct - only valid field names
-   const values = useOnChangeValues(form, ['email', 'age']);
+   const values = useFieldsWatch(form, ['email', 'age']);
    ```
 
 ### Wizard Navigation Issues
@@ -166,16 +166,16 @@
 1. **Use specific field watching**:
    ```tsx
    // ❌ Slow - watches all fields
-   const values = useOnChangeValues(form);
+   const values = useFieldsWatch(form);
 
    // ✅ Fast - watches only needed fields
-   const values = useOnChangeValues(form, ['email', 'name']);
+   const values = useFieldsWatch(form, ['email', 'name']);
    ```
 
 2. **Use onBlur for non-critical updates**:
    ```tsx
    // For display purposes, use onBlur
-   const values = useOnBlurValues(form, ['firstName', 'lastName']);
+   const values = useFieldsWatch(form, ['firstName', 'lastName'], { mode: 'onBlur' });
    ```
 
 3. **Debounce expensive operations**:
@@ -230,7 +230,7 @@ Add debug output to understand form behavior:
 ```tsx
 function DebugForm() {
   const form = useFormContext<MyForm>();
-  const values = useOnChangeValues(form);
+  const values = useFieldsWatch(form);
   const validations = useValidations(form);
 
   // Debug current state

@@ -5,7 +5,7 @@
 This example shows a form that dynamically adds/removes fields based on user input.
 
 ```tsx
-import { useForm, Form, Field, Rule, useFormContext, useOnChangeValues } from 'graneet-form';
+import { useForm, Form, Field, Rule, useFormContext, useFieldsWatch } from 'graneet-form';
 
 interface ProjectForm {
   projectName: string;
@@ -20,7 +20,7 @@ interface ProjectForm {
 
 function DynamicFields() {
   const form = useFormContext<ProjectForm>();
-  const { projectType } = useOnChangeValues(form, ['projectType']);
+  const { projectType } = useFieldsWatch(form, ['projectType']);
 
   const renderFrameworkField = () => {
     switch (projectType) {
@@ -500,7 +500,7 @@ function ProjectFormWithTeam() {
     }
   });
 
-  const { teamMembers } = useOnChangeValues(form, ['teamMembers']);
+  const { teamMembers } = useFieldsWatch(form, ['teamMembers']);
 
   const addTeamMember = () => {
     const currentValues = form.getFormValues();
@@ -556,12 +556,12 @@ function ProjectFormWithTeam() {
 Create custom hooks to encapsulate complex form logic.
 
 ```tsx
-import { useFormContext, useOnChangeValues, useValidations } from 'graneet-form';
+import { useFormContext, useFieldsWatch, useValidations } from 'graneet-form';
 
 // Custom hook for managing dependent fields
 function useAddressDependencies() {
   const form = useFormContext<AddressForm>();
-  const { country, state } = useOnChangeValues(form, ['country', 'state']);
+  const { country, state } = useFieldsWatch(form, ['country', 'state']);
   
   const getStatesForCountry = (country: string) => {
     const statesByCountry: Record<string, string[]> = {
@@ -616,7 +616,7 @@ function useAddressDependencies() {
 // Custom hook for form progress tracking
 function useFormProgress<T extends FieldValues>(form: FormContextApi<T>) {
   const validations = useValidations(form);
-  const values = useOnChangeValues(form);
+  const values = useFieldsWatch(form);
 
   const totalFields = Object.keys(validations).length;
   const completedFields = Object.values(validations).filter(

@@ -96,7 +96,7 @@ function MyForm() {
 | **Field Registration** | `register()` or `Controller` | `Field` component with render prop |
 | **Validation** | `rules` prop or schema | `Rule` components as children |
 | **Error Handling** | `formState.errors` | `validationStatus` in render prop |
-| **Value Watching** | `watch()` | `useOnChangeValues()`, `useOnBlurValues()` |
+| **Value Watching** | `watch()` | `useFieldsWatch()` with `mode` option |
 | **Form State** | `formState` | `useFormStatus()` |
 | **Field Arrays** | `useFieldArray()` | Manual array management with form values |
 
@@ -159,11 +159,11 @@ useEffect(() => {
 
 **graneet-form:**
 ```tsx
-const { email } = useOnChangeValues(form, ['email']);
-const allValues = useOnChangeValues(form);
+const { email } = useFieldsWatch(form, ['email']); // onChange by default
+const allValues = useFieldsWatch(form);
 
 // Automatic subscription management - no manual cleanup needed
-const { email } = useOnBlurValues(form, ['email']); // For less frequent updates
+const { email } = useFieldsWatch(form, ['email'], { mode: 'onBlur' }); // For less frequent updates
 ```
 
 ## Migrating from Formik
@@ -469,13 +469,13 @@ const values = useOnChangeValues(form, ['email', 'password']); // Type-safe
 **Problem**: Watching all fields unnecessarily
 ```tsx
 // ❌ Causes unnecessary re-renders
-const allValues = useOnChangeValues(form);
+const allValues = useFieldsWatch(form);
 ```
 
 **Solution**: Watch specific fields
 ```tsx
 // ✅ Only watch needed fields
-const { email, name } = useOnChangeValues(form, ['email', 'name']);
+const { email, name } = useFieldsWatch(form, ['email', 'name']);
 ```
 
 ## Benefits After Migration
@@ -483,6 +483,6 @@ const { email, name } = useOnChangeValues(form, ['email', 'name']);
 1. **Better Performance**: Subscription-based updates reduce re-renders
 2. **Type Safety**: Strong TypeScript integration
 3. **Wizard Support**: Built-in multi-step form capabilities  
-4. **Simpler API**: Fewer concepts to learn
+4. **Simpler API**: Unified `useFieldsWatch` hook with mode options
 5. **Better Developer Experience**: Clear separation of concerns
 6. **Zero Dependencies**: No external validation libraries needed
