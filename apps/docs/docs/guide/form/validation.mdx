@@ -42,7 +42,7 @@ The `Rule` component is the foundation of validation in graneet-form:
         onBlur={fieldProps.onBlur}
         onFocus={fieldProps.onFocus}
       />
-      {!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' && (
+      {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
         <span className="error">{fieldState.validationStatus.message}</span>
       )}
     </div>
@@ -224,8 +224,8 @@ The `fieldState` object contains:
 interface FieldState {
   isPristine: boolean; // true if field hasn't been focused/modified
   validationStatus: {
-    status: 'VALID' | 'INVALID' | 'PENDING';
-    message?: string; // Error message if status is INVALID
+    status: 'valid' | 'invalid' | 'pending';
+    message?: string; // Error message if status is invalid
   };
 }
 ```
@@ -243,8 +243,8 @@ interface FieldState {
         <input
           className={`
             input 
-            ${!isPristine && validationStatus.status === 'INVALID' ? 'error' : ''} 
-            ${!isPristine && validationStatus.status === 'VALID' ? 'success' : ''}
+            ${!isPristine && validationStatus.status === 'invalid' ? 'error' : ''}
+            ${!isPristine && validationStatus.status === 'valid' ? 'success' : ''}
           `}
           {...fieldProps}
         />
@@ -255,12 +255,12 @@ interface FieldState {
         )}
         
         {/* Show error message */}
-        {!isPristine && validationStatus.status === 'INVALID' && (
+        {!isPristine && validationStatus.status === 'invalid' && (
           <span className="validation-error">❌ {validationStatus.message}</span>
         )}
         
         {/* Show success indicator */}
-        {!isPristine && validationStatus.status === 'VALID' && (
+        {!isPristine && validationStatus.status === 'valid' && (
           <span className="validation-success">✅ Valid</span>
         )}
       </div>
@@ -290,7 +290,7 @@ function ValidationSummary() {
   const allValidations = useValidations(form, undefined);
   
   const hasErrors = Object.values(allValidations).some(
-    validation => validation?.status === 'INVALID'
+    validation => validation?.status === 'invalid'
   );
   
   return (
@@ -302,7 +302,7 @@ function ValidationSummary() {
           <p>Please fix the following errors:</p>
           <ul>
             {Object.entries(allValidations).map(([field, validation]) => 
-              validation?.status === 'INVALID' && (
+              validation?.status === 'invalid' && (
                 <li key={field}>{field}: {validation.message}</li>
               )
             )}
@@ -353,10 +353,9 @@ function SubmitButton() {
 ```
 
 Form status values:
-- `VALID` - All fields are valid
-- `INVALID` - At least one field is invalid
-- `UNDETERMINED` - Some fields haven't been validated yet
-- `PENDING` - Async validation in progress
+- `valid` - All fields are valid
+- `invalid` - At least one field is invalid
+- `undetermined` - Some fields haven't been validated yet
 
 ## Reusable Validation Rules
 

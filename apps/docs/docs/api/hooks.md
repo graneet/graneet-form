@@ -445,8 +445,8 @@ function useValidations<T extends FieldValues, K extends keyof T>(
 Each field's validation status contains:
 ```tsx
 interface ValidationStatus {
-  status: 'VALID' | 'INVALID' | 'PENDING';
-  message?: string; // Error message if status is INVALID
+  status: 'valid' | 'invalid' | 'pending';
+  message?: string; // Error message if status is invalid
 }
 ```
 
@@ -461,7 +461,7 @@ function ValidationSummary() {
   const { email, password } = useValidations(form, ['email', 'password']);
   
   const hasErrors = [email, password].some(
-    validation => validation?.status === 'INVALID'
+    validation => validation?.status === 'invalid'
   );
   
   return (
@@ -490,7 +490,7 @@ function GlobalValidationStatus() {
   const allValidations = useValidations(form, undefined);
   
   const errorFields = Object.entries(allValidations)
-    .filter(([_, validation]) => validation?.status === 'INVALID')
+    .filter(([_, validation]) => validation?.status === 'invalid')
     .map(([fieldName, validation]) => ({
       field: fieldName,
       message: validation?.message
@@ -738,19 +738,19 @@ function useStepStatus(): VALIDATION_OUTCOME
 function StepStatusIndicator() {
   const stepStatus = useStepStatus();
   
-  const getStatusIcon = (status: VALIDATION_OUTCOME) => {
+  const getStatusIcon = (status) => {
     switch (status) {
-      case 'VALID': return '✅';
-      case 'INVALID': return '❌';
-      case 'UNDETERMINED': return '⏳';
+      case 'valid': return '✅';
+      case 'invalid': return '❌';
+      case 'undetermined': return '⏳';
     }
   };
   
-  const getStatusMessage = (status: VALIDATION_OUTCOME) => {
+  const getStatusMessage = (status) => {
     switch (status) {
-      case 'VALID': return 'Step completed successfully';
-      case 'INVALID': return 'Please fix the errors in this step';
-      case 'UNDETERMINED': return 'Complete this step to continue';
+      case 'valid': return 'Step completed successfully';
+      case 'invalid': return 'Please fix the errors in this step';
+      case 'undetermined': return 'Complete this step to continue';
     }
   };
 

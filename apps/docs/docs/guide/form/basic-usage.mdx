@@ -4,12 +4,6 @@ import { IFrame } from "../../../src/components/IFrame";
 
 Get started with `graneet-form` by learning the fundamental concepts and creating your first form.
 
-## Installation
-
-```bash
-npm install graneet-form
-```
-
 ## Quick Start
 
 Here's a simple example to get you started:
@@ -36,67 +30,65 @@ function ContactFormExample() {
   });
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Form form={form}>
-        <div>
-          <label>Name:</label>
-          <Field<ContactForm, 'name'>
-            name="name"
-            render={(fieldProps, fieldState) => (
-              <div>
-                <input
-                  type="text"
-                  value={fieldProps.value || ''}
-                  onChange={(e) => fieldProps.onChange(e.target.value)}
-                  onBlur={fieldProps.onBlur}
-                  onFocus={fieldProps.onFocus}
-                />
-                {!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' && (
-                  <span style={{ color: 'red' }}>
-                    {fieldState.validationStatus.message}
-                  </span>
-                )}
-              </div>
-            )}
-          >
-            <Rule
-              validationFn={(value) => !!value && value.length > 0}
-              message="Name is required"
+  <Form form={form} onSubmit={handleSubmit}>
+    <div>
+      <label>Name:</label>
+      <Field<ContactForm, 'name'>
+        name="name"
+        render={(fieldProps, fieldState) => (
+          <div>
+            <input
+              type="text"
+              value={fieldProps.value || ''}
+              onChange={(e) => fieldProps.onChange(e.target.value)}
+              onBlur={fieldProps.onBlur}
+              onFocus={fieldProps.onFocus}
             />
-          </Field>
-        </div>
-
-        <div>
-          <label>Email:</label>
-          <Field<ContactForm, 'email'>
-            name="email"
-            render={(fieldProps, fieldState) => (
-              <div>
-                <input
-                  type="email"
-                  value={fieldProps.value || ''}
-                  onChange={(e) => fieldProps.onChange(e.target.value)}
-                  onBlur={fieldProps.onBlur}
-                  onFocus={fieldProps.onFocus}
-                />
-                {!fieldState.isPristine && fieldState.validationStatus.status === 'INVALID' && (
-                  <span style={{ color: 'red' }}>
-                    {fieldState.validationStatus.message}
-                  </span>
-                )}
-              </div>
+            {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+              <span style={{ color: 'red' }}>
+                {fieldState.validationStatus.message}
+              </span>
             )}
-          >
-            <Rule
-              validationFn={(value) => !!value && value.includes('@')}
-              message="Please enter a valid email"
-            />
-          </Field>
-        </div>
+          </div>
+        )}
+      >
+        <Rule
+          validationFn={(value) => !!value && value.length > 0}
+          message="Name is required"
+        />
+      </Field>
+    </div>
 
-        <button type="submit">Submit</button>
-      </Form>
-    </form>
+    <div>
+      <label>Email:</label>
+      <Field<ContactForm, 'email'>
+        name="email"
+        render={(fieldProps, fieldState) => (
+          <div>
+            <input
+              type="email"
+              value={fieldProps.value || ''}
+              onChange={(e) => fieldProps.onChange(e.target.value)}
+              onBlur={fieldProps.onBlur}
+              onFocus={fieldProps.onFocus}
+            />
+            {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+              <span style={{ color: 'red' }}>
+                {fieldState.validationStatus.message}
+              </span>
+            )}
+          </div>
+        )}
+      >
+        <Rule
+          validationFn={(value) => !!value && value.includes('@')}
+          message="Please enter a valid email"
+        />
+      </Field>
+    </div>
+
+    <button type="submit">Submit</button>
+  </Form>
   );
 }
 ```
@@ -176,7 +168,7 @@ The render function also receives `fieldState` with:
 
 - `isPristine`: `true` if the field hasn't been focused/modified yet
 - `validationStatus`: Object containing validation status and message
-  - `status`: `'VALID'`, `'INVALID'`, or `'PENDING'`
+  - `status`: `'valid'`, `'invalide'`, or `'pending'`
   - `message`: Error message if validation failed
 
 ## Simple Form Patterns

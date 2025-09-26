@@ -620,7 +620,7 @@ function useFormProgress<T extends FieldValues>(form: FormContextApi<T>) {
 
   const totalFields = Object.keys(validations).length;
   const completedFields = Object.values(validations).filter(
-    v => v?.status === 'VALID'
+    v => v?.status === 'valid'
   ).length;
   const filledFields = Object.values(values).filter(v => v !== undefined && v !== '').length;
 

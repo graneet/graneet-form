@@ -74,7 +74,7 @@ function MyForm() {
               onChange={(e) => onChange(e.target.value)}
               onBlur={onBlur}
             />
-            {!isPristine && validationStatus.status === 'INVALID' && (
+            {!isPristine && validationStatus.status === 'invalid' && (
               <span>{validationStatus.message}</span>
             )}
           </div>
@@ -262,7 +262,7 @@ function MyForm() {
               onChange={(e) => onChange(e.target.value)}
               onBlur={onBlur}
             />
-            {!isPristine && validationStatus.status === 'INVALID' && (
+            {!isPristine && validationStatus.status === 'invalid' && (
               <div>{validationStatus.message}</div>
             )}
           </div>

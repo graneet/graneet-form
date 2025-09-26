@@ -193,19 +193,19 @@ interface FieldRenderState {
         onFocus={onFocus}
         className={`
           input 
-          ${!isPristine && validationStatus.status === 'INVALID' ? 'error' : ''} 
-          ${!isPristine && validationStatus.status === 'VALID' ? 'valid' : ''}
+          ${!isPristine && validationStatus.status === 'invalid' ? 'error' : ''} 
+          ${!isPristine && validationStatus.status === 'valid' ? 'valid' : ''}
         `}
         placeholder="Enter username"
       />
       
       {/* Validation feedback */}
-      {!isPristine && validationStatus.status === 'INVALID' && (
+      {!isPristine && validationStatus.status === 'invalid' && (
         <span className="error-message">
           ❌ {validationStatus.message}
         </span>
       )}
-      {!isPristine && validationStatus.status === 'VALID' && (
+      {!isPristine && validationStatus.status === 'valid' && (
         <span className="success-message">✅ Looks good!</span>
       )}
       {validationStatus.status === 'PENDING' && (
@@ -231,7 +231,7 @@ interface FieldRenderState {
         onChange={(e) => onChange(e.target.value)}
         onBlur={onBlur}
         onFocus={onFocus}
-        className={!isPristine && validationStatus.status === 'INVALID' ? 'error' : ''}
+        className={!isPristine && validationStatus.status === 'invalid' ? 'error' : ''}
       >
         <option value="">Select a country</option>
         <option value="us">United States</option>
@@ -267,7 +267,7 @@ interface FieldRenderState {
           I agree to the <a href="/terms">Terms and Conditions</a>
         </span>
       </label>
-      {!isPristine && validationStatus.status === 'INVALID' && (
+      {!isPristine && validationStatus.status === 'invalid' && (
         <span className="error-message">{validationStatus.message}</span>
       )}
     </div>
@@ -313,7 +313,7 @@ interface FieldRenderState {
         </div>
       )}
       
-      {!isPristine && validationStatus.status === 'INVALID' && (
+      {!isPristine && validationStatus.status === 'invalid' && (
         <span className="error-message">{validationStatus.message}</span>
       )}
     </div>
@@ -748,20 +748,20 @@ function TextField<T extends FieldValues, K extends keyof T>({
             onFocus={onFocus}
             className={`
               field-input
-              ${!isPristine && validationStatus.status === 'INVALID' ? 'error' : ''}
-              ${!isPristine && validationStatus.status === 'VALID' ? 'valid' : ''}
+              ${!isPristine && validationStatus.status === 'invalid' ? 'error' : ''}
+              ${!isPristine && validationStatus.status === 'valid' ? 'valid' : ''}
             `}
           />
           
           {/* Validation feedback */}
-          {!isPristine && validationStatus.status === 'INVALID' && (
+          {!isPristine && validationStatus.status === 'invalid' && (
             <div className="field-error">
               <Icon name="error" />
               {validationStatus.message}
             </div>
           )}
           
-          {!isPristine && validationStatus.status === 'VALID' && (
+          {!isPristine && validationStatus.status === 'valid' && (
             <div className="field-success">
               <Icon name="check" />
               Looks good!
