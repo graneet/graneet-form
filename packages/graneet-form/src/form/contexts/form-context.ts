@@ -35,7 +35,7 @@ export interface FormInternal<T extends FieldValues> {
    * @example
    * ```ts
    * const errors = getFormErrors();
-   * // Returns: { name: { status: 'VALID', message: undefined }, email: { status: 'INVALID', message: 'Required' } }
+   * // Returns: { name: { status: 'valid', message: undefined }, email: { status: 'invalid', message: 'Required' } }
    * ```
    */
   getFormErrors(): PartialRecord<keyof T, ValidationState>;

@@ -1,20 +1,81 @@
-import { IFrame } from "../../../src/components/IFrame";
-
 # Usage
 
-You can build forms strongly types with a simple syntax.
+:::info Documentation Moved
+This page has been restructured. Please visit our new comprehensive documentation:
 
-## Explanation
+- **[Basic Usage](./basic-usage)** - Get started with graneet-form fundamentals
+- **[Form API Reference](./form-api)** - Complete API documentation
+- **[Field Management](./field-management)** - Deep dive into field handling
+- **[Watching Values](./watching-values)** - Learn about value subscription system
+- **[Form Validation](./validation)** - Comprehensive validation guide
+- **[Advanced Features](./advanced-features)** - Complex patterns and techniques
 
-The library has a concept of registered field. When an input (having the library wrapper) is rendered with JSX. It is registered and will be
-able to see, update or watch its value.
+The documentation has been completely reorganized for better learning experience and easier navigation.
+:::
 
-## Example
+## Quick Start
 
-In this example, we are building a simple form with one input with a default value.
+```tsx
+import { useForm, Form, Field, Rule } from 'graneet-form';
 
-<IFrame model="simple-form" />
+interface ContactForm {
+  name: string;
+  email: string;
+}
 
-## Access to form in nested component of `Form`
+function MyForm() {
+  const form = useForm<ContactForm>();
 
-To avoid prop drilling of form from `useForm`, you can use `useFormContext` inside a component, child of `Form`
+  const handleSubmit = form.handleSubmit(async (data) => {
+    console.log('Form data:', data);
+  });
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <Form form={form}>
+        <Field<ContactForm, 'name'>
+          name="name"
+          render={(fieldProps) => (
+            <input
+              type="text"
+              placeholder="Name"
+              value={fieldProps.value || ''}
+              onChange={(e) => fieldProps.onChange(e.target.value)}
+              onBlur={fieldProps.onBlur}
+              onFocus={fieldProps.onFocus}
+            />
+          )}
+        >
+          <Rule
+            validationFn={(value) => !!value}
+            message="Name is required"
+          />
+        </Field>
+
+        <Field<ContactForm, 'email'>
+          name="email"
+          render={(fieldProps) => (
+            <input
+              type="email"
+              placeholder="Email"
+              value={fieldProps.value || ''}
+              onChange={(e) => fieldProps.onChange(e.target.value)}
+              onBlur={fieldProps.onBlur}
+              onFocus={fieldProps.onFocus}
+            />
+          )}
+        >
+          <Rule
+            validationFn={(value) => !!value && value.includes('@')}
+            message="Valid email is required"
+          />
+        </Field>
+
+        <button type="submit">Submit</button>
+      </Form>
+    </form>
+  );
+}
+```
+
+**[Continue to Basic Usage →](./basic-usage)**

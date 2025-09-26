@@ -1,41 +1,45 @@
 import { Tab, Tabs } from 'rspress/theme';
 
-# Why building another form library
+# Why We Built Another Form Library 🚀
 
-At Graneet, we are dealing with big form. We have pages having potentially 1000 inputs displayed at the same time. We used in the past very well known library like Formik or React hook form. But there no who could match our needs.
+At Graneet, we deal with large forms containing up to 1000 inputs displayed simultaneously. We've used popular libraries like Formik and React Hook Form in the past, but none could meet our specific requirements.
 
 ## Formik
-The problem we encountered with the library is performance issues. This is every good library, but the library is not built with performance in mind. We had too much page loading and updated due to rendering issue.
+While Formik is a solid library, we encountered significant performance issues 🐌. The library wasn't designed with large-scale performance in mind, leading to excessive page loads and updates due to frequent re-renders.
 
-## React hook form
-React hook form is known for being a very performent library and having a very good API. But we had two blocking issues:
-- error triggers many renders (because the library handles error in a big object without having a subscriber system)
-- in our app, we have multiple steps forms and integrating form in it was a very big challenge. At a time, we developed a solution on top of React hook form (see the POC of our CTO built several years ago https://github.com/orgs/react-hook-form/discussions/1979). But with time and additional complexities, we came with an unmaintainable overlay. The decision was made to build a library matching our needs.
+## React Hook Form
+React Hook Form is known for its excellent performance and API design. However, we faced two critical issues:
+- **Error handling triggers excessive renders**: The library manages errors in a large object without a granular subscription system, causing unnecessary re-renders
+- **Multi-step form complexity**: Integrating forms into our multi-step workflows proved challenging. We initially developed a solution on top of React Hook Form (see our CTO's POC from several years ago: https://github.com/orgs/react-hook-form/discussions/1979), but increasing complexity made our overlay unmaintainable
 
-# Specifications
-The library is built with performance is mind and keys features are:
-- having a subscribers system: you can watch a field or a form
-- error handling
-- build-in step form system (called Wizard)
+These challenges led us to build a library tailored to our specific needs.
 
-# Installation
+# Key Features 🎁
+
+Graneet Form is built with performance as a core principle. Our key features include:
+
+- **Granular subscription system**: Watch specific fields or entire forms without unnecessary re-renders
+- **Optimized error handling**: Efficient error management that doesn't trigger cascade re-renders
+- **Built-in wizard system**: Native support for multi-step forms with seamless navigation
+
+# Installation 📦
 
 To use graneet-form in your project, invoke the following command:
 
 <Tabs>
     <Tab label="pnpm">
         ```shell
-            pnpm install graneet-form
+pnpm install graneet-form
         ```
     </Tab>
     <Tab label="yarn">
         ```shell
-            yarn install graneet-form
+yarn add graneet-form
         ```
     </Tab>
     <Tab label="npm">
         ```shell
-            npm install graneet-form
+npm install graneet-form
         ```
     </Tab>
 </Tabs>

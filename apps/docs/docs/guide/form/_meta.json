@@ -1,22 +1,42 @@
 [
   {
     "type": "file",
-    "name": "usage",
-    "label": "Usage"
+    "name": "basic-usage",
+    "label": "Basic Usage"
   },
   {
     "type": "file",
-    "name": "subscribers",
-    "label": "Subscribers"
+    "name": "form-api",
+    "label": "Form API Reference"
+  },
+  {
+    "type": "file",
+    "name": "field-management",
+    "label": "Field Management"
+  },
+  {
+    "type": "file",
+    "name": "watching-values",
+    "label": "Watching Values"
   },
   {
     "type": "file",
     "name": "validation",
-    "label": "Validation"
+    "label": "Form Validation"
+  },
+  {
+    "type": "file",
+    "name": "advanced-features",
+    "label": "Advanced Features"
   },
   {
     "type": "file",
     "name": "complex-typescript",
-    "label": "Complex Typescript"
+    "label": "TypeScript Guide"
+  },
+  {
+    "type": "file",
+    "name": "performance",
+    "label": "Performance"
   }
 ]
