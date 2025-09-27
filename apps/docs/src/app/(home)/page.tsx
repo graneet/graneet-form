@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/Button';
 
 export default function HomePage() {
@@ -8,7 +8,13 @@ export default function HomePage() {
       <section className="flex flex-col items-center justify-center text-center py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <img src="/graneet-form-logo.png" alt="Graneet Form Logo" className="h-24 w-auto mx-auto mb-6" />
+            <Image
+              src="/graneet-form-logo.png"
+              width={200}
+              height={200}
+              alt="Graneet Form Logo"
+              className="mx-auto mb-6"
+            />
           </div>
 
           <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-800 to-teal-600 bg-clip-text text-transparent mb-6">
@@ -25,11 +31,11 @@ export default function HomePage() {
             <Button href="/docs" variant="primary" size="lg">
               🚀 Quick Start
             </Button>
-            <Button 
+            <Button
               href="https://github.com/graneet/graneet-form"
               target="_blank"
               rel="noopener noreferrer"
-              variant="secondary" 
+              variant="secondary"
               size="lg"
               icon={
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" role="img" aria-label="Github">
