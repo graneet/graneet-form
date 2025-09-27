@@ -270,8 +270,6 @@ type WatchMode = 'onChange' | 'onBlur';
 - **`'onChange'`** - Values update immediately on every field change
 - **`'onBlur'`** - Values update only when fields lose focus
 
-Used internally by `useOnChangeValues` and `useOnBlurValues` hooks.
-
 ---
 
 ## Component Props Types
@@ -602,7 +600,7 @@ const form = useForm<UserForm>({
 });
 
 // Type-safe field watching (only valid keys allowed)
-const { email, password } = useOnChangeValues(form, ['email', 'password']);
+const { email, password } = useFieldsWatch(form, ['email', 'password']);
 const validations = useValidations(form, ['email']); // validations.email is ValidationState | undefined
 
 // TypeScript ensures field names match form structure

@@ -187,7 +187,7 @@ Use form context to validate against other fields:
 ```tsx
 function PasswordConfirmField() {
   const form = useFormContext<{ password: string; confirmPassword: string }>();
-  const { password } = useOnChangeValues(form, ['password']);
+  const { password } = useFieldsWatch(form, ['password']);
 
   return (
     <Field<FormData, 'confirmPassword'>
@@ -498,7 +498,7 @@ Use debounced validation for expensive operations:
 ```tsx
 function ConditionalValidationField() {
   const form = useFormContext<FormData>();
-  const { accountType } = useOnChangeValues(form, ['accountType']);
+  const { accountType } = useFieldsWatch(form, ['accountType']);
 
   return (
     <Field name="taxId" render={/* ... */}>

@@ -12,10 +12,10 @@ The library uses a subscription system that minimizes re-renders:
 
 ```tsx
 // ✅ Only re-renders when 'email' changes
-const { email } = useOnChangeValues(form, ['email']);
+const { email } = useFieldsWatch(form, ['email']);
 
 // ❌ Re-renders on any field change
-const allValues = useOnChangeValues(form);
+const allValues = useFieldsWatch(form);
 ```
 
 ### 2. Field-Level Isolation
@@ -62,7 +62,7 @@ Always specify which fields you need to watch:
 // ✅ Good - Only watches specific fields
 function UserPreview() {
   const form = useFormContext<UserForm>();
-  const { firstName, lastName } = useOnChangeValues(form, ['firstName', 'lastName']);
+  const { firstName, lastName } = useFieldsWatch(form, ['firstName', 'lastName']);
   
   return <div>{firstName} {lastName}</div>;
 }
@@ -70,7 +70,7 @@ function UserPreview() {
 // ❌ Bad - Watches all fields
 function UserPreview() {
   const form = useFormContext<UserForm>();
-  const values = useOnChangeValues(form); // Re-renders on any change
+  const values = useFieldsWatch(form); // Re-renders on any change
   
   return <div>{values.firstName} {values.lastName}</div>;
 }
@@ -78,14 +78,14 @@ function UserPreview() {
 
 ### 2. Choose the Right Watch Mode
 
-Use `useOnBlurValues` for less critical updates:
+Use `useFieldsWatch`  with blur mode for less critical updates:
 
 ```tsx
-// For live previews - use onChange
-const { search } = useOnChangeValues(form, ['search']);
+// For live previews - use onChange (default)
+const { search } = useFieldsWatch(form, ['search']);
 
 // For validation summaries - use onBlur
-const { email, password } = useOnBlurValues(form, ['email', 'password']);
+const { email, password } = useFieldsWatch(form, ['email', 'password'], { mode: 'onBlur' });
 ```
 
 ### 3. Optimize Validation Functions

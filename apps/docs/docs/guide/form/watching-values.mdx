@@ -10,18 +10,18 @@ Graneet-form provides a powerful subscription system that allows components to w
 
 ## Watch Modes
 
-### `useOnChangeValues` - Real-time Updates
+### `useFieldsWatch` - Real-time Updates
 
 Updates immediately whenever a field value changes (on every keystroke).
 
 ```tsx
-import { useOnChangeValues, useFormContext } from 'graneet-form';
+import { useFieldsWatch, useFormContext } from 'graneet-form';
 
 function LiveFormDisplay() {
   const form = useFormContext<{ name: string; email: string }>();
   
   // Watch specific fields (recommended for performance)
-  const { name, email } = useOnChangeValues(form, ['name', 'email']);
+  const { name, email } = useFieldsWatch(form, ['name', 'email']);
   
   return (
     <div>
@@ -32,18 +32,18 @@ function LiveFormDisplay() {
 }
 ```
 
-### `useOnBlurValues` - Update on Blur
+### `useFieldsWatch` with onBlur Mode - Update on Blur
 
 Updates only when fields lose focus (after user finishes editing).
 
 ```tsx
-import { useOnBlurValues, useFormContext } from 'graneet-form';
+import { useFieldsWatch, useFormContext } from 'graneet-form';
 
 function FormSummary() {
   const form = useFormContext<FormData>();
   
   // Updates only when fields lose focus
-  const { title, description } = useOnBlurValues(form, ['title', 'description']);
+  const { title, description } = useFieldsWatch(form, ['title', 'description'], { mode: 'onBlur' });
   
   return (
     <div className="summary">
@@ -62,7 +62,7 @@ More performant as components only re-render when watched fields change.
 
 ```tsx
 // ✅ Efficient - only re-renders when name or email changes
-const { name, email } = useOnChangeValues(form, ['name', 'email']);
+const { name, email } = useFieldsWatch(form, ['name', 'email']);
 ```
 
 ### Watching All Fields
@@ -71,7 +71,7 @@ Less performant but sometimes necessary for global form state.
 
 ```tsx
 // ⚠️ Less efficient - re-renders on any field change
-const allValues = useOnChangeValues(form, undefined);
+const allValues = useFieldsWatch(form, undefined);
 ```
 
 ## Practical Examples
@@ -81,7 +81,7 @@ const allValues = useOnChangeValues(form, undefined);
 ```tsx
 function ValidationSummary() {
   const form = useFormContext<UserForm>();
-  const { name, email, password } = useOnBlurValues(form, ['name', 'email', 'password']);
+  const { name, email, password } = useFieldsWatch(form, ['name', 'email', 'password'], { mode: 'onBlur' });
   
   const completedFields = [name, email, password].filter(Boolean).length;
   const totalFields = 3;
@@ -111,7 +111,7 @@ function AutoSaveStatus() {
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
   
   // Watch for changes in real-time
-  const { title, content } = useOnChangeValues(form, ['title', 'content']);
+  const { title, content } = useFieldsWatch(form, ['title', 'content']);
   
   useEffect(() => {
     setSaveStatus('unsaved');
@@ -146,7 +146,7 @@ function AddressForm() {
   const form = useFormContext<AddressFormData>();
   
   // Watch zip code changes
-  const { zipCode } = useOnBlurValues(form, ['zipCode']);
+  const { zipCode } = useFieldsWatch(form, ['zipCode'], { mode: 'onBlur' });
   
   useEffect(() => {
     if (zipCode && zipCode.length === 5) {
@@ -177,7 +177,7 @@ function PaymentForm() {
   const form = useFormContext<PaymentFormData>();
   
   // Watch payment method selection
-  const { paymentMethod } = useOnChangeValues(form, ['paymentMethod']);
+  const { paymentMethod } = useFieldsWatch(form, ['paymentMethod']);
   
   return (
     <div>
@@ -213,21 +213,21 @@ function PaymentForm() {
 
 ```tsx
 // ❌ Watching all fields when only needing name
-const allValues = useOnChangeValues(form, undefined);
+const allValues = useFieldsWatch(form, undefined);
 const name = allValues.name;
 
 // ✅ Watch only the specific field needed
-const { name } = useOnChangeValues(form, ['name']);
+const { name } = useFieldsWatch(form, ['name']);
 ```
 
 ### 2. Choose Appropriate Watch Mode
 
 ```tsx
 // For real-time display (search, live preview, etc.)
-const { searchTerm } = useOnChangeValues(form, ['searchTerm']);
+const { searchTerm } = useFieldsWatch(form, ['searchTerm']);
 
 // For validation, summaries, auto-save (less frequent updates)
-const { title, content } = useOnBlurValues(form, ['title', 'content']);
+const { title, content } = useFieldsWatch(form, ['title', 'content'], { mode: 'onBlur' });
 ```
 
 ### 3. Debounce Expensive Operations
@@ -235,7 +235,7 @@ const { title, content } = useOnBlurValues(form, ['title', 'content']);
 ```tsx
 function ExpensiveFormWatcher() {
   const form = useFormContext<FormData>();
-  const { complexField } = useOnChangeValues(form, ['complexField']);
+  const { complexField } = useFieldsWatch(form, ['complexField']);
   
   // Debounce expensive calculations
   const debouncedValue = useDebounce(complexField, 500);
@@ -263,13 +263,13 @@ function ComprehensiveFormWatcher() {
   const form = useFormContext<ComplexForm>();
   
   // Real-time updates for immediate feedback
-  const { searchQuery } = useOnChangeValues(form, ['searchQuery']);
+  const { searchQuery } = useFieldsWatch(form, ['searchQuery']);
   
   // Blur updates for less critical information
-  const { title, description, tags } = useOnBlurValues(form, ['title', 'description', 'tags']);
+  const { title, description, tags } = useFieldsWatch(form, ['title', 'description', 'tags'], { mode: 'onBlur' });
   
   // Global form state for debugging (use sparingly)
-  const allValues = useOnChangeValues(form, undefined);
+  const allValues = useFieldsWatch(form, undefined);
   
   return (
     <div>
@@ -293,7 +293,7 @@ function ComprehensiveFormWatcher() {
 ```tsx
 // Custom hook for form progress tracking
 function useFormProgress<T>(form: FormContextApi<T>, requiredFields: (keyof T)[]) {
-  const watchedValues = useOnBlurValues(form, requiredFields);
+  const watchedValues = useFieldsWatch(form, requiredFields, { mode: 'onBlur' });
   
   return useMemo(() => {
     const completedFields = requiredFields.filter(
@@ -325,7 +325,7 @@ function FormProgressIndicator() {
 ## Global Watching Warnings
 
 :::warning Performance Impact
-Global watching (`useOnChangeValues(form, undefined)`) causes components to re-render on every form change. Use sparingly and only when necessary.
+Global watching (`useFieldsWatch(form, undefined)`) causes components to re-render on every form change. Use sparingly and only when necessary.
 :::
 
 :::tip Best Practice
@@ -344,8 +344,8 @@ const allValues = watch();
 
 // Graneet Form equivalent
 const form = useFormContext<FormType>();
-const { name } = useOnChangeValues(form, ['name']);
-const allValues = useOnChangeValues(form, undefined);
+const { name } = useFieldsWatch(form, ['name']);
+const allValues = useFieldsWatch(form, undefined);
 ```
 
 ### From Formik
@@ -357,7 +357,7 @@ const name = values.name;
 
 // Graneet Form equivalent
 const form = useFormContext<FormType>();
-const { name } = useOnChangeValues(form, ['name']);
+const { name } = useFieldsWatch(form, ['name']);
 ```
 
 ## Next Steps

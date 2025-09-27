@@ -456,7 +456,7 @@ const isUniqueUsername = async (username: string): Promise<boolean> => {
 ```tsx
 function PasswordConfirmationField() {
   const form = useFormContext<{ password: string; confirmPassword: string }>();
-  const { password } = useOnChangeValues(form, ['password']);
+  const { password } = useFieldsWatch(form, ['password']);
 
   return (
     <Field<FormData, 'confirmPassword'>
@@ -804,7 +804,7 @@ function ConditionalFieldsExample() {
     businessId?: string;
   }>();
   
-  const { accountType } = useOnChangeValues(form, ['accountType']);
+  const { accountType } = useFieldsWatch(form, ['accountType']);
 
   return (
     <div className="conditional-fields">
