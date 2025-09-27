@@ -1,0 +1,175 @@
+---
+title: Why Graneet Form?
+description: Compare Graneet Form with other popular form libraries
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# Why We Built Another Form Library 🚀
+
+At Graneet, we deal with large forms containing up to 1000 inputs displayed simultaneously. We've used popular libraries like Formik and React Hook Form in the past, but none could meet our specific requirements.
+
+## The Problem with Existing Solutions
+
+### Formik 🐌
+
+While Formik is a solid library, we encountered significant performance issues. The library wasn't designed with large-scale performance in mind, leading to:
+
+- **Excessive page loads** due to frequent re-renders
+- **Poor performance** with large forms (500+ fields)
+- **Memory leaks** in complex scenarios
+- **Slow updates** affecting user experience
+
+### React Hook Form ⚡
+
+React Hook Form is known for its excellent performance and API design. However, we faced two critical issues:
+
+- **Error handling triggers excessive renders**: The library manages errors in a large object without a granular subscription system, causing unnecessary re-renders when validation fails
+- **Multi-step form complexity**: Integrating forms into our multi-step workflows proved challenging. We initially developed a solution on top of React Hook Form, but increasing complexity made our overlay unmaintainable
+
+<Callout type="info">
+  Check out our CTO's POC from several years ago: [React Hook Form Multi-step Discussion](https://github.com/orgs/react-hook-form/discussions/1979)
+</Callout>
+
+These challenges led us to build a library tailored to our specific needs.
+
+## Our Solution: Graneet Form
+
+### Key Features 🎁
+
+Graneet Form is built with performance as a core principle. Our key features include:
+
+#### 🎯 Granular Subscription System
+Watch specific fields or entire forms without unnecessary re-renders. Only components that actually need to update will re-render.
+
+#### 🚀 Optimized Error Handling
+Efficient error management that doesn't trigger cascade re-renders. Errors are handled per-field basis with smart subscription.
+
+#### 🗒️ Built-in Wizard System
+Native support for multi-step forms with seamless navigation. No additional overlays or complex state management needed.
+
+#### 📦 Zero Dependencies
+Completely self-contained with no external dependencies, keeping your bundle size minimal.
+
+#### 🔧 TypeScript First
+Built from the ground up with TypeScript for excellent developer experience and type safety.
+
+## Performance Comparison
+
+| Feature | Graneet Form | React Hook Form | Formik |
+|---------|--------------|-----------------|--------|
+| **Large Forms (1000+ fields)** | ✅ Excellent | ⚠️ Good | ❌ Poor |
+| **Error Handling Performance** | ✅ Granular | ⚠️ Object-based | ❌ Re-renders all |
+| **Multi-step Forms** | ✅ Built-in | ⚠️ Complex setup | ⚠️ Manual |
+| **Bundle Size** | ✅ Small | ✅ Small | ❌ Large |
+| **Learning Curve** | ✅ Gentle | ⚠️ Moderate | ✅ Easy |
+| **TypeScript Support** | ✅ Excellent | ✅ Good | ⚠️ Basic |
+
+## Real-world Performance
+
+### Render Optimization
+
+```tsx
+// ❌ Other libraries: All fields re-render on any error
+form.setError('field1', 'Error'); // Re-renders 1000+ components
+
+// ✅ Graneet Form: Only affected field re-renders
+form.setFieldError('field1', 'Error'); // Re-renders 1 component
+```
+
+### Memory Usage
+
+```tsx
+// ❌ Other libraries: Large validation objects in memory
+const errors = {
+  field1: 'error1',
+  field2: 'error2',
+  // ... 1000 more fields
+}; // Causes memory pressure
+
+// ✅ Graneet Form: Distributed field-level storage
+// Each field manages its own validation state
+// Minimal memory footprint
+```
+
+### Multi-step Complexity
+
+```tsx
+// ❌ React Hook Form: Complex wizard setup
+const step1Form = useForm();
+const step2Form = useForm();
+// Manual state synchronization, validation coordination...
+
+// ✅ Graneet Form: Built-in wizard
+const wizard = useWizard({
+  steps: [Step1, Step2, Step3]
+}); // Automatic state management
+```
+
+## Migration Guide
+
+### From React Hook Form
+
+```tsx
+// Before (React Hook Form)
+const { register, handleSubmit, formState: { errors } } = useForm();
+
+<input {...register('email', { required: 'Email is required' })} />
+{errors.email && <span>{errors.email.message}</span>}
+
+// After (Graneet Form)
+const form = useForm();
+
+<Field name="email" render={(props, state) => (
+  <div>
+    <input {...props} />
+    {state.validationStatus.status === 'invalid' && (
+      <span>{state.validationStatus.message}</span>
+    )}
+  </div>
+)}>
+  <Rule validationFn={(value) => !!value} message="Email is required" />
+</Field>
+```
+
+### From Formik
+
+```tsx
+// Before (Formik)
+<Formik initialValues={{ email: '' }} onSubmit={handleSubmit}>
+  <Form>
+    <Field name="email" type="email" />
+    <ErrorMessage name="email" />
+  </Form>
+</Formik>
+
+// After (Graneet Form)
+<Form form={form} onSubmit={handleSubmit}>
+  <Field name="email" render={(props, state) => (
+    <div>
+      <input type="email" {...props} />
+      {state.validationStatus.status === 'invalid' && (
+        <span>{state.validationStatus.message}</span>
+      )}
+    </div>
+  )} />
+</Form>
+```
+
+## When to Choose Graneet Form
+
+### ✅ Perfect for:
+- Large forms with 100+ fields
+- Multi-step forms and wizards
+- Performance-critical applications
+- TypeScript projects
+- Applications requiring granular control
+
+### ⚠️ Consider alternatives if:
+- Simple forms with < 10 fields
+- Tight integration with existing React Hook Form ecosystem
+- Need for specific third-party integrations
+
+<Callout type="success">
+  **Ready to get started?** Check out our [Quick Start Guide](/docs/quick-start) to build your first form in minutes!
+</Callout>

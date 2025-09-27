@@ -1,0 +1,187 @@
+---
+title: Quick Start
+description: Get started with Graneet Form in minutes
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# Quick Start 🚀
+
+Get up and running with Graneet Form in just a few minutes. This guide will walk you through installation and creating your first form.
+
+## Installation 📦
+
+Install Graneet Form using your preferred package manager:
+
+<Tabs items={['pnpm', 'npm', 'yarn']}>
+  <Tab value="pnpm">
+    ```bash
+    pnpm install graneet-form
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npm install graneet-form
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn add graneet-form
+    ```
+  </Tab>
+</Tabs>
+
+## Your First Form
+
+Here's a simple contact form to get you started:
+
+```tsx
+import { useForm, Form, Field, Rule } from 'graneet-form';
+
+interface ContactForm {
+  name: string;
+  email: string;
+}
+
+function ContactFormExample() {
+  const form = useForm<ContactForm>({
+    defaultValues: {
+      name: '',
+      email: ''
+    }
+  });
+
+  const handleSubmit = form.handleSubmit(async (data) => {
+    console.log('Form submitted:', data);
+    // Process form data
+  });
+
+  return (
+    <Form form={form} onSubmit={handleSubmit}>
+      <div>
+        <label>Name:</label>
+        <Field<ContactForm, 'name'>
+          name="name"
+          render={(fieldProps, fieldState) => (
+            <div>
+              <input
+                type="text"
+                value={fieldProps.value || ''}
+                onChange={(e) => fieldProps.onChange(e.target.value)}
+                onBlur={fieldProps.onBlur}
+                onFocus={fieldProps.onFocus}
+              />
+              {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+                <span style={{ color: 'red' }}>
+                  {fieldState.validationStatus.message}
+                </span>
+              )}
+            </div>
+          )}
+        >
+          <Rule
+            validationFn={(value) => !!value && value.length > 0}
+            message="Name is required"
+          />
+        </Field>
+      </div>
+
+      <div>
+        <label>Email:</label>
+        <Field<ContactForm, 'email'>
+          name="email"
+          render={(fieldProps, fieldState) => (
+            <div>
+              <input
+                type="email"
+                value={fieldProps.value || ''}
+                onChange={(e) => fieldProps.onChange(e.target.value)}
+                onBlur={fieldProps.onBlur}
+                onFocus={fieldProps.onFocus}
+              />
+              {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+                <span style={{ color: 'red' }}>
+                  {fieldState.validationStatus.message}
+                </span>
+              )}
+            </div>
+          )}
+        >
+          <Rule
+            validationFn={(value) => !!value && value.includes('@')}
+            message="Please enter a valid email"
+          />
+        </Field>
+      </div>
+
+      <button type="submit">Submit</button>
+    </Form>
+  );
+}
+```
+
+## Common Patterns
+
+### Text Input
+
+```tsx
+<Field<FormType, 'username'>
+  name="username"
+  render={(fieldProps) => (
+    <input
+      type="text"
+      placeholder="Enter username"
+      value={fieldProps.value || ''}
+      onChange={(e) => fieldProps.onChange(e.target.value)}
+      onBlur={fieldProps.onBlur}
+      onFocus={fieldProps.onFocus}
+    />
+  )}
+/>
+```
+
+### Checkbox
+
+```tsx
+<Field<FormType, 'agree'>
+  name="agree"
+  render={(fieldProps) => (
+    <label>
+      <input
+        type="checkbox"
+        checked={fieldProps.value || false}
+        onChange={(e) => fieldProps.onChange(e.target.checked)}
+        onBlur={fieldProps.onBlur}
+        onFocus={fieldProps.onFocus}
+      />
+      I agree to the terms
+    </label>
+  )}
+/>
+```
+
+### Select Dropdown
+
+```tsx
+<Field<FormType, 'country'>
+  name="country"
+  render={(fieldProps) => (
+    <select
+      value={fieldProps.value || ''}
+      onChange={(e) => fieldProps.onChange(e.target.value)}
+      onBlur={fieldProps.onBlur}
+      onFocus={fieldProps.onFocus}
+    >
+      <option value="">Select a country</option>
+      <option value="us">United States</option>
+      <option value="ca">Canada</option>
+      <option value="uk">United Kingdom</option>
+    </select>
+  )}
+/>
+```
+
+<Callout type="info">
+  **Next Steps**: Now that you understand the basics, explore our comprehensive guides on validation, field management, and advanced features!
+</Callout>
