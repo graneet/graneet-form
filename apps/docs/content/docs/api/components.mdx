@@ -1,0 +1,161 @@
+---
+title: Form Components
+description: Form, Field, and Rule components reference
+---
+
+# Form Components
+
+Graneet Form provides a set of React components for building forms with validation and state management.
+
+## Field Component
+
+The Field component registers form fields and handles their state management with optimized re-rendering.
+
+### Props
+
+<AutoTypeTable path="../../../packages/graneet-form/src/form/components/field.tsx" name="FieldProps" />
+
+### Render Props
+
+The render function receives these props:
+
+<AutoTypeTable path="../../../packages/graneet-form/src/form/components/field.tsx" name="FieldRenderProps" />
+
+### Render State
+
+The render function also receives state information:
+
+<AutoTypeTable path="../../../packages/graneet-form/src/form/components/field.tsx" name="FieldRenderState" />
+
+### Example
+
+```tsx
+<Field 
+  name="email" 
+  render={(props, state) => (
+    <div>
+      <input 
+        type="email"
+        value={props.value || ''}
+        onChange={(e) => props.onChange(e.target.value)}
+        onBlur={props.onBlur}
+        onFocus={props.onFocus}
+      />
+      {state.validationStatus.status === 'invalid' && (
+        <span className="error">{state.validationStatus.message}</span>
+      )}
+    </div>
+  )}
+>
+  <Rule 
+    validationFn={(value) => !!value?.includes('@')} 
+    message="Please enter a valid email" 
+  />
+</Field>
+```
+
+## Form Component
+
+The Form component provides context to child components and handles form submission.
+
+### Usage
+
+```tsx
+import { Form } from 'graneet-form';
+
+<Form form={formInstance}>
+  {/* Your form fields */}
+</Form>
+```
+
+### Example with Submission
+
+```tsx
+function MyForm() {
+  const form = useForm<FormData>();
+  
+  const handleSubmit = form.handleSubmit((data) => {
+    console.log('Form data:', data);
+  });
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <Form form={form}>
+        <Field name="username" render={...} />
+        <Field name="password" render={...} />
+        <button type="submit">Submit</button>
+      </Form>
+    </form>
+  );
+}
+```
+
+## Rule Component
+
+The Rule component adds validation rules to fields. Multiple rules can be added to a single field.
+
+### Example
+
+```tsx
+<Field name="password" render={...}>
+  <Rule 
+    validationFn={(value) => (value?.length || 0) >= 8}
+    message="Password must be at least 8 characters"
+  />
+  <Rule 
+    validationFn={(value) => /[A-Z]/.test(value || '')}
+    message="Password must contain an uppercase letter"
+  />
+  <Rule 
+    validationFn={(value) => /[0-9]/.test(value || '')}
+    message="Password must contain a number"
+  />
+</Field>
+```
+
+### Conditional Validation
+
+```tsx
+<Field name="confirmPassword" render={...}>
+  <Rule 
+    validationFn={(value, formValues) => value === formValues.password}
+    message="Passwords must match"
+    when={(formValues) => !!formValues.password}
+  />
+</Field>
+```
+
+## useFormContext Hook
+
+Access the form context within form components:
+
+<AutoTypeTable path="../../../packages/graneet-form/src/form/contexts/form-context.ts" name="useFormContext" />
+
+### Example
+
+```tsx
+function CustomFormField() {
+  const { getFormValues, setFormValues } = useFormContext<{
+    name: string;
+    email: string;
+  }>();
+
+  const handleClearForm = () => {
+    setFormValues({ name: '', email: '' });
+  };
+
+  return (
+    <div>
+      <button onClick={handleClearForm}>Clear Form</button>
+      <pre>{JSON.stringify(getFormValues(), null, 2)}</pre>
+    </div>
+  );
+}
+```
+
+## Performance Optimization
+
+- **Field-level subscriptions**: Only components watching specific fields re-render
+- **Automatic cleanup**: Field unregistration happens automatically on unmount
+- **Debounced updates**: Global form watchers are debounced to prevent spam
+- **Minimal re-renders**: State changes only trigger necessary component updates

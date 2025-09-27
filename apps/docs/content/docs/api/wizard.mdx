@@ -1,0 +1,43 @@
+---
+title: Wizard System
+description: Multi-step form components and hooks
+---
+
+# Wizard System
+
+Graneet Form includes a built-in wizard system for creating multi-step forms with seamless navigation and state management.
+
+## Coming Soon
+
+The wizard system documentation is being prepared. This will include:
+
+- `useWizard` hook for managing multi-step forms
+- Wizard component for navigation
+- Step validation and progression
+- State management across steps
+- Integration with form validation
+
+For now, you can explore the wizard components in the source code:
+
+- `/packages/graneet-form/src/wizard/`
+
+## Basic Concept
+
+```tsx
+// Example of what the wizard API will look like
+const wizard = useWizard({
+  steps: [
+    { component: <PersonalInfoStep /> },
+    { component: <ContactInfoStep /> },
+    { component: <PreferencesStep /> }
+  ]
+});
+
+return (
+  <Wizard wizard={wizard}>
+    {/* Navigation and step content */}
+  </Wizard>
+);
+```
+
+Check back soon for complete wizard documentation!

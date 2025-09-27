@@ -1,0 +1,168 @@
+---
+title: Types & Interfaces
+description: TypeScript definitions and type reference
+---
+
+# Types & Interfaces
+
+Complete TypeScript reference for all Graneet Form types and interfaces.
+
+## Core Types
+
+### FormValues
+
+Type helper for form values with specific field keys:
+
+<AutoTypeTable path="../../../packages/graneet-form/src/form/types/form-values.ts" name="FormValues" />
+
+### FieldValues
+
+Base type for form field values:
+
+<AutoTypeTable path="../../../packages/graneet-form/src/shared/types/field-value.ts" name="FieldValues" />
+
+### FieldValue
+
+Individual field value type:
+
+<AutoTypeTable path="../../../packages/graneet-form/src/shared/types/field-value.ts" name="FieldValue" />
+
+## Validation Types
+
+### ValidationState
+
+Represents the validation status of a field:
+
+<AutoTypeTable path="../../../packages/graneet-form/src/shared/types/validation.ts" name="ValidationState" />
+
+### ValidationStatus
+
+Possible validation status values:
+
+<AutoTypeTable path="../../../packages/graneet-form/src/shared/types/validation.ts" name="ValidationStatus" />
+
+## Utility Types
+
+### AnyRecord
+
+Type for objects with any structure:
+
+<AutoTypeTable path="../../../packages/graneet-form/src/shared/types/any-record.ts" name="AnyRecord" />
+
+### PartialRecord
+
+Type for partial records with specific keys:
+
+<AutoTypeTable path="../../../packages/graneet-form/src/shared/types/partial-record.ts" name="PartialRecord" />
+
+## Usage Examples
+
+### Defining Form Types
+
+```tsx
+// Define your form data structure
+interface UserRegistrationForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  age: number;
+  preferences: {
+    newsletter: boolean;
+    marketing: boolean;
+  };
+}
+
+// Use with useForm
+const form = useForm<UserRegistrationForm>({
+  defaultValues: {
+    firstName: '',
+    lastName: '',
+    email: '',
+    age: 18,
+    preferences: {
+      newsletter: false,
+      marketing: false
+    }
+  }
+});
+```
+
+### Working with Validation
+
+```tsx
+// Custom validation function
+const validateEmail = (value: string): boolean => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+};
+
+// Use in Field component
+<Field<UserRegistrationForm, 'email'>
+  name="email"
+  render={(props, state) => (
+    <div>
+      <input {...props} type="email" />
+      {state.validationStatus.status === 'invalid' && (
+        <span>{state.validationStatus.message}</span>
+      )}
+    </div>
+  )}
+>
+  <Rule validationFn={validateEmail} message="Please enter a valid email" />
+</Field>
+```
+
+### Type-safe Field Access
+
+```tsx
+// Get values with proper typing
+const formValues = form.getFormValues();
+// formValues is typed as Partial<UserRegistrationForm>
+
+// Set values with type safety
+form.setFormValues({
+  firstName: 'John', // ✅ Valid
+  email: 'john@example.com', // ✅ Valid
+  // invalidField: 'value' // ❌ TypeScript error
+});
+```
+
+### Custom Hook with Types
+
+```tsx
+function useUserForm() {
+  const form = useForm<UserRegistrationForm>({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      age: 18,
+      preferences: {
+        newsletter: false,
+        marketing: false
+      }
+    }
+  });
+
+  const handleSubmit = form.handleSubmit(async (data) => {
+    // data is fully typed as UserRegistrationForm
+    await submitUserRegistration(data);
+  });
+
+  return { form, handleSubmit };
+}
+```
+
+## Generic Type Constraints
+
+Most Graneet Form types are generic and constrained to ensure type safety:
+
+```tsx
+// T extends FieldValues ensures form data is a valid object
+useForm<T extends FieldValues>()
+
+// K extends keyof T ensures field names are valid keys
+Field<T extends FieldValues, K extends keyof T>
+
+// Validation functions receive properly typed values
+Rule<T extends FieldValues, K extends keyof T>
+```

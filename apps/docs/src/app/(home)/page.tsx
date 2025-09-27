@@ -2,7 +2,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import Image from 'next/image';
-import { Button } from '@/components/Button';
+import { Button } from '@/components/button';
 
 const START_CODE = `import { useForm, Form, Field, Rule } from 'graneet-form';
 

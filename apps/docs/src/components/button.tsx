@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface ButtonProps {
   children: ReactNode;
@@ -24,14 +24,15 @@ export function Button({
   target,
   rel,
 }: ButtonProps) {
-  const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 ease-in-out relative overflow-hidden group';
-  
+  const baseClasses =
+    'inline-flex items-center justify-center font-medium transition-all duration-200 ease-in-out relative overflow-hidden group';
+
   const sizeClasses = {
     sm: 'px-4 py-2 text-sm',
     md: 'px-6 py-3 text-base',
     lg: 'px-8 py-4 text-lg',
   };
-  
+
   const variantClasses = {
     primary: `
       bg-gradient-to-r from-slate-800 to-teal-600 text-white rounded-lg
@@ -53,9 +54,9 @@ export function Button({
       before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100
     `,
   };
-  
+
   const classes = `${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`;
-  
+
   const content = (
     <>
       <span className="relative z-10 flex items-center gap-2">
@@ -67,7 +68,7 @@ export function Button({
       )}
     </>
   );
-  
+
   if (href) {
     if (href.startsWith('http')) {
       return (
@@ -76,16 +77,16 @@ export function Button({
         </a>
       );
     }
-    
+
     return (
       <Link href={href} className={classes}>
         {content}
       </Link>
     );
   }
-  
+
   return (
-    <button className={classes}>
+    <button className={classes} type="button">
       {content}
     </button>
   );
