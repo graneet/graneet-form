@@ -1,3 +1,5 @@
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Card, Cards } from 'fumadocs-ui/components/card';
 import Image from 'next/image';
 import { Button } from '@/components/Button';
 
@@ -58,69 +60,101 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Why Choose Graneet Form?</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center p-6 rounded-lg bg-fd-background border border-fd-border">
-              <div className="text-4xl mb-4">🚀</div>
-              <h3 className="text-lg font-semibold mb-3">Performant</h3>
-              <p className="text-fd-muted-foreground">
-                Built with performance in mind. You will not have unwanted renders.
-              </p>
-            </div>
-
-            <div className="text-center p-6 rounded-lg bg-fd-background border border-fd-border">
-              <div className="text-4xl mb-4">🌈</div>
-              <h3 className="text-lg font-semibold mb-3">Easy to use</h3>
-              <p className="text-fd-muted-foreground">API is built to be as simple as possible.</p>
-            </div>
-
-            <div className="text-center p-6 rounded-lg bg-fd-background border border-fd-border">
-              <div className="text-4xl mb-4">📦</div>
-              <h3 className="text-lg font-semibold mb-3">Small bundle size</h3>
-              <p className="text-fd-muted-foreground">Zero dependencies for optimal bundle size.</p>
-            </div>
-
-            <div className="text-center p-6 rounded-lg bg-fd-background border border-fd-border">
-              <div className="text-4xl mb-4">🗒️</div>
-              <h3 className="text-lg font-semibold mb-3">Built-in Wizard system</h3>
-              <p className="text-fd-muted-foreground">Simply build interfaces with steps where each step has a form.</p>
-            </div>
-          </div>
+          <Cards className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+            <Card
+              icon="🚀"
+              title="Performant"
+              description="Built with performance in mind. You will not have unwanted renders."
+            />
+            <Card icon="🌈" title="Easy to use" description="API is built to be as simple as possible." />
+            <Card icon="📦" title="Small bundle size" description="Zero dependencies for optimal bundle size." />
+            <Card
+              icon="🗒️"
+              title="Built-in Wizard system"
+              description="Simply build interfaces with steps where each step has a form."
+            />
+          </Cards>
         </div>
       </section>
 
       {/* Quick Example Section */}
       <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-8">Get Started in Seconds</h2>
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-8">Get Started in Seconds</h2>
 
-          <div className="bg-fd-muted/50 rounded-lg p-6 text-left overflow-x-auto">
-            <pre className="text-sm">
-              <code>{`import { useForm } from '@graneet/form';
+          <Callout type="info" className="mb-8">
+            Graneet Form provides a simple yet powerful API for building forms with TypeScript support and granular
+            subscriptions.
+          </Callout>
 
-const MyForm = () => {
-  const form = useForm({
-    defaultValues: {
-      name: '',
-      email: ''
-    }
+          <div className="mb-8">
+            <pre className="bg-fd-muted/50 rounded-lg p-6 text-left overflow-x-auto text-sm">
+              <code>{`import { useForm, Form, Field, Rule } from 'graneet-form';
+
+interface ContactForm {
+  name: string;
+  email: string;
+}
+
+const ContactFormExample = () => {
+  const form = useForm<ContactForm>({
+    defaultValues: { name: '', email: '' }
   });
 
   return (
-    <form onSubmit={form.handleSubmit(console.log)}>
-      <input {...form.register('name')} placeholder="Name" />
-      <input {...form.register('email')} placeholder="Email" />
+    <Form form={form} onSubmit={form.handleSubmit(console.log)}>
+      <Field name="name" render={(props, state) => (
+        <div>
+          <input {...props} placeholder="Name" />
+          {state.validationStatus.status === 'invalid' && (
+            <span className="error">{state.validationStatus.message}</span>
+          )}
+        </div>
+      )}>
+        <Rule validationFn={(value) => !!value} message="Name is required" />
+      </Field>
+      
+      <Field name="email" render={(props, state) => (
+        <div>
+          <input {...props} placeholder="Email" type="email" />
+          {state.validationStatus.status === 'invalid' && (
+            <span className="error">{state.validationStatus.message}</span>
+          )}
+        </div>
+      )}>
+        <Rule validationFn={(v) => v?.includes('@')} message="Valid email required" />
+      </Field>
+      
       <button type="submit">Submit</button>
-    </form>
+    </Form>
   );
 };`}</code>
             </pre>
           </div>
 
-          <div className="mt-8">
+          <div className="text-center">
             <Button href="/docs" variant="ghost" size="md">
               📚 See Full Documentation →
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <Callout type="success">
+            <h3 className="text-xl font-semibold mb-4">Ready to build high-performance forms?</h3>
+            <p className="mb-6">Join developers who have chosen Graneet Form for their most demanding applications.</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button href="/docs/quick-start" variant="primary" size="lg">
+                🚀 Get Started Now
+              </Button>
+              <Button href="/docs/comparison" variant="secondary" size="lg">
+                📊 See Comparison
+              </Button>
+            </div>
+          </Callout>
         </div>
       </section>
     </main>
