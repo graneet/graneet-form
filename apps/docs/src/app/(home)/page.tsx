@@ -1,7 +1,49 @@
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Card, Cards } from 'fumadocs-ui/components/card';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import Image from 'next/image';
 import { Button } from '@/components/Button';
+
+const START_CODE = `import { useForm, Form, Field, Rule } from 'graneet-form';
+
+interface ContactForm {
+  name: string;
+  email: string;
+}
+
+const ContactFormExample = () => {
+  const form = useForm<ContactForm>({
+    defaultValues: { name: '', email: '' }
+  });
+
+  return (
+    <Form form={form} onSubmit={form.handleSubmit(console.log)}>
+      <Field name="name" render={(props, state) => (
+        <div>
+          <input {...props} placeholder="Name" />
+          {state.validationStatus.status === 'invalid' && (
+            <span className="error">{state.validationStatus.message}</span>
+          )}
+        </div>
+      )}>
+        <Rule validationFn={(value) => !!value} message="Name is required" />
+      </Field>
+      
+      <Field name="email" render={(props, state) => (
+        <div>
+          <input {...props} placeholder="Email" type="email" />
+          {state.validationStatus.status === 'invalid' && (
+            <span className="error">{state.validationStatus.message}</span>
+          )}
+        </div>
+      )}>
+        <Rule validationFn={(v) => v?.includes('@')} message="Valid email required" />
+      </Field>
+      
+      <button type="submit">Submit</button>
+    </Form>
+  );
+};`;
 
 export default function HomePage() {
   return (
@@ -79,82 +121,21 @@ export default function HomePage() {
 
       {/* Quick Example Section */}
       <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8">Get Started in Seconds</h2>
+        <div className="max-w-4xl mx-auto flex flex-col gap-3">
+          <h2 className="text-3xl font-bold text-center">Get Started in Seconds</h2>
 
-          <Callout type="info" className="mb-8">
+          <Callout type="info">
             Graneet Form provides a simple yet powerful API for building forms with TypeScript support and granular
             subscriptions.
           </Callout>
 
-          <div className="mb-8">
-            <pre className="bg-fd-muted/50 rounded-lg p-6 text-left overflow-x-auto text-sm">
-              <code>{`import { useForm, Form, Field, Rule } from 'graneet-form';
-
-interface ContactForm {
-  name: string;
-  email: string;
-}
-
-const ContactFormExample = () => {
-  const form = useForm<ContactForm>({
-    defaultValues: { name: '', email: '' }
-  });
-
-  return (
-    <Form form={form} onSubmit={form.handleSubmit(console.log)}>
-      <Field name="name" render={(props, state) => (
-        <div>
-          <input {...props} placeholder="Name" />
-          {state.validationStatus.status === 'invalid' && (
-            <span className="error">{state.validationStatus.message}</span>
-          )}
-        </div>
-      )}>
-        <Rule validationFn={(value) => !!value} message="Name is required" />
-      </Field>
-      
-      <Field name="email" render={(props, state) => (
-        <div>
-          <input {...props} placeholder="Email" type="email" />
-          {state.validationStatus.status === 'invalid' && (
-            <span className="error">{state.validationStatus.message}</span>
-          )}
-        </div>
-      )}>
-        <Rule validationFn={(v) => v?.includes('@')} message="Valid email required" />
-      </Field>
-      
-      <button type="submit">Submit</button>
-    </Form>
-  );
-};`}</code>
-            </pre>
-          </div>
+          <DynamicCodeBlock lang="tsx" code={START_CODE} />
 
           <div className="text-center">
             <Button href="/docs" variant="ghost" size="md">
               📚 See Full Documentation →
             </Button>
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <Callout type="success">
-            <h3 className="text-xl font-semibold mb-4">Ready to build high-performance forms?</h3>
-            <p className="mb-6">Join developers who have chosen Graneet Form for their most demanding applications.</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button href="/docs/quick-start" variant="primary" size="lg">
-                🚀 Get Started Now
-              </Button>
-              <Button href="/docs/comparison" variant="secondary" size="lg">
-                📊 See Comparison
-              </Button>
-            </div>
-          </Callout>
         </div>
       </section>
     </main>
