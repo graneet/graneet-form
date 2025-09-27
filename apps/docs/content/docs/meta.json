@@ -1,0 +1,16 @@
+{
+  "root": true,
+  "pages": [
+    "index",
+    "comparison",
+    "quick-start",
+    "---Mechanisms---",
+    "watching-form-values",
+    "---API---",
+    "api/index",
+    "api/use-form",
+    "api/components.mdx",
+    "api/types.mdx",
+    "api/wizard"
+  ]
+}
