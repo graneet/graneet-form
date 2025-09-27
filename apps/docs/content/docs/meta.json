@@ -8,6 +8,8 @@
     "watching-form-values",
     "form-validation",
     "field-management",
+    "performance-optimization",
+    "complex-typescript",
     "---API---",
     "api/index",
     "api/use-form",
