@@ -1,4 +1,7 @@
-import { IFrame } from "../../../src/components/IFrame";
+---
+title: Form Validation
+description: Complete guide to implementing robust form validation with graneet-form's rule-based validation system
+---
 
 # Form Validation
 
@@ -250,7 +253,7 @@ interface FieldState {
         />
         
         {/* Show loading indicator for async validation */}
-        {validationStatus.status === 'PENDING' && (
+        {validationStatus.status === 'pending' && (
           <span className="validation-pending">⏳ Checking...</span>
         )}
         
@@ -438,10 +441,6 @@ export function LengthRule({ min, max, message }: LengthRuleOptions) {
 </Field>
 ```
 
-## Live Validation Example
-
-<IFrame model="validation-form" />
-
 ## Best Practices
 
 ### 1. Validation Order
@@ -512,9 +511,3 @@ function ConditionalValidationField() {
   );
 }
 ```
-
-## Next Steps
-
-- [Advanced Features](./advanced-features) - Learn about complex form behaviors
-- [Field Management](./field-management) - Deep dive into field handling
-- [Performance Guide](./performance) - Optimize validation for large forms

@@ -6,6 +6,7 @@
     "quick-start",
     "---Mechanisms---",
     "watching-form-values",
+    "form-validation",
     "---API---",
     "api/index",
     "api/use-form",
