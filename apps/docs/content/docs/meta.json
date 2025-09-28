@@ -10,11 +10,12 @@
     "form/field-management",
     "form/performance-optimization",
     "form/complex-typescript",
+    "---Wizard---",
+    "wizard/index",
     "---API---",
     "api/index",
     "api/use-form",
     "api/components.mdx",
-    "api/types.mdx",
-    "api/wizard"
+    "api/types.mdx"
   ]
 }
