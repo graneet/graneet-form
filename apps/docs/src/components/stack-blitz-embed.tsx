@@ -1,12 +1,6 @@
 interface StackBlitzEmbedProps {
-  /** The GitHub repository path (e.g., 'graneet/graneet-form') */
-  repo?: string;
-  /** The branch to use (default: 'main') */
-  branch?: string;
   /** The path within the repository (e.g., 'examples/simple-form') */
   path?: string;
-  /** Direct StackBlitz project ID if not using GitHub integration */
-  projectId?: string;
   /** The file to open by default */
   file?: string;
   /** The height of the iframe (default: '500px') */
@@ -23,11 +17,10 @@ interface StackBlitzEmbedProps {
   title?: string;
 }
 
+const tt = 'https://stackblitz.com/github/graneet/graneet-form/tree/main/examples/simple-form?file=README.md';
+
 export function StackBlitzEmbed({
-  repo = 'graneet/graneet-form',
-  branch = 'main',
   path = '',
-  projectId,
   file,
   height = '500px',
   theme = 'light',
@@ -38,16 +31,7 @@ export function StackBlitzEmbed({
 }: StackBlitzEmbedProps) {
   // Build the StackBlitz URL
   const buildUrl = () => {
-    let baseUrl: string;
-
-    if (projectId) {
-      // Direct project ID
-      baseUrl = `https://stackblitz.com/edit/${projectId}`;
-    } else {
-      // GitHub integration
-      const githubPath = path ? `${repo}/tree/${branch}/${path}` : `${repo}/tree/${branch}`;
-      baseUrl = `https://stackblitz.com/github/${githubPath}`;
-    }
+    const baseUrl = `https://stackblitz.com/github/graneet/graneet-form/tree/main/${path}`;
 
     // Add embed parameter
     const params = new URLSearchParams({
@@ -93,23 +77,9 @@ export function SimpleFormEmbed() {
   return (
     <StackBlitzEmbed
       path="examples/simple-form"
-      file="src/SimpleForm.tsx"
       height="600px"
       title="Simple Form Example - Graneet Form"
       hideNavigation={false}
-    />
-  );
-}
-
-// Pre-configured component for the testing app
-export function TestingAppEmbed() {
-  return (
-    <StackBlitzEmbed
-      path="apps/testing"
-      file="src/screens/FieldTests.tsx"
-      height="700px"
-      title="Testing App - Graneet Form"
-      view="editor"
     />
   );
 }
