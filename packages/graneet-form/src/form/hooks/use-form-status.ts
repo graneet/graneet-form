@@ -5,7 +5,7 @@ import { mapValidationStatusesToOutcome } from '../../shared/util/validation.uti
 import type { FormContextApi } from '../contexts/form-context';
 import { useValidations } from './use-validations';
 
-interface FormStatus {
+export interface FormStatus {
   /**
    * The current status of a form's validation outcome.
    */

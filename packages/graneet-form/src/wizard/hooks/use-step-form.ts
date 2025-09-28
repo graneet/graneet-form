@@ -11,7 +11,7 @@ import { useWizardContext } from '../contexts/wizard-context';
  * API returned by the useStepForm hook for managing form state within a wizard step.
  * @template T - The field values type for this step
  */
-interface UseStepFormApi<T extends FieldValues> {
+export interface UseStepFormApi<T extends FieldValues> {
   /**
    * Form context API that can be passed to Form components.
    * Contains all form management functionality including validation, field registration, and submission handling.

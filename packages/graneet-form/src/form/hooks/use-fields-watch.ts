@@ -5,7 +5,7 @@ import type { FormContextApi } from '../contexts/form-context';
 import type { FormValues } from '../types/form-values';
 import type { WatchMode } from '../types/watch-mode';
 
-interface UseFormWatchOptions {
+export interface UseFormWatchOptions {
   mode?: WatchMode;
 }
 
