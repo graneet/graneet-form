@@ -1,0 +1,308 @@
+---
+title: useStepForm
+description: Hook for integrating forms within wizard steps with automatic data persistence
+---
+
+# useStepForm Hook
+
+The `useStepForm` hook integrates forms within wizard steps, providing automatic data persistence, validation status synchronization, and seamless navigation between steps. It extends `useForm` with wizard-specific functionality.
+
+## Usage
+
+```tsx
+import { useStepForm } from 'graneet-form';
+
+const { form, initFormValues } = useStepForm<WizardValues, StepName>(options);
+```
+
+## Parameters
+
+- `options?: UseFormOptions<WizardValues[Step]>` - Same options as `useForm`, with automatic step integration
+
+## Returns
+
+<AutoTypeTable path="../../packages/graneet-form/src/wizard/hooks/use-step-form.ts" name="UseStepFormApi" />
+
+## Examples
+
+### Basic Step Form
+
+```tsx
+interface WizardData {
+  userInfo: { firstName: string; lastName: string; email: string; };
+  preferences: { theme: 'light' | 'dark'; notifications: boolean; };
+}
+
+function UserInfoStep() {
+  const { form } = useStepForm<WizardData, 'userInfo'>({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: ''
+    }
+  });
+
+  return (
+    <Form form={form}>
+      <Field name="firstName">
+        <Rule validationFn={(value) => value.length > 0} message="First name is required" />
+      </Field>
+      
+      <Field name="lastName">
+        <Rule validationFn={(value) => value.length > 0} message="Last name is required" />
+      </Field>
+      
+      <Field name="email">
+        <Rule validationFn={(value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)} message="Valid email is required" />
+      </Field>
+    </Form>
+  );
+}
+```
+
+### Step with Complex Validation
+
+```tsx
+function PreferencesStep() {
+  const { form } = useStepForm<WizardData, 'preferences'>({
+    defaultValues: {
+      theme: 'light',
+      notifications: true
+    },
+    onUpdateAfterBlur: async (fieldName, value, formData, { setFormValues }) => {
+      if (fieldName === 'theme' && value === 'dark') {
+        // Auto-configure for dark theme
+        setFormValues({
+          notifications: false // Dark theme users prefer fewer notifications
+        });
+      }
+    }
+  });
+
+  return (
+    <Form form={form}>
+      <Field name="theme">
+        <Rule 
+          validationFn={(value) => ['light', 'dark'].includes(value)} 
+          message="Please select a valid theme" 
+        />
+      </Field>
+      
+      <Field name="notifications" />
+    </Form>
+  );
+}
+```
+
+### Step with Cross-Step Validation
+
+```tsx
+function ConfirmationStep() {
+  const wizard = useWizardContext<WizardData>();
+  const { form } = useStepForm<WizardData, 'confirmation'>({
+    defaultValues: {
+      confirmEmail: '',
+      agreed: false
+    }
+  });
+
+  return (
+    <Form form={form}>
+      <Field name="confirmEmail">
+        <Rule 
+          validationFn={(value) => {
+            const userInfo = wizard.getValuesOfStep('userInfo');
+            return value === userInfo?.email;
+          }}
+          message="Email confirmation must match" 
+        />
+      </Field>
+      
+      <Field name="agreed">
+        <Rule 
+          validationFn={(value) => value === true} 
+          message="You must agree to the terms" 
+        />
+      </Field>
+    </Form>
+  );
+}
+```
+
+### Step with Dynamic Fields
+
+```tsx
+function DynamicFieldsStep() {
+  const { form } = useStepForm<WizardData, 'dynamicFields'>({
+    defaultValues: {
+      userType: 'personal',
+      companyName: '',
+      taxId: '',
+      personalId: ''
+    }
+  });
+
+  const { userType } = useFieldsWatch(form, ['userType']);
+
+  return (
+    <Form form={form}>
+      <Field name="userType">
+        <Rule validationFn={(value) => ['personal', 'business'].includes(value)} />
+      </Field>
+
+      {userType === 'business' && (
+        <>
+          <Field name="companyName">
+            <Rule validationFn={(value) => value.length > 0} message="Company name is required" />
+          </Field>
+          
+          <Field name="taxId">
+            <Rule validationFn={(value) => value.length > 0} message="Tax ID is required" />
+          </Field>
+        </>
+      )}
+
+      {userType === 'personal' && (
+        <Field name="personalId">
+          <Rule validationFn={(value) => value.length > 0} message="Personal ID is required" />
+        </Field>
+      )}
+    </Form>
+  );
+}
+```
+
+### Step with File Upload
+
+```tsx
+function DocumentUploadStep() {
+  const { form } = useStepForm<WizardData, 'documents'>({
+    defaultValues: {
+      profilePicture: null,
+      idDocument: null
+    }
+  });
+
+  return (
+    <Form form={form}>
+      <Field name="profilePicture">
+        <Rule 
+          validationFn={(file) => file && file.size < 5 * 1024 * 1024}
+          message="Profile picture must be less than 5MB" 
+        />
+      </Field>
+      
+      <Field name="idDocument">
+        <Rule 
+          validationFn={(file) => file && ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type)}
+          message="ID document must be JPG, PNG, or PDF" 
+        />
+      </Field>
+    </Form>
+  );
+}
+```
+
+### Accessing Previous Step Data
+
+```tsx
+function SummaryStep() {
+  const wizard = useWizardContext<WizardData>();
+  const { form } = useStepForm<WizardData, 'summary'>({
+    defaultValues: {
+      notes: ''
+    }
+  });
+
+  // Access data from previous steps
+  const userInfo = wizard.getValuesOfStep('userInfo');
+  const preferences = wizard.getValuesOfStep('preferences');
+
+  return (
+    <div>
+      <h2>Summary</h2>
+      
+      <div className="summary-section">
+        <h3>User Information</h3>
+        <p>Name: {userInfo?.firstName} {userInfo?.lastName}</p>
+        <p>Email: {userInfo?.email}</p>
+      </div>
+
+      <div className="summary-section">
+        <h3>Preferences</h3>
+        <p>Theme: {preferences?.theme}</p>
+        <p>Notifications: {preferences?.notifications ? 'Enabled' : 'Disabled'}</p>
+      </div>
+
+      <Form form={form}>
+        <Field name="notes" />
+      </Form>
+    </div>
+  );
+}
+```
+
+### Step with Async Validation
+
+```tsx
+function EmailVerificationStep() {
+  const { form } = useStepForm<WizardData, 'emailVerification'>({
+    defaultValues: {
+      verificationCode: ''
+    }
+  });
+
+  return (
+    <Form form={form}>
+      <Field name="verificationCode">
+        <Rule 
+          validationFn={async (code) => {
+            if (!code || code.length !== 6) return false;
+            
+            try {
+              const isValid = await verifyEmailCode(code);
+              return isValid;
+            } catch {
+              return false;
+            }
+          }}
+          message="Please enter a valid 6-digit verification code" 
+        />
+      </Field>
+    </Form>
+  );
+}
+```
+
+## Integration with Wizard
+
+The hook automatically:
+
+- **Persists data**: Form values are saved when navigating between steps
+- **Restores data**: Previously entered values are restored when returning to a step
+- **Syncs validation**: Step validation status is synchronized with wizard navigation
+- **Manages readiness**: Controls when the "Next" button is enabled based on form validation
+
+## Performance Features
+
+- Form state is preserved across step navigation
+- Validation runs only when necessary
+- Efficient re-rendering through granular subscriptions
+- Automatic cleanup when leaving steps
+
+## Migration from initFormValues
+
+The `initFormValues` method is deprecated. Use `defaultValues` instead:
+
+```tsx
+// ❌ Deprecated
+const { form, initFormValues } = useStepForm();
+useEffect(() => {
+  initFormValues({ name: '', email: '' });
+}, []);
+
+// ✅ Preferred
+const { form } = useStepForm({
+  defaultValues: { name: '', email: '' }
+});
+```

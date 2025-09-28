@@ -2,7 +2,7 @@
 
 # graneet-form
 
-<img src="apps/docs/docs/public/graneet-form-logo.png" alt="Graneet Form Logo" width="200">
+<img src="apps/docs-legacy/docs/public/graneet-form-logo.png" alt="Graneet Form Logo" width="200">
 
 ### A performant, type-safe forms and wizard library for React
 

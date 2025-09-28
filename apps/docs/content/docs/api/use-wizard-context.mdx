@@ -1,0 +1,404 @@
+---
+title: useWizardContext
+description: Hook for accessing wizard context within wizard components
+---
+
+# useWizardContext Hook
+
+The `useWizardContext` hook provides access to the wizard context API from within any component that's rendered inside a wizard. This is essential for creating custom navigation components, step indicators, and accessing cross-step data.
+
+## Usage
+
+```tsx
+import { useWizardContext } from 'graneet-form';
+
+const wizardContext = useWizardContext<WizardValuesType>();
+```
+
+## Parameters
+
+- Generic type parameter `WizardValues extends Record<string, FieldValues>` - The type defining all wizard step data
+
+## Returns
+
+Returns the `WizardContextApi<WizardValues>` object:
+
+<AutoTypeTable path="../../packages/graneet-form/src/wizard/contexts/wizard-context.ts" name="WizardContextApi" />
+
+## Examples
+
+### Custom Wizard Navigation
+
+```tsx
+interface WizardData {
+  userInfo: { firstName: string; lastName: string; email: string; };
+  preferences: { theme: 'light' | 'dark'; notifications: boolean; };
+  confirmation: { agreed: boolean; };
+}
+
+function WizardNavigation() {
+  const {
+    steps,
+    currentStep,
+    goNext,
+    goPrevious,
+    goBackTo,
+    isFirstStep,
+    isLastStep,
+    isStepReady
+  } = useWizardContext<WizardData>();
+
+  return (
+    <div className="wizard-navigation">
+      <div className="steps-indicator">
+        {steps.map((stepName, index) => {
+          const currentIndex = steps.indexOf(currentStep);
+          const isCompleted = index < currentIndex;
+          const isCurrent = index === currentIndex;
+          const isAccessible = index <= currentIndex;
+
+          return (
+            <button
+              key={stepName}
+              onClick={() => isAccessible && goBackTo(stepName)}
+              disabled={!isAccessible}
+              className={`step ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`}
+            >
+              <span className="step-number">{index + 1}</span>
+              <span className="step-name">{stepName}</span>
+              {isCompleted && <span className="checkmark">✓</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="navigation-buttons">
+        <button
+          onClick={goPrevious}
+          disabled={isFirstStep}
+          className="btn-secondary"
+        >
+          {isFirstStep ? 'Cancel' : 'Previous'}
+        </button>
+
+        <button
+          onClick={goNext}
+          disabled={!isStepReady}
+          className={isStepReady ? 'btn-primary' : 'btn-disabled'}
+        >
+          {isLastStep ? 'Complete' : 'Next'}
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+### Wizard Progress Bar
+
+```tsx
+function WizardProgressBar() {
+  const { steps, currentStep } = useWizardContext<WizardData>();
+  
+  const currentStepIndex = steps.indexOf(currentStep);
+  const progress = ((currentStepIndex + 1) / steps.length) * 100;
+
+  return (
+    <div className="wizard-progress">
+      <div className="progress-bar">
+        <div 
+          className="progress-fill"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      <div className="progress-text">
+        Step {currentStepIndex + 1} of {steps.length}: {currentStep}
+      </div>
+    </div>
+  );
+}
+```
+
+### Cross-Step Data Display
+
+```tsx
+function WizardSummary() {
+  const { getValuesOfStep, getValuesOfSteps } = useWizardContext<WizardData>();
+
+  // Get data from specific steps
+  const userInfo = getValuesOfStep('userInfo');
+  const preferences = getValuesOfStep('preferences');
+  
+  // Get all wizard data
+  const allData = getValuesOfSteps();
+
+  return (
+    <div className="wizard-summary">
+      <h2>Registration Summary</h2>
+      
+      {userInfo && (
+        <div className="summary-section">
+          <h3>Personal Information</h3>
+          <p>Name: {userInfo.firstName} {userInfo.lastName}</p>
+          <p>Email: {userInfo.email}</p>
+        </div>
+      )}
+
+      {preferences && (
+        <div className="summary-section">
+          <h3>Preferences</h3>
+          <p>Theme: {preferences.theme}</p>
+          <p>Notifications: {preferences.notifications ? 'Enabled' : 'Disabled'}</p>
+        </div>
+      )}
+
+      <details>
+        <summary>View Raw Data</summary>
+        <pre>{JSON.stringify(allData, null, 2)}</pre>
+      </details>
+    </div>
+  );
+}
+```
+
+### Conditional Step Content
+
+```tsx
+function StepContent() {
+  const { currentStep, getValuesOfStep } = useWizardContext<WizardData>();
+  
+  const userInfo = getValuesOfStep('userInfo');
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 'userInfo':
+        return <UserInfoStep />;
+        
+      case 'preferences':
+        return <PreferencesStep />;
+        
+      case 'confirmation':
+        // Show different content based on previous step data
+        if (userInfo?.email?.includes('@company.com')) {
+          return <BusinessConfirmationStep />;
+        }
+        return <PersonalConfirmationStep />;
+        
+      default:
+        return <div>Unknown step: {currentStep}</div>;
+    }
+  };
+
+  return (
+    <div className="step-content">
+      {renderStep()}
+    </div>
+  );
+}
+```
+
+### Wizard Breadcrumbs
+
+```tsx
+function WizardBreadcrumbs() {
+  const { steps, currentStep, goBackTo } = useWizardContext<WizardData>();
+  
+  const currentStepIndex = steps.indexOf(currentStep);
+
+  return (
+    <nav className="wizard-breadcrumbs">
+      {steps.map((stepName, index) => {
+        const isAccessible = index <= currentStepIndex;
+        const isCurrent = stepName === currentStep;
+
+        return (
+          <span key={stepName} className="breadcrumb-item">
+            {index > 0 && <span className="separator"> › </span>}
+            
+            {isAccessible ? (
+              <button
+                onClick={() => goBackTo(stepName)}
+                className={`breadcrumb-link ${isCurrent ? 'current' : ''}`}
+              >
+                {stepName}
+              </button>
+            ) : (
+              <span className="breadcrumb-disabled">{stepName}</span>
+            )}
+          </span>
+        );
+      })}
+    </nav>
+  );
+}
+```
+
+### Step Validation Status
+
+```tsx
+function StepValidationStatus() {
+  const { currentStep } = useWizardContext<WizardData>();
+  const stepStatus = useStepStatus();
+
+  const getStatusMessage = () => {
+    switch (stepStatus) {
+      case 'valid':
+        return `✓ ${currentStep} step completed successfully`;
+      case 'invalid':
+        return `⚠ Please fix errors in ${currentStep} step`;
+      case 'pending':
+        return `⏳ Validating ${currentStep} step...`;
+      case 'undetermined':
+        return `📝 Complete ${currentStep} step to continue`;
+      default:
+        return `Unknown status for ${currentStep} step`;
+    }
+  };
+
+  return (
+    <div className={`step-status status-${stepStatus}`}>
+      {getStatusMessage()}
+    </div>
+  );
+}
+```
+
+### Wizard Data Export
+
+```tsx
+function WizardDataExport() {
+  const { getValuesOfSteps, currentStep } = useWizardContext<WizardData>();
+
+  const exportData = () => {
+    const allData = getValuesOfSteps();
+    const dataStr = JSON.stringify(allData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'wizard-data.json';
+    link.click();
+    
+    URL.revokeObjectURL(url);
+  };
+
+  const saveProgress = () => {
+    const allData = getValuesOfSteps();
+    localStorage.setItem('wizardProgress', JSON.stringify({
+      currentStep,
+      data: allData,
+      timestamp: new Date().toISOString()
+    }));
+  };
+
+  return (
+    <div className="wizard-actions">
+      <button onClick={saveProgress} className="btn-secondary">
+        Save Progress
+      </button>
+      <button onClick={exportData} className="btn-secondary">
+        Export Data
+      </button>
+    </div>
+  );
+}
+```
+
+### Step Timer Component
+
+```tsx
+function StepTimer() {
+  const { currentStep } = useWizardContext<WizardData>();
+  const [startTime] = useState(Date.now());
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setElapsed(Date.now() - startTime);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [startTime]);
+
+  const formatTime = (ms: number) => {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes}:${(seconds % 60).toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="step-timer">
+      Time on {currentStep}: {formatTime(elapsed)}
+    </div>
+  );
+}
+```
+
+### Wizard Layout Component
+
+```tsx
+function WizardLayout({ children }: { children: React.ReactNode }) {
+  const { currentStep, isFirstStep, isLastStep } = useWizardContext<WizardData>();
+
+  return (
+    <div className="wizard-layout">
+      <header className="wizard-header">
+        <h1>Registration Wizard</h1>
+        <WizardProgressBar />
+      </header>
+
+      <aside className="wizard-sidebar">
+        <WizardBreadcrumbs />
+        <StepValidationStatus />
+      </aside>
+
+      <main className="wizard-main">
+        <div className="step-header">
+          <h2>{currentStep}</h2>
+          <StepTimer />
+        </div>
+        
+        <div className="step-content">
+          {children}
+        </div>
+      </main>
+
+      <footer className="wizard-footer">
+        <WizardNavigation />
+        {!isFirstStep && !isLastStep && <WizardDataExport />}
+      </footer>
+    </div>
+  );
+}
+```
+
+## Context Requirements
+
+The `useWizardContext` hook must be used within a component tree that has a wizard context provider:
+
+```tsx
+// ✅ Correct usage
+function MyWizard() {
+  const wizard = useWizard(steps, onFinish);
+
+  return (
+    <WizardContext.Provider value={wizard}>
+      <WizardComponent /> {/* Can use useWizardContext */}
+    </WizardContext.Provider>
+  );
+}
+
+// ❌ Incorrect usage - will throw error
+function WizardComponent() {
+  const wizard = useWizardContext<WizardData>(); // Error: No wizard context found
+  // ...
+}
+```
+
+## Performance Notes
+
+- The hook provides direct access to the wizard context with minimal overhead
+- Navigation methods are memoized to prevent unnecessary re-renders
+- Data retrieval methods are optimized for frequent access
+- Context updates only trigger re-renders when relevant state changes

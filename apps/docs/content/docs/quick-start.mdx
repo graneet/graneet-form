@@ -1,0 +1,223 @@
+---
+title: Quick Start
+description: Get started with Graneet Form in minutes
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { SimpleFormEmbed } from '@/components/stack-blitz-embed';
+
+# Quick Start 🚀
+
+Get up and running with Graneet Form in just a few minutes. This guide will walk you through installation and creating your first form.
+
+## Installation 📦
+
+Install Graneet Form using your preferred package manager:
+
+<Tabs items={['pnpm', 'npm', 'yarn']}>
+  <Tab value="pnpm">
+    ```bash
+    pnpm install graneet-form
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npm install graneet-form
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn add graneet-form
+    ```
+  </Tab>
+</Tabs>
+
+## Your First Form
+
+Let's create a simple contact form with validation. You can see this example in action by opening it in StackBlitz above, or follow along to build it locally:
+
+```tsx
+import { useForm, Form, Field, Rule } from 'graneet-form';
+
+interface FormValues {
+  name: string;
+  email: string;
+}
+
+export function SimpleForm() {
+  const form = useForm<FormValues>({
+    defaultValues: {
+      name: '',
+      email: '',
+    },
+  });
+
+  const onSubmit = (values: FormValues) => {
+    alert(`Form submitted with:\nName: ${values.name}\nEmail: ${values.email}`);
+  };
+
+  return (
+    <div style={{ maxWidth: '400px', margin: '2rem auto', padding: '2rem' }}>
+      <h1>Simple Form Example</h1>
+      
+      <Form form={form} onSubmit={form.handleSubmit(onSubmit)}>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+            Name:
+          </label>
+          <Field<FormValues, 'name'>
+            name="name"
+            render={({ value, onChange, onBlur, onFocus }) => (
+              <input
+                type="text"
+                value={value || ''}
+                onChange={(e) => onChange(e.target.value)}
+                onBlur={onBlur}
+                onFocus={onFocus}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px'
+                }}
+              />
+            )}
+          >
+            <Rule 
+              validationFn={(value) => !!value && value.length > 0} 
+              message="Name is required" 
+            />
+          </Field>
+        </div>
+
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+            Email:
+          </label>
+          <Field<FormValues, 'email'>
+            name="email"
+            render={({ value, onChange, onBlur, onFocus }) => (
+              <input
+                type="email"
+                value={value || ''}
+                onChange={(e) => onChange(e.target.value)}
+                onBlur={onBlur}
+                onFocus={onFocus}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px'
+                }}
+              />
+            )}
+          >
+            <Rule 
+              validationFn={(value) => !!value && /\S+@\S+\.\S+/.test(value)} 
+              message="Please enter a valid email address" 
+            />
+          </Field>
+        </div>
+
+        <button 
+          type="submit"
+          style={{
+            backgroundColor: '#007bff',
+            color: 'white',
+            padding: '0.75rem 1.5rem',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Submit
+        </button>
+      </Form>
+    </div>
+  );
+}
+```
+
+<SimpleFormEmbed />
+
+This example demonstrates the core concepts of Graneet Form:
+- **Form Setup**: Using `useForm` hook to manage form state
+- **Field Management**: Using `Field` components with render props
+- **Validation**: Adding `Rule` components for field validation
+- **Submission**: Handling form submission with proper TypeScript types
+
+### Interactive Example
+
+Try editing the code below and see the changes in real-time:
+
+<SimpleFormEmbed />
+
+<Callout type="tip">
+  **Want to experiment?** Try modifying the validation rules, adding new fields, or changing the styling in the interactive example above!
+</Callout>
+
+## Common Patterns
+
+### Text Input
+
+```tsx
+<Field<FormType, 'username'>
+  name="username"
+  render={(fieldProps) => (
+    <input
+      type="text"
+      placeholder="Enter username"
+      value={fieldProps.value || ''}
+      onChange={(e) => fieldProps.onChange(e.target.value)}
+      onBlur={fieldProps.onBlur}
+      onFocus={fieldProps.onFocus}
+    />
+  )}
+/>
+```
+
+### Checkbox
+
+```tsx
+<Field<FormType, 'agree'>
+  name="agree"
+  render={(fieldProps) => (
+    <label>
+      <input
+        type="checkbox"
+        checked={fieldProps.value || false}
+        onChange={(e) => fieldProps.onChange(e.target.checked)}
+        onBlur={fieldProps.onBlur}
+        onFocus={fieldProps.onFocus}
+      />
+      I agree to the terms
+    </label>
+  )}
+/>
+```
+
+### Select Dropdown
+
+```tsx
+<Field<FormType, 'country'>
+  name="country"
+  render={(fieldProps) => (
+    <select
+      value={fieldProps.value || ''}
+      onChange={(e) => fieldProps.onChange(e.target.value)}
+      onBlur={fieldProps.onBlur}
+      onFocus={fieldProps.onFocus}
+    >
+      <option value="">Select a country</option>
+      <option value="us">United States</option>
+      <option value="ca">Canada</option>
+      <option value="uk">United Kingdom</option>
+    </select>
+  )}
+/>
+```
+
+<Callout type="info">
+  **Next Steps**: Now that you understand the basics, explore our comprehensive guides on validation, field management, and advanced features! Don't forget to check out our [StackBlitz Integration](/stackblitz-integration) guide for more ways to experiment and share your forms.
+</Callout>

@@ -1,0 +1,98 @@
+---
+title: API Overview
+description: Complete API reference for Graneet Form
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+
+# API Reference
+
+Welcome to the Graneet Form API documentation. This section provides comprehensive reference for all components, hooks, and types.
+
+## Quick Navigation
+
+### Form Hooks
+
+<Cards>
+  <Card 
+    title="useForm" 
+    description="Main hook for creating and managing form instances"
+    href="/docs/api/use-form" 
+  />
+  <Card 
+    title="useFormStatus" 
+    description="Hook for monitoring form validation status"
+    href="/docs/api/use-form-status" 
+  />
+  <Card 
+    title="useFieldsWatch" 
+    description="Hook for watching form field values with granular subscriptions"
+    href="/docs/api/use-fields-watch" 
+  />
+  <Card 
+    title="useValidations" 
+    description="Hook for watching form field validation states"
+    href="/docs/api/use-validations" 
+  />
+  <Card 
+    title="useFormContext" 
+    description="Hook for accessing form context within components"
+    href="/docs/api/use-form-context" 
+  />
+</Cards>
+
+### Wizard Hooks
+
+<Cards>
+  <Card 
+    title="useWizard" 
+    description="Main hook for creating multi-step wizard workflows"
+    href="/docs/api/use-wizard" 
+  />
+  <Card 
+    title="useStepForm" 
+    description="Hook for integrating forms within wizard steps"
+    href="/docs/api/use-step-form" 
+  />
+  <Card 
+    title="useStepStatus" 
+    description="Hook for monitoring current wizard step status"
+    href="/docs/api/use-step-status" 
+  />
+  <Card 
+    title="useWizardContext" 
+    description="Hook for accessing wizard context within components"
+    href="/docs/api/use-wizard-context" 
+  />
+</Cards>
+
+### Components & Types
+
+<Cards>
+  <Card 
+    title="Components" 
+    description="Form, Field, Rule, and Step components"
+    href="/docs/api/components" 
+  />
+  <Card 
+    title="Types & Interfaces" 
+    description="TypeScript definitions and type reference"
+    href="/docs/api/types" 
+  />
+</Cards>
+
+## Key Concepts
+
+The Graneet Form API is built around these core concepts:
+
+- **Form Instance**: Created by `useForm`, manages all form state
+- **Field Registration**: Fields register themselves and subscribe to changes
+- **Granular Subscriptions**: Only affected components re-render
+- **Validation System**: Built-in validation with custom rules
+- **Wizard Support**: Native multi-step form functionality
+
+## Getting Started
+
+If you're new to Graneet Form, start with our [Quick Start Guide](/docs/quick-start) to learn the basics, then dive into the specific API documentation you need.
+
+For a comparison with other form libraries, see our [Comparison Guide](/docs/comparison).

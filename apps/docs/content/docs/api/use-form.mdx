@@ -1,0 +1,136 @@
+---
+title: useForm
+description: Main hook for creating and managing form instances
+---
+
+# useForm Hook
+
+The `useForm` hook is the main entry point for creating form instances in Graneet Form. It provides a complete form management solution with optimized performance and granular subscriptions.
+
+## Usage
+
+```tsx
+import { useForm } from 'graneet-form';
+
+const form = useForm<FormDataType>(options);
+```
+
+## Parameters
+
+<AutoTypeTable path="../../packages/graneet-form/src/form/hooks/use-form.ts" name="UseFormOptions" />
+
+## Returns
+
+The hook returns a form context API object:
+
+<AutoTypeTable path="../../packages/graneet-form/src/form/contexts/form-context.ts" name="FormContextApi" />
+
+## Examples
+
+### Basic Form
+
+```tsx
+interface UserForm {
+  name: string;
+  email: string;
+}
+
+function MyComponent() {
+  const form = useForm<UserForm>({
+    defaultValues: {
+      name: '',
+      email: ''
+    }
+  });
+
+  return (
+    <Form form={form}>
+      {/* Your form fields */}
+    </Form>
+  );
+}
+```
+
+### Form with onUpdateAfterBlur
+
+```tsx
+const form = useForm<UserForm>({
+  defaultValues: {
+    name: '',
+    email: ''
+  },
+  onUpdateAfterBlur: async (fieldName, value, data, { getFormValues, setFormValues }) => {
+    if (fieldName === 'email' && value) {
+      // Auto-populate based on email
+      const userInfo = await fetchUserByEmail(value);
+      if (userInfo.name) {
+        setFormValues({ name: userInfo.name });
+      }
+    }
+  }
+});
+```
+
+### Dynamic Default Values
+
+```tsx
+const form = useForm<UserForm>({
+  defaultValues: () => ({
+    name: user?.name || '',
+    email: user?.email || '',
+    timestamp: Date.now()
+  })
+});
+```
+
+## Form Context API Methods
+
+### getFormValues()
+
+Retrieves all current form field values.
+
+```tsx
+const currentValues = form.getFormValues();
+// Returns: { name: 'John', email: 'john@example.com' }
+```
+
+### setFormValues(newValues)
+
+Updates multiple form field values at once.
+
+```tsx
+form.setFormValues({
+  name: 'Jane Doe',
+  email: 'jane@example.com'
+});
+```
+
+### resetForm()
+
+Resets all form fields to their default values.
+
+```tsx
+form.resetForm();
+```
+
+### handleSubmit(callback)
+
+Creates a form submission handler with validation.
+
+```tsx
+const handleSubmit = form.handleSubmit((formData) => {
+  console.log('Valid form data:', formData);
+});
+
+// Use with form element
+<form onSubmit={handleSubmit}>
+  {/* form content */}
+</form>
+```
+
+## Performance Notes
+
+- Form state is managed with refs for optimal performance
+- Only components that subscribe to specific fields re-render when those fields change
+- Global form watchers are debounced to prevent excessive updates
+- Field registration/unregistration is handled automatically

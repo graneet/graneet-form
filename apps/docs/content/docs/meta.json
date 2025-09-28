@@ -1,0 +1,32 @@
+{
+  "root": true,
+  "pages": [
+    "index",
+    "comparison",
+    "quick-start",
+    "---Form---",
+    "form/watching-form-values",
+    "form/form-validation",
+    "form/field-management",
+    "form/performance-optimization",
+    "form/complex-typescript",
+    "---Wizard---",
+    "wizard/index",
+    "---API---",
+    "api/index",
+    "---Form Hooks---",
+    "api/use-form",
+    "api/use-form-status",
+    "api/use-fields-watch",
+    "api/use-validations",
+    "api/use-form-context",
+    "---Wizard Hooks---",
+    "api/use-wizard",
+    "api/use-step-form",
+    "api/use-step-status",
+    "api/use-wizard-context",
+    "---Components & Types---",
+    "api/components.mdx",
+    "api/types.mdx"
+  ]
+}

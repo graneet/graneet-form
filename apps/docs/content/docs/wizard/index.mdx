@@ -1,0 +1,345 @@
+---
+title: Wizard System
+description: Multi-step form components and hooks for creating complex wizards
+---
+
+# Wizard System
+
+Graneet Form provides a comprehensive wizard system for creating multi-step forms with automatic state management, validation, and navigation between steps.
+
+## Core Components
+
+### useWizard Hook
+
+The `useWizard` hook is the foundation of the wizard system. It manages step navigation, validation, and state persistence.
+
+```tsx
+import { useWizard } from 'graneet-form';
+
+type WizardValues = {
+  userInfo: { name: string; email: string };
+  preferences: { theme: 'light' | 'dark' };
+};
+
+const steps = [
+  { name: 'userInfo' as const },
+  { name: 'preferences' as const }
+];
+
+const wizard = useWizard<WizardValues>(
+  steps,
+  (wizardValues) => {
+    // Called when wizard finishes
+    console.log('Wizard completed:', wizardValues);
+  },
+  () => {
+    // Called when wizard is quit from first step
+    console.log('Wizard quit');
+  }
+);
+```
+
+### WizardContext
+
+Provides wizard state to child components throughout the wizard tree.
+
+```tsx
+import { WizardContext, useWizardContext } from 'graneet-form';
+
+function WizardComponent() {
+  const wizard = useWizard(steps, onFinish, onQuit);
+
+  return (
+    <WizardContext.Provider value={wizard}>
+      {/* Wizard steps */}
+    </WizardContext.Provider>
+  );
+}
+
+function NavigationButtons() {
+  const { goNext, goPrevious, isFirstStep, isLastStep } = useWizardContext();
+  
+  return (
+    <div>
+      {!isFirstStep && <button onClick={goPrevious}>Previous</button>}
+      <button onClick={goNext}>
+        {isLastStep ? 'Finish' : 'Next'}
+      </button>
+    </div>
+  );
+}
+```
+
+### Step Component
+
+The `Step` component renders content only when it's the active step.
+
+```tsx
+import { Step } from 'graneet-form';
+
+function UserInfoStep() {
+  return (
+    <Step name="userInfo">
+      <h2>User Information</h2>
+      {/* Step content */}
+    </Step>
+  );
+}
+```
+
+## Form Integration
+
+### useStepForm Hook
+
+Integrates forms within wizard steps with automatic persistence and validation synchronization.
+
+```tsx
+import { useStepForm, Form, Field } from 'graneet-form';
+
+type WizardValues = {
+  userInfo: { name: string; email: string };
+  preferences: { theme: 'light' | 'dark' };
+};
+
+function UserInfoStep() {
+  const { form } = useStepForm<WizardValues, 'userInfo'>({
+    defaultValues: { name: '', email: '' }
+  });
+
+  return (
+    <Step name="userInfo">
+      <Form form={form}>
+        <Field name="name" />
+        <Field name="email" />
+      </Form>
+    </Step>
+  );
+}
+```
+
+Key features of `useStepForm`:
+- **Automatic persistence**: Form values are saved when navigating between steps
+- **Validation sync**: Step validation status affects wizard navigation
+- **Value restoration**: Previously entered values are restored when returning to a step
+- **Ready state management**: Controls when the step allows navigation
+
+### useStepStatus Hook
+
+Monitors the validation status of the current step.
+
+```tsx
+import { useStepStatus } from 'graneet-form';
+
+function StepNavigation() {
+  const stepStatus = useStepStatus();
+  const { goNext, isStepReady } = useWizardContext();
+
+  return (
+    <button 
+      onClick={goNext} 
+      disabled={!isStepReady || stepStatus !== 'valid'}
+    >
+      Next Step
+    </button>
+  );
+}
+```
+
+## Advanced Features
+
+### Step Validation
+
+Add custom validation logic that runs before proceeding to the next step:
+
+```tsx
+const steps = [
+  {
+    name: 'userInfo' as const,
+    onNext: async (stepValues) => {
+      // Custom validation logic
+      if (!stepValues?.email?.includes('@')) {
+        alert('Please enter a valid email');
+        return false; // Prevent navigation
+      }
+      return true; // Allow navigation
+    }
+  }
+];
+```
+
+### Navigation Methods
+
+The wizard context provides several navigation methods:
+
+```tsx
+const {
+  goNext,        // Move to next step or finish
+  goPrevious,    // Move to previous step or quit
+  goBackTo,      // Jump to a specific previous step
+  currentStep,   // Current active step
+  steps,         // Array of all step names
+  isFirstStep,   // Boolean - is current step the first?
+  isLastStep,    // Boolean - is current step the last?
+  isStepReady    // Boolean - is step ready for navigation?
+} = useWizardContext();
+
+// Jump back to a specific step
+const handleGoToUserInfo = () => {
+  goBackTo('userInfo');
+};
+```
+
+### Accessing Step Values
+
+Retrieve form values from any step:
+
+```tsx
+const {
+  getValuesOfStep,          // Get values from specific step
+  getValuesOfCurrentStep,   // Get values from current step
+  getValuesOfSteps         // Get all step values
+} = useWizardContext();
+
+// Get values from a specific step
+const userInfo = getValuesOfStep('userInfo');
+
+// Get all wizard values
+const allValues = getValuesOfSteps();
+```
+
+## Complete Example
+
+```tsx
+import { 
+  useWizard, 
+  useStepForm, 
+  WizardContext, 
+  Step, 
+  Form, 
+  Field 
+} from 'graneet-form';
+
+type WizardValues = {
+  userInfo: { name: string; email: string };
+  preferences: { theme: 'light' | 'dark'; notifications: boolean };
+};
+
+const steps = [
+  { name: 'userInfo' as const },
+  { 
+    name: 'preferences' as const,
+    onNext: async (values) => {
+      // Validate preferences step
+      return values?.theme !== undefined;
+    }
+  }
+];
+
+function UserInfoStep() {
+  const { form } = useStepForm<WizardValues, 'userInfo'>({
+    defaultValues: { name: '', email: '' }
+  });
+
+  return (
+    <Step name="userInfo">
+      <h2>User Information</h2>
+      <Form form={form}>
+        <Field name="name" placeholder="Your name" />
+        <Field name="email" type="email" placeholder="Your email" />
+      </Form>
+    </Step>
+  );
+}
+
+function PreferencesStep() {
+  const { form } = useStepForm<WizardValues, 'preferences'>({
+    defaultValues: { theme: 'light', notifications: true }
+  });
+
+  return (
+    <Step name="preferences">
+      <h2>Preferences</h2>
+      <Form form={form}>
+        <Field name="theme" type="select">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </Field>
+        <Field name="notifications" type="checkbox" />
+      </Form>
+    </Step>
+  );
+}
+
+function WizardNavigation() {
+  const { 
+    goNext, 
+    goPrevious, 
+    isFirstStep, 
+    isLastStep, 
+    isStepReady,
+    currentStep 
+  } = useWizardContext();
+
+  return (
+    <div>
+      <p>Current step: {currentStep}</p>
+      <div>
+        {!isFirstStep && (
+          <button onClick={goPrevious}>Previous</button>
+        )}
+        <button 
+          onClick={goNext} 
+          disabled={!isStepReady}
+        >
+          {isLastStep ? 'Finish' : 'Next'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function MyWizard() {
+  const wizard = useWizard<WizardValues>(
+    steps,
+    (wizardValues) => {
+      console.log('Wizard completed with values:', wizardValues);
+      // Handle wizard completion
+    },
+    () => {
+      console.log('Wizard quit');
+      // Handle wizard quit
+    }
+  );
+
+  return (
+    <WizardContext.Provider value={wizard}>
+      <div>
+        <h1>Setup Wizard</h1>
+        
+        <UserInfoStep />
+        <PreferencesStep />
+        
+        <WizardNavigation />
+      </div>
+    </WizardContext.Provider>
+  );
+}
+```
+
+## Type Safety
+
+The wizard system is fully typed to ensure type safety across steps:
+
+```tsx
+type WizardValues = {
+  step1: { field1: string };
+  step2: { field2: number };
+};
+
+// TypeScript will enforce correct step names and value types
+const { form } = useStepForm<WizardValues, 'step1'>(); // ✅ Valid
+const { form } = useStepForm<WizardValues, 'invalidStep'>(); // ❌ Type error
+
+// Step values are properly typed
+const step1Values = getValuesOfStep('step1'); // Type: { field1: string } | undefined
+```

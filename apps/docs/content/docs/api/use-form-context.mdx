@@ -1,0 +1,345 @@
+---
+title: useFormContext
+description: Hook for accessing form context within form components
+---
+
+# useFormContext Hook
+
+The `useFormContext` hook provides access to the form context API from within any component that's rendered inside a `<Form>` component. This is useful for creating reusable form components that need access to form state and methods.
+
+## Usage
+
+```tsx
+import { useFormContext } from 'graneet-form';
+
+const formContext = useFormContext<FormDataType>();
+```
+
+## Parameters
+
+- Generic type parameter `T extends FieldValues` - The type of your form data
+
+## Returns
+
+Returns the same `FormContextApi<T>` object as returned by `useForm`:
+
+<AutoTypeTable path="../../packages/graneet-form/src/form/contexts/form-context.ts" name="FormContextApi" />
+
+## Examples
+
+### Custom Form Component
+
+```tsx
+interface UserForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+function CustomFormActions() {
+  const form = useFormContext<UserForm>();
+  
+  const handleReset = () => {
+    form.resetForm();
+  };
+
+  const handleSubmit = form.handleSubmit((data) => {
+    console.log('Form submitted:', data);
+  });
+
+  return (
+    <div className="form-actions">
+      <button type="button" onClick={handleReset}>
+        Reset Form
+      </button>
+      <button type="submit" onClick={handleSubmit}>
+        Submit
+      </button>
+    </div>
+  );
+}
+
+// Usage in form
+function MyForm() {
+  const form = useForm<UserForm>();
+
+  return (
+    <Form form={form}>
+      <Field name="firstName" />
+      <Field name="lastName" />
+      <Field name="email" />
+      <CustomFormActions />
+    </Form>
+  );
+}
+```
+
+### Form Status Display
+
+```tsx
+function FormStatusDisplay() {
+  const form = useFormContext<UserForm>();
+  const { formStatus, isValid } = useFormStatus(form);
+
+  return (
+    <div className="form-status">
+      <span className={`status ${formStatus}`}>
+        Status: {formStatus}
+      </span>
+      <span className={`validity ${isValid ? 'valid' : 'invalid'}`}>
+        {isValid ? '✓ Valid' : '✗ Invalid'}
+      </span>
+    </div>
+  );
+}
+```
+
+### Field Value Display
+
+```tsx
+function FormPreview() {
+  const form = useFormContext<UserForm>();
+  const values = useFieldsWatch(form, undefined);
+
+  return (
+    <div className="form-preview">
+      <h3>Form Preview</h3>
+      <pre>{JSON.stringify(values, null, 2)}</pre>
+    </div>
+  );
+}
+```
+
+### Custom Field with Form Integration
+
+```tsx
+interface CustomFieldProps {
+  name: keyof UserForm;
+  label: string;
+  placeholder?: string;
+}
+
+function CustomField({ name, label, placeholder }: CustomFieldProps) {
+  const form = useFormContext<UserForm>();
+  const validations = useValidations(form, [name]);
+  const validation = validations[name];
+
+  return (
+    <div className="custom-field">
+      <label htmlFor={name}>{label}</label>
+      
+      <Field name={name}>
+        {(props, state) => (
+          <input
+            {...props}
+            id={name}
+            placeholder={placeholder}
+            className={validation?.status === 'invalid' ? 'error' : ''}
+          />
+        )}
+      </Field>
+
+      {validation?.status === 'invalid' && (
+        <span className="error-message">{validation.message}</span>
+      )}
+    </div>
+  );
+}
+```
+
+### Conditional Form Logic
+
+```tsx
+function ConditionalFields() {
+  const form = useFormContext<UserForm>();
+  const { accountType, country } = useFieldsWatch(form, ['accountType', 'country']);
+
+  return (
+    <div>
+      <Field name="accountType" />
+      <Field name="country" />
+
+      {accountType === 'business' && (
+        <>
+          <Field name="companyName" />
+          <Field name="taxId" />
+        </>
+      )}
+
+      {country === 'US' && (
+        <Field name="ssn" />
+      )}
+    </div>
+  );
+}
+```
+
+### Form Auto-Save Component
+
+```tsx
+function AutoSave() {
+  const form = useFormContext<UserForm>();
+  const values = useFieldsWatch(form, undefined, { mode: 'onBlur' });
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (Object.keys(values).length > 0) {
+      const timer = setTimeout(async () => {
+        await saveFormDraft(values);
+        setLastSaved(new Date());
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [values]);
+
+  return (
+    <div className="auto-save">
+      {lastSaved && (
+        <span>✓ Auto-saved at {lastSaved.toLocaleTimeString()}</span>
+      )}
+    </div>
+  );
+}
+```
+
+### Form Navigation Component
+
+```tsx
+function FormNavigation() {
+  const form = useFormContext<UserForm>();
+  const { isValid } = useFormStatus(form);
+  const values = form.getFormValues();
+
+  const goToStep = (step: string) => {
+    // Save current form state before navigation
+    localStorage.setItem('formDraft', JSON.stringify(values));
+    router.push(`/form/${step}`);
+  };
+
+  return (
+    <div className="form-navigation">
+      <button 
+        onClick={() => goToStep('step1')}
+        className={values.firstName ? 'completed' : 'pending'}
+      >
+        Step 1: Personal Info
+      </button>
+      
+      <button 
+        onClick={() => goToStep('step2')}
+        disabled={!values.firstName}
+        className={values.email ? 'completed' : 'pending'}
+      >
+        Step 2: Contact Info
+      </button>
+      
+      <button 
+        onClick={() => goToStep('step3')}
+        disabled={!isValid}
+        className={isValid ? 'ready' : 'disabled'}
+      >
+        Step 3: Review
+      </button>
+    </div>
+  );
+}
+```
+
+### Form Error Summary
+
+```tsx
+function FormErrorSummary() {
+  const form = useFormContext<UserForm>();
+  const validations = useValidations(form, undefined);
+
+  const errors = Object.entries(validations)
+    .filter(([_, validation]) => validation?.status === 'invalid')
+    .map(([fieldName, validation]) => ({
+      field: fieldName,
+      message: validation!.message
+    }));
+
+  if (errors.length === 0) return null;
+
+  return (
+    <div className="error-summary">
+      <h4>Please fix the following errors:</h4>
+      <ul>
+        {errors.map(({ field, message }) => (
+          <li key={field}>
+            <button
+              type="button"
+              onClick={() => {
+                const fieldElement = document.querySelector(`[name="${field}"]`);
+                fieldElement?.focus();
+              }}
+            >
+              {field}: {message}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### Form Progress Indicator
+
+```tsx
+function FormProgress() {
+  const form = useFormContext<UserForm>();
+  const values = form.getFormValues();
+  const { isValid } = useFormStatus(form);
+
+  const requiredFields = ['firstName', 'lastName', 'email'];
+  const completedFields = requiredFields.filter(field => values[field]);
+  const progress = (completedFields.length / requiredFields.length) * 100;
+
+  return (
+    <div className="form-progress">
+      <div className="progress-bar">
+        <div 
+          className="progress-fill"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      <span className="progress-text">
+        {completedFields.length} of {requiredFields.length} required fields completed
+        {isValid && ' ✓'}
+      </span>
+    </div>
+  );
+}
+```
+
+## Context Requirements
+
+The `useFormContext` hook must be used within a component tree that has a `<Form>` component as an ancestor:
+
+```tsx
+// ✅ Correct usage
+function MyForm() {
+  const form = useForm<UserForm>();
+
+  return (
+    <Form form={form}>
+      <MyFormComponent /> {/* Can use useFormContext */}
+    </Form>
+  );
+}
+
+// ❌ Incorrect usage - will throw error
+function MyFormComponent() {
+  const form = useFormContext<UserForm>(); // Error: No form context found
+  // ...
+}
+```
+
+## Performance Notes
+
+- The hook provides direct access to the same form context passed to `<Form>`
+- No additional subscriptions or state management overhead
+- Efficient for creating reusable form components
+- All form methods are memoized for optimal performance

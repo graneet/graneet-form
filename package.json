@@ -20,7 +20,7 @@
   "license": "MIT",
   "scripts": {
     "start:dev": "pnpm -r dev",
-    "build:docs": "pnpm --filter graneet-form-documentation build",
+    "build:docs": "pnpm --filter docs build",
     "biome:check": "biome check .",
     "biome:write": "biome check --write .",
     "release": "pnpm --filter graneet-form build && changeset publish",
@@ -28,16 +28,18 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
-    "@changesets/cli": "2.29.7",
     "@changesets/changelog-github": "0.5.1",
+    "@changesets/cli": "2.29.7",
     "typescript": "5.9.2"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "@biomejs/biome",
       "@swc/core",
+      "@tailwindcss/oxide",
       "core-js",
-      "esbuild"
+      "esbuild",
+      "sharp"
     ]
   }
 }

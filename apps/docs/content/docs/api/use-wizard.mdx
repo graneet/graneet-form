@@ -1,0 +1,264 @@
+---
+title: useWizard
+description: Main hook for creating and managing multi-step wizard workflows
+---
+
+# useWizard Hook
+
+The `useWizard` hook is the core hook for creating multi-step wizards with automatic data persistence, validation, and navigation management. It orchestrates multiple form steps and maintains state across the entire wizard flow.
+
+## Usage
+
+```tsx
+import { useWizard } from 'graneet-form';
+
+const wizard = useWizard(steps, onFinish, onQuit);
+```
+
+## Parameters
+
+- `steps: Steps<WizardValues>` - Array of step configurations defining the wizard flow
+- `onFinish?: (wizardValues: WizardValues) => void | Promise<void>` - Callback called when wizard is completed
+- `onQuit?: () => void` - Callback called when user quits the wizard
+
+### Steps Configuration
+
+<AutoTypeTable path="../../packages/graneet-form/src/wizard/hooks/use-wizard.ts" name="Steps" />
+
+Each step in the array should have:
+- `name` - Unique identifier for the step
+- `onNext?` - Optional validation function called before proceeding to next step
+
+## Returns
+
+The hook returns a wizard context API object:
+
+<AutoTypeTable path="../../packages/graneet-form/src/wizard/contexts/wizard-context.ts" name="WizardContextApi" />
+
+## Examples
+
+### Basic Wizard Setup
+
+```tsx
+interface WizardData {
+  userInfo: { name: string; email: string; };
+  preferences: { theme: 'light' | 'dark'; notifications: boolean; };
+  confirmation: { agreed: boolean; };
+}
+
+function RegistrationWizard() {
+  const steps: Steps<WizardData> = [
+    { name: 'userInfo' },
+    { name: 'preferences' },
+    { name: 'confirmation' }
+  ];
+
+  const wizard = useWizard<WizardData>(
+    steps,
+    async (wizardValues) => {
+      console.log('Wizard completed:', wizardValues);
+      await submitRegistration(wizardValues);
+    },
+    () => {
+      console.log('Wizard cancelled');
+      router.push('/');
+    }
+  );
+
+  return (
+    <WizardContext.Provider value={wizard}>
+      <WizardNavigation />
+      <WizardContent />
+    </WizardContext.Provider>
+  );
+}
+```
+
+### Wizard with Step Validation
+
+```tsx
+const steps: Steps<WizardData> = [
+  { 
+    name: 'userInfo',
+    onNext: async (stepData) => {
+      // Validate email uniqueness before proceeding
+      if (stepData.email) {
+        const exists = await checkEmailExists(stepData.email);
+        if (exists) {
+          showError('Email already exists');
+          return false;
+        }
+      }
+      return true;
+    }
+  },
+  { 
+    name: 'preferences',
+    onNext: (stepData) => {
+      // Simple validation
+      return stepData.theme !== undefined;
+    }
+  },
+  { name: 'confirmation' }
+];
+```
+
+### Dynamic Step Navigation
+
+```tsx
+function WizardNavigation() {
+  const wizard = useWizardContext<WizardData>();
+  
+  return (
+    <div className="wizard-nav">
+      <div className="steps-indicator">
+        {wizard.steps.map((stepName, index) => (
+          <button
+            key={stepName}
+            className={stepName === wizard.currentStep ? 'active' : 'inactive'}
+            onClick={() => wizard.goBackTo(stepName)}
+            disabled={index > wizard.steps.indexOf(wizard.currentStep)}
+          >
+            {stepName}
+          </button>
+        ))}
+      </div>
+
+      <div className="navigation-buttons">
+        <button 
+          onClick={wizard.goPrevious}
+          disabled={wizard.isFirstStep}
+        >
+          {wizard.isFirstStep ? 'Cancel' : 'Previous'}
+        </button>
+
+        <button 
+          onClick={wizard.goNext}
+          disabled={!wizard.isStepReady}
+        >
+          {wizard.isLastStep ? 'Finish' : 'Next'}
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+### Step Content Rendering
+
+```tsx
+function WizardContent() {
+  const { currentStep } = useWizardContext<WizardData>();
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 'userInfo':
+        return <UserInfoStep />;
+      case 'preferences':
+        return <PreferencesStep />;
+      case 'confirmation':
+        return <ConfirmationStep />;
+      default:
+        return <div>Unknown step</div>;
+    }
+  };
+
+  return (
+    <div className="wizard-content">
+      {renderStep()}
+    </div>
+  );
+}
+```
+
+### Access Wizard Data
+
+```tsx
+function ConfirmationStep() {
+  const wizard = useWizardContext<WizardData>();
+
+  // Get data from specific step
+  const userInfo = wizard.getValuesOfStep('userInfo');
+  
+  // Get data from current step
+  const currentData = wizard.getValuesOfCurrentStep();
+  
+  // Get all wizard data
+  const allData = wizard.getValuesOfSteps();
+
+  return (
+    <div>
+      <h2>Confirm Your Information</h2>
+      
+      <div>
+        <h3>User Information</h3>
+        <p>Name: {userInfo?.name}</p>
+        <p>Email: {userInfo?.email}</p>
+      </div>
+
+      <div>
+        <h3>All Data</h3>
+        <pre>{JSON.stringify(allData, null, 2)}</pre>
+      </div>
+    </div>
+  );
+}
+```
+
+### Conditional Step Flow
+
+```tsx
+function ConditionalWizard() {
+  const [userType, setUserType] = useState<'personal' | 'business'>('personal');
+
+  const steps: Steps<WizardData> = useMemo(() => {
+    const baseSteps = [
+      { name: 'userInfo' },
+      { name: 'preferences' }
+    ];
+
+    if (userType === 'business') {
+      baseSteps.splice(1, 0, { name: 'businessInfo' });
+    }
+
+    return [...baseSteps, { name: 'confirmation' }];
+  }, [userType]);
+
+  const wizard = useWizard<WizardData>(steps, handleFinish);
+
+  return (
+    <WizardContext.Provider value={wizard}>
+      <WizardFlow />
+    </WizardContext.Provider>
+  );
+}
+```
+
+## Wizard Context API Methods
+
+### Navigation Methods
+
+- `goNext()` - Proceed to the next step (with validation)
+- `goPrevious()` - Go back to the previous step
+- `goBackTo(stepName)` - Jump to a specific previous step
+
+### Data Access Methods
+
+- `getValuesOfStep(stepName)` - Get data from a specific step
+- `getValuesOfCurrentStep()` - Get data from the current step
+- `getValuesOfSteps()` - Get all wizard data
+
+### State Properties
+
+- `currentStep` - Currently active step name
+- `isFirstStep` - Whether on the first step
+- `isLastStep` - Whether on the last step
+- `isStepReady` - Whether current step is ready for navigation
+- `steps` - Array of all step names
+
+## Performance Notes
+
+- Step data is persisted automatically when navigating
+- Validation is performed only when needed (before navigation)
+- Step components are unmounted/remounted for clean state management
+- Use `useStepForm` within steps for optimal form performance

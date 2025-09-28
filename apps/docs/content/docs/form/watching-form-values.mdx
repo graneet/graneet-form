@@ -1,0 +1,384 @@
+---
+title: Watching Form Values
+description: Learn how to efficiently watch and react to form value changes using graneet-form's subscription-based system
+---
+
+# Watching Form Values
+
+Learn how to efficiently watch and react to form value changes using graneet-form's subscription-based system.
+
+## Overview
+
+Graneet-form provides a powerful subscription system that allows components to watch specific form fields or all fields. This system is designed for optimal performance, ensuring components only re-render when their watched fields change.
+
+## Watch Modes
+
+### `useFieldsWatch` - Real-time Updates
+
+Updates immediately whenever a field value changes (on every keystroke).
+
+```tsx
+import { useFieldsWatch, useFormContext } from 'graneet-form';
+
+function LiveFormDisplay() {
+  const form = useFormContext<{ name: string; email: string }>();
+  
+  // Watch specific fields (recommended for performance)
+  const { name, email } = useFieldsWatch(form, ['name', 'email']);
+  
+  return (
+    <div>
+      <p>Name: {name}</p>
+      <p>Email: {email}</p>
+    </div>
+  );
+}
+```
+
+### `useFieldsWatch` with onBlur Mode - Update on Blur
+
+Updates only when fields lose focus (after user finishes editing).
+
+```tsx
+import { useFieldsWatch, useFormContext } from 'graneet-form';
+
+function FormSummary() {
+  const form = useFormContext<FormData>();
+  
+  // Updates only when fields lose focus
+  const { title, description } = useFieldsWatch(form, ['title', 'description'], { mode: 'onBlur' });
+  
+  return (
+    <div className="summary">
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
+}
+```
+
+## Watching Specific Fields vs All Fields
+
+### Watching Specific Fields (Recommended)
+
+More performant as components only re-render when watched fields change.
+
+```tsx
+// ✅ Efficient - only re-renders when name or email changes
+const { name, email } = useFieldsWatch(form, ['name', 'email']);
+```
+
+### Watching All Fields
+
+Less performant but sometimes necessary for global form state.
+
+```tsx
+// ⚠️ Less efficient - re-renders on any field change
+const allValues = useFieldsWatch(form, undefined);
+```
+
+## Practical Examples
+
+### 1. Form Validation Summary
+
+```tsx
+function ValidationSummary() {
+  const form = useFormContext<UserForm>();
+  const { name, email, password } = useFieldsWatch(form, ['name', 'email', 'password'], { mode: 'onBlur' });
+  
+  const completedFields = [name, email, password].filter(Boolean).length;
+  const totalFields = 3;
+  const progress = (completedFields / totalFields) * 100;
+  
+  return (
+    <div className="validation-summary">
+      <div className="progress">
+        Form Progress: {progress.toFixed(0)}%
+        <div className="progress-bar" style={{ width: `${progress}%` }} />
+      </div>
+      <ul>
+        <li className={name ? 'complete' : 'incomplete'}>Name</li>
+        <li className={email ? 'complete' : 'incomplete'}>Email</li>
+        <li className={password ? 'complete' : 'incomplete'}>Password</li>
+      </ul>
+    </div>
+  );
+}
+```
+
+### 2. Auto-save Indicator
+
+```tsx
+function AutoSaveStatus() {
+  const form = useFormContext<ArticleForm>();
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
+  
+  // Watch for changes in real-time
+  const { title, content } = useFieldsWatch(form, ['title', 'content']);
+  
+  useEffect(() => {
+    setSaveStatus('unsaved');
+    
+    const saveTimeout = setTimeout(async () => {
+      setSaveStatus('saving');
+      try {
+        await api.saveDraft({ title, content });
+        setSaveStatus('saved');
+      } catch {
+        setSaveStatus('unsaved');
+      }
+    }, 2000);
+    
+    return () => clearTimeout(saveTimeout);
+  }, [title, content]);
+  
+  return (
+    <div className={`save-status ${saveStatus}`}>
+      {saveStatus === 'saved' && '✅ Saved'}
+      {saveStatus === 'saving' && '⏳ Saving...'}
+      {saveStatus === 'unsaved' && '📝 Unsaved changes'}
+    </div>
+  );
+}
+```
+
+### 3. Dependent Field Updates
+
+```tsx
+function AddressForm() {
+  const form = useFormContext<AddressFormData>();
+  
+  // Watch zip code changes
+  const { zipCode } = useFieldsWatch(form, ['zipCode'], { mode: 'onBlur' });
+  
+  useEffect(() => {
+    if (zipCode && zipCode.length === 5) {
+      // Auto-populate city and state based on zip code
+      geocodeService.getByZip(zipCode).then(info => {
+        form.setFormValues({
+          city: info.city,
+          state: info.state
+        });
+      });
+    }
+  }, [zipCode, form]);
+  
+  return (
+    <div>
+      <Field name="zipCode" render={/* zip code input */} />
+      <Field name="city" render={/* city input */} />
+      <Field name="state" render={/* state input */} />
+    </div>
+  );
+}
+```
+
+### 4. Dynamic Form Behavior
+
+```tsx
+function PaymentForm() {
+  const form = useFormContext<PaymentFormData>();
+  
+  // Watch payment method selection
+  const { paymentMethod } = useFieldsWatch(form, ['paymentMethod']);
+  
+  return (
+    <div>
+      <Field<PaymentFormData, 'paymentMethod'>
+        name="paymentMethod"
+        render={(fieldProps) => (
+          <select
+            value={fieldProps.value || ''}
+            onChange={(e) => fieldProps.onChange(e.target.value)}
+            onBlur={fieldProps.onBlur}
+            onFocus={fieldProps.onFocus}
+          >
+            <option value="">Select payment method</option>
+            <option value="card">Credit Card</option>
+            <option value="paypal">PayPal</option>
+            <option value="bank">Bank Transfer</option>
+          </select>
+        )}
+      />
+      
+      {/* Conditionally render payment-specific fields */}
+      {paymentMethod === 'card' && <CreditCardFields />}
+      {paymentMethod === 'paypal' && <PayPalFields />}
+      {paymentMethod === 'bank' && <BankTransferFields />}
+    </div>
+  );
+}
+```
+
+## Performance Considerations
+
+### 1. Watch Only What You Need
+
+```tsx
+// ❌ Watching all fields when only needing name
+const allValues = useFieldsWatch(form, undefined);
+const name = allValues.name;
+
+// ✅ Watch only the specific field needed
+const { name } = useFieldsWatch(form, ['name']);
+```
+
+### 2. Choose Appropriate Watch Mode
+
+```tsx
+// For real-time display (search, live preview, etc.)
+const { searchTerm } = useFieldsWatch(form, ['searchTerm']);
+
+// For validation, summaries, auto-save (less frequent updates)
+const { title, content } = useFieldsWatch(form, ['title', 'content'], { mode: 'onBlur' });
+```
+
+### 3. Debounce Expensive Operations
+
+```tsx
+function ExpensiveFormWatcher() {
+  const form = useFormContext<FormData>();
+  const { complexField } = useFieldsWatch(form, ['complexField']);
+  
+  // Debounce expensive calculations
+  const debouncedValue = useDebounce(complexField, 500);
+  
+  useEffect(() => {
+    if (debouncedValue) {
+      performExpensiveCalculation(debouncedValue);
+    }
+  }, [debouncedValue]);
+  
+  return <div>...</div>;
+}
+```
+
+## Advanced Patterns
+
+### Multiple Watchers in One Component
+
+```tsx
+function ComprehensiveFormWatcher() {
+  const form = useFormContext<ComplexForm>();
+  
+  // Real-time updates for immediate feedback
+  const { searchQuery } = useFieldsWatch(form, ['searchQuery']);
+  
+  // Blur updates for less critical information
+  const { title, description, tags } = useFieldsWatch(form, ['title', 'description', 'tags'], { mode: 'onBlur' });
+  
+  // Global form state for debugging (use sparingly)
+  const allValues = useFieldsWatch(form, undefined);
+  
+  return (
+    <div>
+      {/* Real-time search results */}
+      <SearchResults query={searchQuery} />
+      
+      {/* Form summary updated on blur */}
+      <FormPreview title={title} description={description} tags={tags} />
+      
+      {/* Debug panel (development only) */}
+      {process.env.NODE_ENV === 'development' && (
+        <pre>{JSON.stringify(allValues, null, 2)}</pre>
+      )}
+    </div>
+  );
+}
+```
+
+### Custom Hook for Common Patterns
+
+```tsx
+// Custom hook for form progress tracking
+function useFormProgress<T>(form: FormContextApi<T>, requiredFields: (keyof T)[]) {
+  const watchedValues = useFieldsWatch(form, requiredFields, { mode: 'onBlur' });
+  
+  return useMemo(() => {
+    const completedFields = requiredFields.filter(
+      field => watchedValues[field] != null && watchedValues[field] !== ''
+    ).length;
+    
+    return {
+      completed: completedFields,
+      total: requiredFields.length,
+      percentage: (completedFields / requiredFields.length) * 100,
+      isComplete: completedFields === requiredFields.length
+    };
+  }, [watchedValues, requiredFields]);
+}
+
+// Usage
+function FormProgressIndicator() {
+  const form = useFormContext<UserForm>();
+  const progress = useFormProgress(form, ['name', 'email', 'password']);
+  
+  return (
+    <div>
+      Progress: {progress.completed}/{progress.total} ({progress.percentage.toFixed(0)}%)
+    </div>
+  );
+}
+```
+
+## Global Watching Warnings
+
+<div className="border-l-4 border-amber-500 bg-amber-50 p-4 my-4">
+  <div className="flex">
+    <div className="flex-shrink-0">
+      <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+      </svg>
+    </div>
+    <div className="ml-3">
+      <h3 className="text-sm font-medium text-amber-800">Performance Impact</h3>
+      <div className="mt-2 text-sm text-amber-700">
+        <p>Global watching (`useFieldsWatch(form, undefined)`) causes components to re-render on every form change. Use sparingly and only when necessary.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div className="border-l-4 border-blue-500 bg-blue-50 p-4 my-4">
+  <div className="flex">
+    <div className="flex-shrink-0">
+      <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
+      </svg>
+    </div>
+    <div className="ml-3">
+      <h3 className="text-sm font-medium text-blue-800">Best Practice</h3>
+      <div className="mt-2 text-sm text-blue-700">
+        <p>Always prefer specific field watching over global watching. If you need many fields, consider splitting your component or using multiple targeted watchers.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+## Migration from Other Form Libraries
+
+### From React Hook Form
+
+```tsx
+// React Hook Form
+const { watch } = useForm();
+const name = watch('name');
+const allValues = watch();
+
+// Graneet Form equivalent
+const form = useFormContext<FormType>();
+const { name } = useFieldsWatch(form, ['name']);
+const allValues = useFieldsWatch(form, undefined);
+```
+
+### From Formik
+
+```tsx
+// Formik
+const { values } = useFormikContext<FormType>();
+const name = values.name;
+
+// Graneet Form equivalent
+const form = useFormContext<FormType>();
+const { name } = useFieldsWatch(form, ['name']);
+```
