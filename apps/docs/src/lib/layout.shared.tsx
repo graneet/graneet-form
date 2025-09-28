@@ -13,11 +13,11 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: (
         <>
-          <Image 
-            src="/graneet-form-logo.png" 
-            alt="Graneet Form Logo" 
-            width={24} 
-            height={24} 
+          <Image
+            src="/graneet-form-logo.png"
+            alt="Graneet Form Logo"
+            width={24}
+            height={24}
             style={{ borderRadius: '50%' }}
           />
           Graneet form

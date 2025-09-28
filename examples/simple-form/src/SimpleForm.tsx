@@ -1,4 +1,5 @@
 import { Field, Form, Rule, useForm } from 'graneet-form';
+import { useId } from 'react';
 
 interface FormValues {
   name: string;
@@ -6,6 +7,9 @@ interface FormValues {
 }
 
 export function SimpleForm() {
+  const nameId = useId();
+  const emailId = useId();
+
   const form = useForm<FormValues>({
     defaultValues: {
       name: '',
@@ -23,12 +27,15 @@ export function SimpleForm() {
 
       <Form form={form} onSubmit={form.handleSubmit(onSubmit)}>
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem' }}>Name:</label>
+          <label htmlFor={nameId} style={{ display: 'block', marginBottom: '0.5rem' }}>
+            Name:
+          </label>
 
           <Field<FormValues, 'name'>
             name="name"
             render={({ value, onChange, onBlur, onFocus }) => (
               <input
+                id={nameId}
                 type="text"
                 value={value || ''}
                 onChange={(e) => onChange(e.target.value)}
@@ -48,11 +55,14 @@ export function SimpleForm() {
         </div>
 
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email:</label>
+          <label htmlFor={emailId} style={{ display: 'block', marginBottom: '0.5rem' }}>
+            Email:
+          </label>
           <Field<FormValues, 'email'>
             name="email"
             render={({ value, onChange, onBlur, onFocus }) => (
               <input
+                id={emailId}
                 type="email"
                 value={value || ''}
                 onChange={(e) => onChange(e.target.value)}
