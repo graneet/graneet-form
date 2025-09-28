@@ -1,5 +1,26 @@
 # graneet-form
 
+## 3.0.0-next.11
+
+### Major Changes
+
+- [#139](https://github.com/graneet/graneet-form/pull/139) [`814e18e`](https://github.com/graneet/graneet-form/commit/814e18e057716ceb1a5d9e481610da575cfe3cbb) Thanks [@victorduclos](https://github.com/victorduclos)! - **Breaking Change**: Rename and unify `useOnBlurValues`, `useOnChangeValues` to `useFieldsWatch` for consistency
+
+  The hooks `useOnBlurValues` and `useOnChangeValues` have been unified into a single `useFieldsWatch` hook with a `mode` option for better consistency and API simplification.
+
+  **Migration Guide:**
+
+  ```diff
+  - import { useOnChangeValues, useOnBlurValues } from 'graneet-form';
+  + import { useFieldsWatch } from 'graneet-form';
+
+  - const values = useOnChangeValues(form, ['field1', 'field2']);
+  + const values = useFieldsWatch(form, ['field1', 'field2']); // onChange by default
+
+  - const values = useOnBlurValues(form, ['field1', 'field2']);
+  + const values = useFieldsWatch(form, ['field1', 'field2'], { mode: 'onBlur' });
+  ```
+
 ## 3.0.0-next.10
 
 ### Major Changes
