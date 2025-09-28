@@ -4,7 +4,11 @@
   "initialVersions": {
     "graneet-form-documentation": "1.0.0",
     "graneet-form-testing": "0.0.1",
-    "graneet-form": "2.3.3"
+    "graneet-form": "2.3.3",
+    "docs": "1.0.0",
+    "testing": "0.0.1",
+    "complex-typescript": "0.0.0",
+    "simple-form": "0.0.0"
   },
   "changesets": [
     "cool-foxes-beg",
@@ -17,6 +21,7 @@
     "great-walls-dress",
     "happy-horses-sniff",
     "itchy-carpets-feel",
+    "major-rename-useformwatch",
     "nine-chairs-enjoy",
     "orange-chicken-decide",
     "sharp-symbols-jump",

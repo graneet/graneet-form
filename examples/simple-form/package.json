@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "graneet-form": "3.0.0-next.10",
+    "graneet-form": "3.0.0-next.11",
     "react": "19.1.1",
     "react-dom": "19.1.1"
   },
