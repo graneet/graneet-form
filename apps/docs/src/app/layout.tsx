@@ -1,10 +1,18 @@
 import '@/app/global.css';
 import { RootProvider } from 'fumadocs-ui/provider';
 import { Inter } from 'next/font/google';
+import type { Metadata } from 'next';
 
 const inter = Inter({
   subsets: ['latin'],
 });
+
+export const metadata: Metadata = {
+  icons: {
+    icon: '/graneet-form-logo.png',
+    apple: '/graneet-form-logo.png',
+  },
+};
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
