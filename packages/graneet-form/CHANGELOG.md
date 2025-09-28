@@ -1,5 +1,11 @@
 # graneet-form
 
+## 3.0.0-next.12
+
+### Minor Changes
+
+- [#146](https://github.com/graneet/graneet-form/pull/146) [`97bfa77`](https://github.com/graneet/graneet-form/commit/97bfa77d906597649e5329e3ffe676ce6b592c13) Thanks [@victorduclos](https://github.com/victorduclos)! - Empty bump
+
 ## 3.0.0-next.11
 
 ### Major Changes
