@@ -1,0 +1,233 @@
+---
+title: useValidations
+description: Hook for watching form field validation states and errors
+---
+
+# useValidations Hook
+
+The `useValidations` hook provides access to validation states and error messages for form fields. You can watch all field validations or subscribe to specific fields for granular validation monitoring.
+
+## Usage
+
+```tsx
+import { useValidations } from 'graneet-form';
+
+// Watch all field validations
+const allValidations = useValidations(form, undefined);
+
+// Watch specific field validations
+const specificValidations = useValidations(form, ['email', 'password']);
+```
+
+## Parameters
+
+- `form: FormContextApi<T>` - The form instance created by `useForm`
+- `names: K[] | undefined` - Array of field names to watch, or `undefined` to watch all fields
+
+## Returns
+
+- When `names` is `undefined`: `PartialRecord<keyof T, ValidationState | undefined>` - Partial record of all field validation states
+- When `names` is an array: `FormValidations<T, K>` - Record containing validation states for specified fields
+
+## ValidationState Type
+
+<AutoTypeTable path="../../packages/graneet-form/src/shared/types/validation.ts" name="ValidationState" />
+
+## Examples
+
+### Watch All Field Validations
+
+```tsx
+interface UserForm {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+function ValidationSummary() {
+  const form = useForm<UserForm>();
+  const validations = useValidations(form, undefined);
+
+  const getValidationCount = (status: string) => {
+    return Object.values(validations).filter(
+      validation => validation?.status === status
+    ).length;
+  };
+
+  return (
+    <div className="validation-summary">
+      <p>Valid fields: {getValidationCount('valid')}</p>
+      <p>Invalid fields: {getValidationCount('invalid')}</p>
+      <p>Pending validations: {getValidationCount('pending')}</p>
+    </div>
+  );
+}
+```
+
+### Watch Specific Field Validations
+
+```tsx
+function PasswordFields() {
+  const form = useFormContext<UserForm>();
+  const { password, confirmPassword } = useValidations(form, ['password', 'confirmPassword']);
+
+  return (
+    <div>
+      <Field name="password">
+        <Rule 
+          validationFn={(value) => value.length >= 8}
+          message="Password must be at least 8 characters"
+        />
+      </Field>
+      {password?.status === 'invalid' && (
+        <div className="error">{password.message}</div>
+      )}
+
+      <Field name="confirmPassword">
+        <Rule 
+          validationFn={(value, formData) => value === formData.password}
+          message="Passwords must match"
+        />
+      </Field>
+      {confirmPassword?.status === 'invalid' && (
+        <div className="error">{confirmPassword.message}</div>
+      )}
+    </div>
+  );
+}
+```
+
+### Error List Component
+
+```tsx
+function ErrorList() {
+  const form = useFormContext<UserForm>();
+  const validations = useValidations(form, undefined);
+
+  const errors = Object.entries(validations)
+    .filter(([_, validation]) => validation?.status === 'invalid')
+    .map(([fieldName, validation]) => ({
+      field: fieldName,
+      message: validation!.message
+    }));
+
+  if (errors.length === 0) return null;
+
+  return (
+    <div className="error-list">
+      <h4>Please fix the following errors:</h4>
+      <ul>
+        {errors.map(({ field, message }) => (
+          <li key={field}>
+            <strong>{field}:</strong> {message}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### Conditional Field Validation
+
+```tsx
+function ConditionalValidation() {
+  const form = useFormContext<UserForm>();
+  const { email } = useValidations(form, ['email']);
+
+  return (
+    <div>
+      <Field name="email">
+        <Rule 
+          validationFn={(value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)}
+          message="Please enter a valid email address"
+        />
+      </Field>
+
+      {email?.status === 'valid' && (
+        <div className="success">
+          ✓ Email format is valid
+        </div>
+      )}
+
+      {email?.status === 'pending' && (
+        <div className="pending">
+          🔄 Checking email availability...
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### Form Section Validation Status
+
+```tsx
+function PersonalInfoSection() {
+  const form = useFormContext<UserForm>();
+  const personalFields = useValidations(form, ['firstName', 'lastName', 'dateOfBirth']);
+
+  const sectionIsValid = Object.values(personalFields).every(
+    validation => validation?.status === 'valid'
+  );
+
+  return (
+    <fieldset className={sectionIsValid ? 'valid-section' : 'invalid-section'}>
+      <legend>
+        Personal Information 
+        {sectionIsValid && <span className="checkmark">✓</span>}
+      </legend>
+      
+      <Field name="firstName" />
+      <Field name="lastName" />
+      <Field name="dateOfBirth" />
+    </fieldset>
+  );
+}
+```
+
+### Real-time Validation Feedback
+
+```tsx
+function LiveValidationField({ name }: { name: keyof UserForm }) {
+  const form = useFormContext<UserForm>();
+  const validations = useValidations(form, [name]);
+  const validation = validations[name];
+
+  const getValidationIcon = () => {
+    switch (validation?.status) {
+      case 'valid': return '✓';
+      case 'invalid': return '✗';
+      case 'pending': return '⏳';
+      default: return '';
+    }
+  };
+
+  return (
+    <div className="field-container">
+      <Field name={name} />
+      <span className={`validation-icon ${validation?.status}`}>
+        {getValidationIcon()}
+      </span>
+      {validation?.status === 'invalid' && (
+        <div className="validation-message">
+          {validation.message}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+## Validation Status Values
+
+- `'valid'` - Field passes all validation rules
+- `'invalid'` - Field fails one or more validation rules
+- `'pending'` - Async validation is in progress
+- `'undetermined'` - No validation has been performed yet
+
+## Performance Notes
+
+- The hook efficiently subscribes only to the specified fields
+- Validation state updates are optimized to prevent unnecessary re-renders
+- Use specific field watching for better performance in large forms

@@ -1,0 +1,290 @@
+---
+title: useStepStatus
+description: Hook for monitoring current wizard step validation status
+---
+
+# useStepStatus Hook
+
+The `useStepStatus` hook provides access to the current wizard step's validation status. It's useful for creating custom navigation components or status indicators that need to respond to step validation changes.
+
+## Usage
+
+```tsx
+import { useStepStatus } from 'graneet-form';
+
+const stepStatus = useStepStatus();
+```
+
+## Parameters
+
+This hook takes no parameters and must be used within a wizard context.
+
+## Returns
+
+- `ValidationStatus` - The current step's validation status
+
+## Status Values
+
+- `'valid'` - All fields in the current step are valid
+- `'invalid'` - One or more fields in the current step are invalid  
+- `'pending'` - Async validation is in progress
+- `'undetermined'` - No validation has been performed yet
+
+## Examples
+
+### Custom Navigation Button
+
+```tsx
+function NextButton() {
+  const stepStatus = useStepStatus();
+  const { goNext, isLastStep } = useWizardContext();
+
+  const getButtonText = () => {
+    if (stepStatus === 'pending') return 'Validating...';
+    if (isLastStep) return 'Finish';
+    return 'Next';
+  };
+
+  const getButtonClass = () => {
+    switch (stepStatus) {
+      case 'valid': return 'btn-primary';
+      case 'invalid': return 'btn-disabled';
+      case 'pending': return 'btn-loading';
+      default: return 'btn-default';
+    }
+  };
+
+  return (
+    <button
+      onClick={goNext}
+      disabled={stepStatus !== 'valid'}
+      className={getButtonClass()}
+    >
+      {getButtonText()}
+    </button>
+  );
+}
+```
+
+### Step Status Indicator
+
+```tsx
+function StepStatusIndicator() {
+  const stepStatus = useStepStatus();
+
+  const getStatusIcon = () => {
+    switch (stepStatus) {
+      case 'valid': return '✅';
+      case 'invalid': return '❌';
+      case 'pending': return '⏳';
+      case 'undetermined': return '⚪';
+      default: return '❓';
+    }
+  };
+
+  const getStatusMessage = () => {
+    switch (stepStatus) {
+      case 'valid': return 'Step completed successfully';
+      case 'invalid': return 'Please fix the errors below';
+      case 'pending': return 'Validating your input...';
+      case 'undetermined': return 'Fill out the required fields';
+      default: return 'Unknown status';
+    }
+  };
+
+  return (
+    <div className={`status-indicator status-${stepStatus}`}>
+      <span className="status-icon">{getStatusIcon()}</span>
+      <span className="status-message">{getStatusMessage()}</span>
+    </div>
+  );
+}
+```
+
+### Progress Bar with Status
+
+```tsx
+function WizardProgressBar() {
+  const { steps, currentStep } = useWizardContext();
+  const currentStepStatus = useStepStatus();
+  
+  const currentStepIndex = steps.indexOf(currentStep);
+
+  return (
+    <div className="progress-bar">
+      {steps.map((stepName, index) => {
+        let status: 'completed' | 'current' | 'pending' = 'pending';
+        
+        if (index < currentStepIndex) {
+          status = 'completed';
+        } else if (index === currentStepIndex) {
+          status = 'current';
+        }
+
+        return (
+          <div 
+            key={stepName}
+            className={`progress-step ${status}`}
+          >
+            <div className="step-indicator">
+              {status === 'completed' && '✓'}
+              {status === 'current' && (
+                <span className={`current-status ${currentStepStatus}`}>
+                  {currentStepStatus === 'valid' && '✓'}
+                  {currentStepStatus === 'invalid' && '!'}
+                  {currentStepStatus === 'pending' && '⋯'}
+                  {currentStepStatus === 'undetermined' && index + 1}
+                </span>
+              )}
+              {status === 'pending' && index + 1}
+            </div>
+            <span className="step-label">{stepName}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+```
+
+### Conditional Help Text
+
+```tsx
+function StepHelpText() {
+  const stepStatus = useStepStatus();
+  const { currentStep } = useWizardContext();
+
+  const getHelpText = () => {
+    if (stepStatus === 'invalid') {
+      return 'Please correct the errors highlighted in red before continuing.';
+    }
+    
+    if (stepStatus === 'pending') {
+      return 'We\'re validating your information. This may take a moment.';
+    }
+    
+    if (stepStatus === 'valid') {
+      return 'Great! You can proceed to the next step.';
+    }
+
+    // Step-specific help for undetermined status
+    switch (currentStep) {
+      case 'userInfo':
+        return 'Please fill in your basic information to continue.';
+      case 'preferences':
+        return 'Choose your preferences to personalize your experience.';
+      case 'confirmation':
+        return 'Review your information and confirm to complete registration.';
+      default:
+        return 'Complete this step to continue.';
+    }
+  };
+
+  return (
+    <div className={`help-text help-${stepStatus}`}>
+      <p>{getHelpText()}</p>
+    </div>
+  );
+}
+```
+
+### Auto-save Based on Status
+
+```tsx
+function AutoSaveIndicator() {
+  const stepStatus = useStepStatus();
+  const { getValuesOfCurrentStep } = useWizardContext();
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (stepStatus === 'valid') {
+      // Auto-save when step becomes valid
+      const currentValues = getValuesOfCurrentStep();
+      if (currentValues && Object.keys(currentValues).length > 0) {
+        saveDraft(currentValues).then(() => {
+          setLastSaved(new Date());
+        });
+      }
+    }
+  }, [stepStatus, getValuesOfCurrentStep]);
+
+  if (!lastSaved) return null;
+
+  return (
+    <div className="auto-save-indicator">
+      <span>✓ Auto-saved at {lastSaved.toLocaleTimeString()}</span>
+    </div>
+  );
+}
+```
+
+### Status-Based Form Actions
+
+```tsx
+function FormActions() {
+  const stepStatus = useStepStatus();
+  const { goNext, goPrevious, isFirstStep, isLastStep } = useWizardContext();
+
+  return (
+    <div className="form-actions">
+      <button
+        onClick={goPrevious}
+        disabled={stepStatus === 'pending'}
+        className="btn-secondary"
+      >
+        {isFirstStep ? 'Cancel' : 'Previous'}
+      </button>
+
+      {stepStatus === 'invalid' && (
+        <button
+          onClick={() => {
+            // Scroll to first error
+            const firstError = document.querySelector('.field-error');
+            firstError?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="btn-warning"
+        >
+          Show Errors
+        </button>
+      )}
+
+      <button
+        onClick={goNext}
+        disabled={stepStatus !== 'valid'}
+        className={stepStatus === 'valid' ? 'btn-primary' : 'btn-disabled'}
+      >
+        {stepStatus === 'pending' && <span className="spinner" />}
+        {isLastStep ? 'Complete' : 'Continue'}
+      </button>
+    </div>
+  );
+}
+```
+
+## Integration with Step Forms
+
+The hook automatically receives status updates from `useStepForm` when used in the same step:
+
+```tsx
+function MyWizardStep() {
+  const { form } = useStepForm({ /* options */ });
+  const stepStatus = useStepStatus(); // Automatically synced with form validation
+
+  return (
+    <div>
+      <Form form={form}>
+        {/* Your form fields */}
+      </Form>
+      
+      <StepStatusIndicator />
+      <CustomNavigationButtons />
+    </div>
+  );
+}
+```
+
+## Performance Notes
+
+- The hook uses efficient subscription mechanisms to minimize re-renders
+- Status updates are debounced to prevent excessive updates during rapid form changes
+- Only triggers re-renders when the status actually changes

@@ -1,0 +1,119 @@
+---
+title: useFormStatus
+description: Hook for monitoring form validation status and state
+---
+
+# useFormStatus Hook
+
+The `useFormStatus` hook provides real-time access to a form's overall validation status and validity state. It automatically aggregates all field validation states to determine the form's overall status.
+
+## Usage
+
+```tsx
+import { useFormStatus } from 'graneet-form';
+
+const { formStatus, isValid } = useFormStatus(form);
+```
+
+## Parameters
+
+- `form: FormContextApi<T>` - The form instance created by `useForm`
+
+## Returns
+
+<AutoTypeTable path="../../packages/graneet-form/src/form/hooks/use-form-status.ts" name="FormStatus" />
+
+## Examples
+
+### Basic Status Monitoring
+
+```tsx
+interface UserForm {
+  name: string;
+  email: string;
+}
+
+function FormStatusIndicator() {
+  const form = useForm<UserForm>();
+  const { formStatus, isValid } = useFormStatus(form);
+
+  return (
+    <div>
+      <span>Status: {formStatus}</span>
+      <span>Valid: {isValid ? 'Yes' : 'No'}</span>
+    </div>
+  );
+}
+```
+
+### Conditional Submit Button
+
+```tsx
+function SubmitButton() {
+  const form = useFormContext<UserForm>();
+  const { isValid } = useFormStatus(form);
+
+  return (
+    <button 
+      type="submit" 
+      disabled={!isValid}
+      className={isValid ? 'enabled' : 'disabled'}
+    >
+      Submit Form
+    </button>
+  );
+}
+```
+
+### Status-based UI Feedback
+
+```tsx
+function FormWithStatusFeedback() {
+  const form = useForm<UserForm>();
+  const { formStatus, isValid } = useFormStatus(form);
+
+  const getStatusColor = () => {
+    switch (formStatus) {
+      case 'valid': return 'green';
+      case 'invalid': return 'red';
+      case 'pending': return 'orange';
+      default: return 'gray';
+    }
+  };
+
+  return (
+    <Form form={form}>
+      <div className="form-header">
+        <h2>User Registration</h2>
+        <div 
+          className="status-indicator"
+          style={{ backgroundColor: getStatusColor() }}
+        >
+          {formStatus}
+        </div>
+      </div>
+      
+      {/* Form fields */}
+      
+      <button type="submit" disabled={!isValid}>
+        {formStatus === 'pending' ? 'Validating...' : 'Submit'}
+      </button>
+    </Form>
+  );
+}
+```
+
+## Status Values
+
+The `formStatus` can be one of:
+
+- `'valid'` - All form fields are valid
+- `'invalid'` - One or more form fields are invalid
+- `'pending'` - Validation is in progress (async validation)
+- `'undetermined'` - Initial state or no validation rules
+
+## Performance Notes
+
+- The hook automatically subscribes to all field validation changes
+- Status updates are debounced to prevent excessive re-renders
+- Only triggers re-renders when the overall status actually changes

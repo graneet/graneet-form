@@ -1,0 +1,176 @@
+---
+title: useFieldsWatch
+description: Hook for watching form field values with granular subscriptions
+---
+
+# useFieldsWatch Hook
+
+The `useFieldsWatch` hook allows you to subscribe to form field value changes with granular control. You can watch all fields or specific fields, and control when updates trigger (onChange or onBlur).
+
+## Usage
+
+```tsx
+import { useFieldsWatch } from 'graneet-form';
+
+// Watch all fields
+const allValues = useFieldsWatch(form, undefined);
+
+// Watch specific fields
+const specificValues = useFieldsWatch(form, ['name', 'email']);
+
+// Watch with onBlur mode
+const valuesOnBlur = useFieldsWatch(form, ['name'], { mode: 'onBlur' });
+```
+
+## Parameters
+
+- `form: FormContextApi<T>` - The form instance created by `useForm`
+- `names: K[] | undefined` - Array of field names to watch, or `undefined` to watch all fields
+- `options?: UseFormWatchOptions` - Configuration options
+
+### Options
+
+<AutoTypeTable path="../../packages/graneet-form/src/form/hooks/use-fields-watch.ts" name="UseFormWatchOptions" />
+
+## Returns
+
+- When `names` is `undefined`: `Partial<T>` - Partial object containing all form values
+- When `names` is an array: `FormValues<T, K>` - Object containing only the specified field values
+
+## Examples
+
+### Watch All Fields
+
+```tsx
+interface UserForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+function FormPreview() {
+  const form = useForm<UserForm>();
+  const allValues = useFieldsWatch(form, undefined);
+
+  return (
+    <div>
+      <h3>Form Preview</h3>
+      <pre>{JSON.stringify(allValues, null, 2)}</pre>
+    </div>
+  );
+}
+```
+
+### Watch Specific Fields
+
+```tsx
+function NameDisplay() {
+  const form = useFormContext<UserForm>();
+  // Only watch firstName and lastName
+  const { firstName, lastName } = useFieldsWatch(form, ['firstName', 'lastName']);
+
+  return (
+    <div>
+      {firstName && lastName && (
+        <p>Full Name: {firstName} {lastName}</p>
+      )}
+    </div>
+  );
+}
+```
+
+### Watch with onBlur Mode
+
+```tsx
+function AutoSave() {
+  const form = useFormContext<UserForm>();
+  // Only trigger on blur for better performance
+  const values = useFieldsWatch(form, undefined, { mode: 'onBlur' });
+
+  useEffect(() => {
+    // Auto-save when user stops editing
+    if (Object.keys(values).length > 0) {
+      saveFormDraft(values);
+    }
+  }, [values]);
+
+  return <div>Auto-saving...</div>;
+}
+```
+
+### Conditional Field Display
+
+```tsx
+function ConditionalFields() {
+  const form = useFormContext<UserForm>();
+  const { accountType } = useFieldsWatch(form, ['accountType']);
+
+  return (
+    <div>
+      <Field name="accountType" />
+      
+      {accountType === 'business' && (
+        <>
+          <Field name="companyName" />
+          <Field name="taxId" />
+        </>
+      )}
+      
+      {accountType === 'personal' && (
+        <Field name="dateOfBirth" />
+      )}
+    </div>
+  );
+}
+```
+
+### Performance-Optimized Watching
+
+```tsx
+function EfficientFormWatcher() {
+  const form = useFormContext<UserForm>();
+  
+  // Only watch fields that trigger expensive operations
+  const { email } = useFieldsWatch(form, ['email'], { mode: 'onBlur' });
+  const { city, country } = useFieldsWatch(form, ['city', 'country']);
+
+  useEffect(() => {
+    if (email) {
+      // Expensive API call only on blur
+      validateEmailExists(email);
+    }
+  }, [email]);
+
+  useEffect(() => {
+    if (city && country) {
+      // Update timezone based on location
+      updateTimezone(city, country);
+    }
+  }, [city, country]);
+
+  return null;
+}
+```
+
+## Watch Modes
+
+### onChange (Default)
+
+```tsx
+// Updates immediately as user types
+const values = useFieldsWatch(form, ['search'], { mode: 'onChange' });
+```
+
+### onBlur
+
+```tsx
+// Updates only when field loses focus
+const values = useFieldsWatch(form, ['email'], { mode: 'onBlur' });
+```
+
+## Performance Notes
+
+- Watching specific fields is more performant than watching all fields
+- Use `onBlur` mode for expensive operations or API calls
+- The hook uses efficient subscription mechanisms to minimize re-renders
+- Only subscribed fields trigger component updates
