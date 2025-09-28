@@ -20,7 +20,7 @@
   "license": "MIT",
   "scripts": {
     "start:dev": "pnpm -r dev",
-    "build:docs": "pnpm --filter graneet-form-documentation build",
+    "build:docs": "pnpm --filter docs build",
     "biome:check": "biome check .",
     "biome:write": "biome check --write .",
     "release": "pnpm --filter graneet-form build && changeset publish",
