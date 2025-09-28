@@ -3,10 +3,86 @@ title: Complex TypeScript
 description: Advanced TypeScript patterns and usage for graneet-form at scale
 ---
 
+import { StackBlitzEmbed } from '@/components/stack-blitz-embed';
+import { Callout } from 'fumadocs-ui/components/callout';
+
 # Complex TypeScript
 
 At Graneet, we use the library with complex patterns in production. This section showcases advanced TypeScript features and patterns used in real applications.
 
 ## Template Literal Types
 
-TODO
+This example demonstrates how to use template literal types with graneet-form to create dynamic, type-safe field names. This pattern is particularly useful when you need to generate multiple fields programmatically while maintaining full TypeScript support.
+
+<StackBlitzEmbed name="complex-typescript" height="700px" hideNavigation={false} />
+
+### Key Features
+
+- **Template Literal Types**: Dynamic field names with `firstName-${number}` pattern
+- **Type Guards**: Runtime type checking with compile-time type narrowing
+- **Dynamic Field Generation**: Programmatically create multiple form fields
+- **Full Type Safety**: TypeScript ensures you can only access valid field names
+
+### Code Breakdown
+
+#### Template Literal Type Definition
+```typescript
+type FieldName = `firstName-${number}`;
+
+interface FormValues {
+  [firstNameField: FieldName]: string;
+  otherField: number;
+}
+```
+
+This creates a type that accepts any string matching the pattern `firstName-{number}`, such as `firstName-0`, `firstName-1`, etc.
+
+#### Field Name Generator
+```typescript
+const getFieldName = (index: number): FieldName => {
+  return `firstName-${index}`;
+};
+```
+
+A helper function that generates valid field names with proper typing.
+
+#### Type Guard Function
+```typescript
+const isFirstName = (fieldName: string): fieldName is FieldName => {
+  return fieldName.split('-')[0] === 'firstName';
+};
+```
+
+This function provides both runtime validation and compile-time type narrowing. When used in an `if` statement, TypeScript knows that the field is of type `FieldName`.
+
+#### Usage in Form Processing
+```typescript
+const onClick = () => {
+  const formValues = form.getFormValues();
+  const values: string[] = [];
+
+  Object.keys(formValues).forEach((key) => {
+    if (isFirstName(key)) {
+      // TypeScript knows formValues[key] is a string here
+      values.push(formValues[key]);
+    }
+  });
+
+  alert(`First names: ${values.join(', ')}`);
+};
+```
+
+The type guard ensures that only fields matching the `firstName-${number}` pattern are processed, and TypeScript provides full autocomplete and type checking.
+
+<Callout type="info">
+  **Production Tip**: This pattern is excellent for forms with dynamic sections, such as adding/removing items in a list, where each item has multiple fields that need to be tracked individually.
+</Callout>
+
+### When to Use This Pattern
+
+- **Dynamic Forms**: When the number of fields changes based on user interaction
+- **Repeating Sections**: Forms with add/remove functionality for similar field groups
+- **Complex Data Structures**: When working with arrays or nested objects in forms
+- **Type Safety**: When you need compile-time guarantees about field access
+
+This approach combines the flexibility of dynamic forms with the safety and developer experience of TypeScript's advanced type system.

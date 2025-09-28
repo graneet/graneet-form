@@ -8,6 +8,10 @@ const TEMPLATES = {
     title: 'Simple Form Example - Graneet Form',
     defaultFile: 'src/simple-form.tsx',
   },
+  'complex-typescript': {
+    title: 'Complex TypeScript Example - Graneet Form',
+    defaultFile: 'src/app.tsx',
+  },
 };
 
 interface StackBlitzEmbedProps {

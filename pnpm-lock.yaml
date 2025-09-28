@@ -101,6 +101,37 @@ importers:
         specifier: 7.1.7
         version: 7.1.7(@types/node@24.5.2)(jiti@2.6.0)(lightningcss@1.30.1)(sass-embedded@1.88.0)(terser@5.39.0)
 
+  examples/complex-typescript:
+    dependencies:
+      graneet-form:
+        specifier: 3.0.0-next.10
+        version: 3.0.0-next.10(react@19.1.1)
+      react:
+        specifier: 19.1.1
+        version: 19.1.1
+      react-dom:
+        specifier: 19.1.1
+        version: 19.1.1(react@19.1.1)
+    devDependencies:
+      '@types/react':
+        specifier: 19.1.15
+        version: 19.1.15
+      '@types/react-dom':
+        specifier: 19.1.9
+        version: 19.1.9(@types/react@19.1.15)
+      '@vitejs/plugin-react':
+        specifier: 5.0.4
+        version: 5.0.4(vite@7.1.7(@types/node@24.5.2)(jiti@2.6.0)(lightningcss@1.30.1)(sass-embedded@1.88.0)(terser@5.39.0))
+      globals:
+        specifier: 16.4.0
+        version: 16.4.0
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+      vite:
+        specifier: 7.1.7
+        version: 7.1.7(@types/node@24.5.2)(jiti@2.6.0)(lightningcss@1.30.1)(sass-embedded@1.88.0)(terser@5.39.0)
+
   examples/simple-form:
     dependencies:
       graneet-form:
