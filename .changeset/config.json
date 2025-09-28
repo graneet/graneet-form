@@ -10,5 +10,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["testing", "docs"]
+  "ignore": ["testing", "docs", "complex-typescript", "simple-form"]
 }
