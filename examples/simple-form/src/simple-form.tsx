@@ -14,24 +14,21 @@ export function SimpleForm() {
 
   return (
     <Form form={form} onSubmit={form.handleSubmit(onSubmit)}>
-      <Field name="name" render={({ value, onChange }) => (
-        <input 
-          placeholder="Name" 
-          value={value || ''} 
-          onChange={(e) => onChange(e.target.value)} 
-        />
-      )}>
+      <Field
+        name="name"
+        render={({ value, onChange }) => (
+          <input placeholder="Name" value={value || ''} onChange={(e) => onChange(e.target.value)} />
+        )}
+      >
         <Rule validationFn={(value) => !!value} message="Name is required" />
       </Field>
 
-      <Field name="email" render={({ value, onChange }) => (
-        <input 
-          type="email" 
-          placeholder="Email" 
-          value={value || ''} 
-          onChange={(e) => onChange(e.target.value)} 
-        />
-      )}>
+      <Field
+        name="email"
+        render={({ value, onChange }) => (
+          <input type="email" placeholder="Email" value={value || ''} onChange={(e) => onChange(e.target.value)} />
+        )}
+      >
         <Rule validationFn={(value) => /\S+@\S+\.\S+/.test(value || '')} message="Invalid email" />
       </Field>
 
