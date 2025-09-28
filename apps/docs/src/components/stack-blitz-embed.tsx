@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 const TEMPLATES = {
   'simple-form': {
     title: 'Simple Form Example - Graneet Form',
-    defaultFile: 'src/SimpleForm.tsx',
+    defaultFile: 'src/simple-form.tsx',
   },
 };
 
