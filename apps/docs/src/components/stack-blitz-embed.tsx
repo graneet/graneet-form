@@ -1,59 +1,61 @@
+'use client';
+
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
+
+const TEMPLATES = {
+  'simple-form': {
+    title: 'Simple Form Example - Graneet Form',
+    defaultFile: 'src/simple-form.tsx',
+  },
+};
+
 interface StackBlitzEmbedProps {
-  /** The GitHub repository path (e.g., 'graneet/graneet-form') */
-  repo?: string;
-  /** The branch to use (default: 'main') */
-  branch?: string;
   /** The path within the repository (e.g., 'examples/simple-form') */
-  path?: string;
-  /** Direct StackBlitz project ID if not using GitHub integration */
-  projectId?: string;
-  /** The file to open by default */
-  file?: string;
+  name: keyof typeof TEMPLATES;
+
   /** The height of the iframe (default: '500px') */
   height?: string;
-  /** The theme to use (light/dark) */
-  theme?: 'light' | 'dark';
+
   /** The default view (editor/preview) */
   view?: 'editor' | 'preview';
+
   /** Hide the file explorer */
   hideExplorer?: boolean;
+
   /** Hide navigation */
   hideNavigation?: boolean;
-  /** Title for accessibility */
-  title?: string;
 }
 
 export function StackBlitzEmbed({
-  repo = 'graneet/graneet-form',
-  branch = 'main',
-  path = '',
-  projectId,
-  file,
+  name,
   height = '500px',
-  theme = 'light',
   view = 'editor',
   hideExplorer = false,
   hideNavigation = false,
-  title = 'StackBlitz Example',
 }: StackBlitzEmbedProps) {
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const { title, defaultFile } = TEMPLATES[name];
+
+  // Ensure component is mounted to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Build the StackBlitz URL
   const buildUrl = () => {
-    let baseUrl: string;
+    const baseUrl = `https://stackblitz.com/github/graneet/graneet-form/tree/main/examples/${name}`;
 
-    if (projectId) {
-      // Direct project ID
-      baseUrl = `https://stackblitz.com/edit/${projectId}`;
-    } else {
-      // GitHub integration
-      const githubPath = path ? `${repo}/tree/${branch}/${path}` : `${repo}/tree/${branch}`;
-      baseUrl = `https://stackblitz.com/github/${githubPath}`;
-    }
+    // Use resolvedTheme for more reliable theme detection
+    const currentTheme = resolvedTheme || theme || 'light';
+    const stackblitzTheme = currentTheme === 'dark' ? 'dark' : 'light';
 
     // Add embed parameter
     const params = new URLSearchParams({
       embed: '1',
-      ...(file && { file }),
-      ...(theme && { theme }),
+      file: defaultFile,
+      theme: stackblitzTheme,
       ...(view && { view }),
       ...(hideExplorer && { hideExplorer: '1' }),
       ...(hideNavigation && { hideNavigation: '1' }),
@@ -61,6 +63,30 @@ export function StackBlitzEmbed({
 
     return `${baseUrl}?${params.toString()}`;
   };
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div
+        style={{
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          marginBottom: '1.5rem',
+          height,
+          background: '#f8f9fa',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        Loading...
+      </div>
+    );
+  }
+
+  const currentTheme = resolvedTheme || theme || 'light';
+  const stackblitzTheme = currentTheme === 'dark' ? 'dark' : 'light';
 
   return (
     <div
@@ -72,6 +98,7 @@ export function StackBlitzEmbed({
       }}
     >
       <iframe
+        key={`${name}-${stackblitzTheme}`} // Force re-render when theme changes
         src={buildUrl()}
         style={{
           width: '100%',
@@ -85,31 +112,5 @@ export function StackBlitzEmbed({
         loading="lazy"
       />
     </div>
-  );
-}
-
-// Pre-configured component for the simple form example
-export function SimpleFormEmbed() {
-  return (
-    <StackBlitzEmbed
-      path="examples/simple-form"
-      file="src/SimpleForm.tsx"
-      height="600px"
-      title="Simple Form Example - Graneet Form"
-      hideNavigation={false}
-    />
-  );
-}
-
-// Pre-configured component for the testing app
-export function TestingAppEmbed() {
-  return (
-    <StackBlitzEmbed
-      path="apps/testing"
-      file="src/screens/FieldTests.tsx"
-      height="700px"
-      title="Testing App - Graneet Form"
-      view="editor"
-    />
   );
 }

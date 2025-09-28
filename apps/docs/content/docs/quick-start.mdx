@@ -5,7 +5,7 @@ description: Get started with Graneet Form in minutes
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
-import { SimpleFormEmbed } from '@/components/stack-blitz-embed';
+import { StackBlitzEmbed } from '@/components/stack-blitz-embed';
 
 # Quick Start 🚀
 
@@ -139,24 +139,13 @@ export function SimpleForm() {
 }
 ```
 
-<SimpleFormEmbed />
+<StackBlitzEmbed name="simple-form" height="600px" hideNavigation={false} />
 
 This example demonstrates the core concepts of Graneet Form:
 - **Form Setup**: Using `useForm` hook to manage form state
 - **Field Management**: Using `Field` components with render props
 - **Validation**: Adding `Rule` components for field validation
 - **Submission**: Handling form submission with proper TypeScript types
-
-### Interactive Example
-
-Try editing the code below and see the changes in real-time:
-
-<SimpleFormEmbed />
-
-<Callout type="tip">
-  **Want to experiment?** Try modifying the validation rules, adding new fields, or changing the styling in the interactive example above!
-</Callout>
-
 ## Common Patterns
 
 ### Text Input

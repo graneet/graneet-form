@@ -12,7 +12,8 @@
       "!**/build",
       "!**/dist",
       "!**/.claude",
-      "!**/.next"
+      "!**/.next",
+      "!**/.source"
     ]
   },
   "formatter": {
