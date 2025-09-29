@@ -1,6 +1,4 @@
 {
-  "mode": "pre",
-  "tag": "next",
   "initialVersions": {
     "graneet-form-documentation": "1.0.0",
     "graneet-form-testing": "0.0.1",
