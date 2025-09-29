@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useRef } from 'react';
+import { type Dispatch, type SetStateAction, useEffect, useMemo } from 'react';
 import type { FormContextApi } from '../../form/contexts/form-context';
 import { type UseFormOptions, useForm } from '../../form/hooks/use-form';
 import type { FieldValues } from '../../shared/types/field-value';
@@ -17,27 +17,6 @@ export interface UseStepFormApi<T extends FieldValues> {
    * Contains all form management functionality including validation, field registration, and submission handling.
    */
   form: FormContextApi<T>;
-
-  /**
-   * Initializes form values if no values have been previously set for this step.
-   *
-   * **⚠️ DEPRECATED:** Use the `defaultValues` prop in useStepForm options instead.
-   *
-   * @param initialValues - Initial values to set for the form fields
-   * @deprecated Use `defaultValues` prop instead for better performance and consistency
-   * @example
-   * ```ts
-   * // ❌ Deprecated approach
-   * const { initFormValues } = useStepForm();
-   * initFormValues({ name: 'John', email: '' });
-   *
-   * // ✅ Preferred approach
-   * const { form } = useStepForm({
-   *   defaultValues: { name: 'John', email: '' }
-   * });
-   * ```
-   */
-  initFormValues(initialValues: Partial<T>): void;
 }
 
 /**
@@ -101,7 +80,6 @@ export function useStepForm<
     wizardInternal: { stepStatusSetter, setValuesGetterForCurrentStep },
     getValuesOfCurrentStep,
   } = useWizardContext<WizardValues[Step]>();
-  const valuesHasBeenInitializedRef = useRef(false);
 
   const defaultValues = getValuesOfCurrentStep() ?? props?.defaultValues;
   const form = useForm<WizardValues[Step]>({
@@ -112,7 +90,6 @@ export function useStepForm<
   const {
     formInternal: { addGlobalValidationStatusSubscriber },
     getFormValues,
-    setFormValues,
   } = form;
 
   useEffect(() => {
@@ -141,31 +118,10 @@ export function useStepForm<
     setValuesGetterForCurrentStep(getFormValues);
   }, [getFormValues, setValuesGetterForCurrentStep]);
 
-  useEffect(() => {
-    const valuesOfCurrentStep = getValuesOfCurrentStep() as Partial<WizardValues[Step]>;
-    // If values for the current step are stored in the wizard context, we update values of the form
-    // and set valuesHasBeenInitialized to true to detect if values getting has been done
-    if (valuesOfCurrentStep) {
-      valuesHasBeenInitializedRef.current = true;
-      setFormValues(valuesOfCurrentStep);
-    }
-  }, [getValuesOfCurrentStep, setFormValues]);
-
-  const initFormValues = useCallback(
-    (initialValues: Partial<WizardValues[Step]>): void => {
-      // when values from the wizard has been gotten, the function do nothing
-      if (!valuesHasBeenInitializedRef.current) {
-        setFormValues(initialValues);
-      }
-    },
-    [setFormValues],
-  );
-
   return useMemo(
     () => ({
-      initFormValues,
       form,
     }),
-    [form, initFormValues],
+    [form],
   );
 }
