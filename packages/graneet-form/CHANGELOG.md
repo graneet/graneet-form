@@ -1,5 +1,88 @@
 # graneet-form
 
+## 3.0.0
+
+### Major Changes
+
+- [#109](https://github.com/graneet/graneet-form/pull/109) [`8cc58d7`](https://github.com/graneet/graneet-form/commit/8cc58d744eda3169580d9e763dac3961bde63685) Thanks [@victorduclos](https://github.com/victorduclos)! - Remove `composeEventHandlers`, `HiddenField` and `useHiddenField`
+
+- [#135](https://github.com/graneet/graneet-form/pull/135) [`e1ba0b2`](https://github.com/graneet/graneet-form/commit/e1ba0b226faaa146daf66d9263a4f19017f2cd67) Thanks [@victorduclos](https://github.com/victorduclos)! - Do not expose internals to user
+
+- [#130](https://github.com/graneet/graneet-form/pull/130) [`a9c0888`](https://github.com/graneet/graneet-form/commit/a9c08886986bb9f2eeb9f5e178d44c7e65997749) Thanks [@victorduclos](https://github.com/victorduclos)! - Migrate tsup to tsdown to reduce package size
+
+- [#139](https://github.com/graneet/graneet-form/pull/139) [`814e18e`](https://github.com/graneet/graneet-form/commit/814e18e057716ceb1a5d9e481610da575cfe3cbb) Thanks [@victorduclos](https://github.com/victorduclos)! - **Breaking Change**: Rename and unify `useOnBlurValues`, `useOnChangeValues` to `useFieldsWatch` for consistency
+
+  The hooks `useOnBlurValues` and `useOnChangeValues` have been unified into a single `useFieldsWatch` hook with a `mode` option for better consistency and API simplification.
+
+  **Migration Guide:**
+
+  ```diff
+  - import { useOnChangeValues, useOnBlurValues } from 'graneet-form';
+  + import { useFieldsWatch } from 'graneet-form';
+
+  - const values = useOnChangeValues(form, ['field1', 'field2']);
+  + const values = useFieldsWatch(form, ['field1', 'field2']); // onChange by default
+
+  - const values = useOnBlurValues(form, ['field1', 'field2']);
+  + const values = useFieldsWatch(form, ['field1', 'field2'], { mode: 'onBlur' });
+  ```
+
+- [#116](https://github.com/graneet/graneet-form/pull/116) [`0c4617d`](https://github.com/graneet/graneet-form/commit/0c4617d5486ea03f51ed68bb18fcc1b199c9490e) Thanks [@victorduclos](https://github.com/victorduclos)! - Remove `usePlaceholder`, deprecated methods in `useWizard`, `WizardLabels` and `Placeholder`
+
+- [#149](https://github.com/graneet/graneet-form/pull/149) [`d2c0954`](https://github.com/graneet/graneet-form/commit/d2c0954bcbc122eebec20c914e52ed319d409453) Thanks [@victorduclos](https://github.com/victorduclos)! - Remove deprecated `initFormValues` from `useStepForm` hook
+
+  BREAKING CHANGE: The `initFormValues` method has been removed from the `useStepForm` hook. Use the `defaultValues` option instead for better performance and consistency.
+
+  Migration:
+
+  ```typescript
+  // Before (deprecated)
+  const { initFormValues } = useStepForm();
+  initFormValues({ name: "John", email: "" });
+
+  // After (recommended)
+  const { form } = useStepForm({
+    defaultValues: { name: "John", email: "" },
+  });
+  ```
+
+- [#136](https://github.com/graneet/graneet-form/pull/136) [`86630bf`](https://github.com/graneet/graneet-form/commit/86630bf0e2bb118ed696c36159d013dc7920ed7d) Thanks [@victorduclos](https://github.com/victorduclos)! - **Breaking Change**: Replace enums with union types for better type safety
+
+  - Replaced `WATCH_MODE` enum with `WatchMode` union type (`'onChange' | 'onBlur'`)
+  - Replaced `VALIDATION_OUTCOME` enum with `ValidationOutcome` union type (`'valid' | 'invalid' | 'undetermined'`)
+  - Updated all imports and usages throughout the codebase to use the new union types
+  - Enforced stricter TypeScript checks with `exactOptionalPropertyTypes: true`
+
+  This change improves type safety and follows modern TypeScript best practices by using literal union types instead of enums.
+
+- [#126](https://github.com/graneet/graneet-form/pull/126) [`780732b`](https://github.com/graneet/graneet-form/commit/780732bed7b0074fb22cecf2fa5b4233c422d907) Thanks [@victorduclos](https://github.com/victorduclos)! - Pass wizard Steps through prop
+
+- [#106](https://github.com/graneet/graneet-form/pull/106) [`e4d6e10`](https://github.com/graneet/graneet-form/commit/e4d6e1081404caf3445819d0b7d392805478beb1) Thanks [@victorduclos](https://github.com/victorduclos)! - Migrate target to ES2020 and to ESM only
+
+### Minor Changes
+
+- [#112](https://github.com/graneet/graneet-form/pull/112) [`f395a78`](https://github.com/graneet/graneet-form/commit/f395a789fb3a8c57f3481be819ad5d6fb9144bb2) Thanks [@victorduclos](https://github.com/victorduclos)! - Fix ESM build
+
+- [#118](https://github.com/graneet/graneet-form/pull/118) [`1a9056f`](https://github.com/graneet/graneet-form/commit/1a9056f5969b365a6b8413e7ef83fb451fcb2fb7) Thanks [@victorduclos](https://github.com/victorduclos)! - Fix: wizard steps are always reset with side effects
+
+- [#114](https://github.com/graneet/graneet-form/pull/114) [`537a0ee`](https://github.com/graneet/graneet-form/commit/537a0ee6156cd31f8f78a535d2412a95315b575a) Thanks [@victorduclos](https://github.com/victorduclos)! - Fix ESM build (part 3...)
+
+- [#110](https://github.com/graneet/graneet-form/pull/110) [`aa54622`](https://github.com/graneet/graneet-form/commit/aa54622ef464ae3b37bba643f86975ba747b6a3d) Thanks [@victorduclos](https://github.com/victorduclos)! - Fix esm build
+
+- [#133](https://github.com/graneet/graneet-form/pull/133) [`8099bab`](https://github.com/graneet/graneet-form/commit/8099babe4e30c0da121381dca43fa39097fbea2c) Thanks [@victorduclos](https://github.com/victorduclos)! - Allow function to define default values
+
+- [#146](https://github.com/graneet/graneet-form/pull/146) [`97bfa77`](https://github.com/graneet/graneet-form/commit/97bfa77d906597649e5329e3ffe676ce6b592c13) Thanks [@victorduclos](https://github.com/victorduclos)! - Empty bump
+
+### Patch Changes
+
+- [#120](https://github.com/graneet/graneet-form/pull/120) [`e7a6ab6`](https://github.com/graneet/graneet-form/commit/e7a6ab6aa0bbf9bf9b085f123f8f79c2b2aeb80c) Thanks [@grollec](https://github.com/grollec)! - Added API + some guide into the docs
+
+- [#127](https://github.com/graneet/graneet-form/pull/127) [`c6a30f5`](https://github.com/graneet/graneet-form/commit/c6a30f5b48b5ddfb942fa6e37bc66eae1ab60361) Thanks [@victorduclos](https://github.com/victorduclos)! - initialize first step
+
+- [#135](https://github.com/graneet/graneet-form/pull/135) [`e1ba0b2`](https://github.com/graneet/graneet-form/commit/e1ba0b226faaa146daf66d9263a4f19017f2cd67) Thanks [@victorduclos](https://github.com/victorduclos)! - Improve JSDoc
+
+- [#151](https://github.com/graneet/graneet-form/pull/151) [`3962573`](https://github.com/graneet/graneet-form/commit/39625736b188b57257e65e7f722fa676cfe66525) Thanks [@victorduclos](https://github.com/victorduclos)! - Remove pre-release mode
+
 ## 3.0.0-next.13
 
 ### Major Changes
