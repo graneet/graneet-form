@@ -27,5 +27,6 @@
     "social-heads-repair",
     "spicy-taxis-try",
     "tidy-buttons-hammer"
-  ]
+  ],
+  "mode": "exit"
 }
