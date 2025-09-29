@@ -1,5 +1,26 @@
 # graneet-form
 
+## 3.0.0-next.13
+
+### Major Changes
+
+- [#149](https://github.com/graneet/graneet-form/pull/149) [`d2c0954`](https://github.com/graneet/graneet-form/commit/d2c0954bcbc122eebec20c914e52ed319d409453) Thanks [@victorduclos](https://github.com/victorduclos)! - Remove deprecated `initFormValues` from `useStepForm` hook
+
+  BREAKING CHANGE: The `initFormValues` method has been removed from the `useStepForm` hook. Use the `defaultValues` option instead for better performance and consistency.
+
+  Migration:
+
+  ```typescript
+  // Before (deprecated)
+  const { initFormValues } = useStepForm();
+  initFormValues({ name: "John", email: "" });
+
+  // After (recommended)
+  const { form } = useStepForm({
+    defaultValues: { name: "John", email: "" },
+  });
+  ```
+
 ## 3.0.0-next.12
 
 ### Minor Changes
