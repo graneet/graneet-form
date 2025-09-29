@@ -10,5 +10,6 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
+  "bumpVersionsWithWorkspaceProtocolOnly": true,
   "ignore": ["testing", "docs", "complex-typescript", "simple-form"]
 }
