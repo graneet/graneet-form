@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/trusted-publishers-setup  # TEMPORARY: for testing
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -11,6 +12,13 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    
+    # Add OIDC permissions for Trusted Publishers
+    permissions:
+      contents: write      # Required for creating releases/tags
+      pull-requests: write # Required for changesets PR
+      id-token: write      # Required for OIDC authentication
+    
     steps:
       - name: Checkout branch
         uses: actions/checkout@v5
@@ -18,11 +26,37 @@ jobs:
       - name: Install
         uses: ./.github/composite-actions/install
 
+      # Update npm to v11 for Trusted Publishers support
+      - name: Update npm to v11
+        run: npm install -g npm@latest
+        shell: bash
+
+      # Configure npm registry for OIDC
+      - name: Setup npm registry
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      # Verify OIDC detection (for debugging)
+      - name: Check OIDC and npm configuration
+        run: |
+          echo "🔍 Environment check:"
+          echo "Node version: $(node --version)"
+          echo "npm version: $(npm --version)"
+          echo "pnpm version: $(pnpm --version)"
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
+            echo "✅ OIDC is available"
+          else
+            echo "❌ OIDC is NOT available"
+          fi
+        shell: bash
+
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: pnpm release
+          publish: pnpm release -- --dry-run
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  # Keep as fallback during testing

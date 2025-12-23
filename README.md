@@ -10,6 +10,7 @@
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/graneet-form?style=flat-square&color=green)](https://bundlephobia.com/package/graneet-form)
 [![License](https://img.shields.io/npm/l/graneet-form?style=flat-square&color=orange)](https://github.com/graneet/graneet-form/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue?style=flat-square)](https://www.typescriptlang.org/)
+[![Provenance](https://img.shields.io/badge/Provenance-Verified-success?style=flat-square)](https://www.npmjs.com/package/graneet-form)
 
 **[📚 Documentation](https://graneet-form.vercel.app/)** • **[🚀 Quick Start](#usage)** • **[💡 Examples](#wizard-example)
 **
@@ -36,6 +37,7 @@
 - **Built-in error handling** - Comprehensive validation and error management
 - **Value watching** - Real-time form state monitoring and reactive updates
 - **TypeScript support** - Full type safety out of the box
+- **🔒 Secure publishing** - Published with [npm Trusted Publishers](https://docs.npmjs.com/trusted-publishers) and automatic provenance
 
 ## Installation
 
@@ -212,6 +214,23 @@ function MultiStepForm() {
 | `<Wizard>` | `wizard: WizardInstance`           | Wizard provider component             |
 | `<Step>`   | `name: string, title?: string`     | Individual step in a wizard           |
 
+## Security 🔒
+
+This package is published using [npm Trusted Publishers](https://docs.npmjs.com/trusted-publishers) with automatic provenance generation. Every release includes cryptographic proof of its source code, build process, and authenticity.
+
+You can verify the provenance of any version on the [npm package page](https://www.npmjs.com/package/graneet-form).
+
+### What is Provenance?
+
+Provenance provides transparency about how and where packages are built. Each release of `graneet-form` includes:
+
+- ✅ Source repository verification
+- ✅ Build workflow transparency
+- ✅ Cryptographic signatures
+- ✅ SLSA compliance
+
+Learn more about [npm provenance](https://docs.npmjs.com/generating-provenance-statements).
+
 ## Contributing
 
 We welcome contributions! Here's how you can help:
@@ -220,6 +239,32 @@ We welcome contributions! Here's how you can help:
 2. 💡 **Suggest features** - Share your ideas for improvements
 3. 🔧 **Submit PRs** - Fix bugs or implement new features
 4. 📝 **Improve docs** - Help make our documentation better
+
+### Publishing (for maintainers)
+
+This package uses [npm Trusted Publishers](https://docs.npmjs.com/trusted-publishers) for secure, automated publishing.
+
+**How it works:**
+
+1. Releases are managed via [Changesets](https://github.com/changesets/changesets)
+2. Publishing is automated through GitHub Actions
+3. Authentication uses OIDC (no long-lived tokens required)
+4. Every release includes automatic provenance attestation
+
+**Creating a release:**
+
+```bash
+# 1. Create a changeset
+pnpm changeset
+
+# 2. Commit and push to main
+git add . && git commit -m "chore: add changeset" && git push
+
+# 3. Changesets will create a "Version Packages" PR
+# 4. Merge the PR to publish automatically
+```
+
+No manual npm authentication needed! 🎉
 
 ## License
 
