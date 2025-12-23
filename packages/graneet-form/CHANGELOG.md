@@ -1,5 +1,11 @@
 # graneet-form
 
+## 3.0.1
+
+### Patch Changes
+
+- [#155](https://github.com/graneet/graneet-form/pull/155) [`9ee3d4c`](https://github.com/graneet/graneet-form/commit/9ee3d4c296f5215cda737a4550a4d0b042a0bdde) Thanks [@victorduclos](https://github.com/victorduclos)! - Test de migration vers Trusted Publishers npm (OIDC). Ce changeset sera supprimé avant la publication réelle.
+
 ## 3.0.0
 
 ### Major Changes
