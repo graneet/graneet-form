@@ -38,6 +38,17 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
   getValuesOfSteps(): WizardValues;
 
   /**
+   * Sets the form values for a specific wizard step.
+   * @param stepName - The name of the step to update
+   * @param values - The new field values for the specified step
+   * @example
+   * ```ts
+   * setValuesOfStep('userInfo', { name: 'John', email: 'john@example.com' });
+   * ```
+   */
+  setValuesOfStep<Step extends keyof WizardValues>(stepName: Step, values: WizardValues[Step]): void;
+
+  /**
    * Internal API for wizard implementation details.
    *
    * **⚠️ WARNING: DO NOT use outside this library.**
