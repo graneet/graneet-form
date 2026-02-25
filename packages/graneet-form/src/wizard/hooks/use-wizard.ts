@@ -66,6 +66,13 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
     [],
   );
 
+  const setValuesOfStep = useCallback<WizardContextApi<WizardValues>['setValuesOfStep']>(
+    <Step extends keyof WizardValues>(stepName: Step, values: WizardValues[Step]): void => {
+      wizardValuesRef.current[stepName] = values;
+    },
+    [],
+  );
+
   const goBackTo = useCallback<WizardContextApi<WizardValues>['goBackTo']>(
     (previousStep) => {
       if (!currentStep) {
@@ -173,6 +180,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       getValuesOfCurrentStep,
       getValuesOfStep,
       getValuesOfSteps,
+      setValuesOfStep,
       get isLastStep() {
         return !steps.length || currentStep === steps[steps.length - 1]?.name;
       },
@@ -194,6 +202,7 @@ export function useWizard<WizardValues extends Record<string, FieldValues> = Rec
       getValuesOfCurrentStep,
       getValuesOfStep,
       getValuesOfSteps,
+      setValuesOfStep,
     ],
   );
 }
