@@ -1,5 +1,11 @@
 # graneet-form
 
+## 3.1.0
+
+### Minor Changes
+
+- [#158](https://github.com/graneet/graneet-form/pull/158) [`b6c5e31`](https://github.com/graneet/graneet-form/commit/b6c5e3151b7bc501c6a76c90f7d2cffb64baab6c) Thanks [@victorduclos](https://github.com/victorduclos)! - Add setValuesOfStep to useWizard
+
 ## 3.0.0
 
 ### Major Changes
