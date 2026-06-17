@@ -27,10 +27,10 @@
     "test": "exit 0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.4",
-    "@changesets/changelog-github": "0.5.1",
-    "@changesets/cli": "2.29.7",
-    "typescript": "5.9.2"
+    "@biomejs/biome": "2.5.0",
+    "@changesets/changelog-github": "0.7.0",
+    "@changesets/cli": "2.31.0",
+    "typescript": "6.0.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -9,16 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "graneet-form": "3.0.0-next.10",
-    "react": "19.1.1",
-    "react-dom": "19.1.1"
+    "graneet-form": "3.1.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
   },
   "devDependencies": {
-    "@types/react": "19.1.15",
-    "@types/react-dom": "19.1.9",
-    "@vitejs/plugin-react": "5.0.4",
-    "globals": "16.4.0",
-    "typescript": "5.9.2",
-    "vite": "7.1.7"
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "globals": "17.6.0",
+    "typescript": "6.0.3",
+    "vite": "8.0.16"
   }
 }
