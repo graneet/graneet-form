@@ -1,6 +1,3 @@
-'use client';
-
-import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
 const TEMPLATES = {
@@ -15,19 +12,10 @@ const TEMPLATES = {
 };
 
 interface StackBlitzEmbedProps {
-  /** The path within the repository (e.g., 'examples/simple-form') */
   name: keyof typeof TEMPLATES;
-
-  /** The height of the iframe (default: '500px') */
   height?: string;
-
-  /** The default view (editor/preview) */
   view?: 'editor' | 'preview';
-
-  /** Hide the file explorer */
   hideExplorer?: boolean;
-
-  /** Hide navigation */
   hideNavigation?: boolean;
 }
 
@@ -38,37 +26,34 @@ export function StackBlitzEmbed({
   hideExplorer = false,
   hideNavigation = false,
 }: StackBlitzEmbedProps) {
-  const { theme, resolvedTheme } = useTheme();
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
   const { title, defaultFile } = TEMPLATES[name];
 
-  // Ensure component is mounted to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
+    const update = () => {
+      setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    };
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
   }, []);
 
-  // Build the StackBlitz URL
   const buildUrl = () => {
     const baseUrl = `https://stackblitz.com/github/graneet/graneet-form/tree/main/examples/${name}`;
-
-    // Use resolvedTheme for more reliable theme detection
-    const currentTheme = resolvedTheme || theme || 'light';
-    const stackblitzTheme = currentTheme === 'dark' ? 'dark' : 'light';
-
-    // Add embed parameter
     const params = new URLSearchParams({
       embed: '1',
       file: defaultFile,
-      theme: stackblitzTheme,
+      theme,
       ...(view && { view }),
       ...(hideExplorer && { hideExplorer: '1' }),
       ...(hideNavigation && { hideNavigation: '1' }),
     });
-
     return `${baseUrl}?${params.toString()}`;
   };
 
-  // Don't render until mounted to prevent hydration mismatch
   if (!mounted) {
     return (
       <div
@@ -89,9 +74,6 @@ export function StackBlitzEmbed({
     );
   }
 
-  const currentTheme = resolvedTheme || theme || 'light';
-  const stackblitzTheme = currentTheme === 'dark' ? 'dark' : 'light';
-
   return (
     <div
       style={{
@@ -102,7 +84,7 @@ export function StackBlitzEmbed({
       }}
     >
       <iframe
-        key={`${name}-${stackblitzTheme}`} // Force re-render when theme changes
+        key={`${name}-${theme}`}
         src={buildUrl()}
         style={{
           width: '100%',

@@ -1,6 +1,3 @@
-'use client';
-
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 interface ButtonProps {
@@ -37,7 +34,7 @@ export function Button({
     primary: `
       bg-gradient-to-r from-slate-800 to-teal-600 text-white rounded-lg
       hover:from-slate-900 hover:to-teal-700 hover:shadow-lg hover:scale-105
-      before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent 
+      before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent
       before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100
       shadow-md hover:shadow-xl
     `,
@@ -70,18 +67,10 @@ export function Button({
   );
 
   if (href) {
-    if (href.startsWith('http')) {
-      return (
-        <a href={href} target={target} rel={rel} className={classes}>
-          {content}
-        </a>
-      );
-    }
-
     return (
-      <Link href={href} className={classes}>
+      <a href={href} target={target} rel={rel} className={classes}>
         {content}
-      </Link>
+      </a>
     );
   }
 
