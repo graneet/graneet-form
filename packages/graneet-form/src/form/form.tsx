@@ -34,6 +34,7 @@ export function Form<T extends FieldValues>({ children, form, onSubmit, ...other
     onSubmit();
   }
 
+  // oxlint-disable-next-line typescript/strict-void-return
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
       event.preventDefault();

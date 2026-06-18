@@ -180,16 +180,18 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     isRegistered: boolean;
   }
   const formStateRef = useRef<{ [K in keyof T]?: FieldState<K> }>(
-    (Object.keys(resolvedDefaultValues) as (keyof T)[]).reduce<{ [K in keyof T]?: FieldState<K> }>((acc, key) => {
-      acc[key] = {
-        isRegistered: false,
-        name: key,
-        validation: VALIDATION_STATE_UNDETERMINED,
-        value: resolvedDefaultValues[key],
-      };
-
+    (() => {
+      const acc: { [K in keyof T]?: FieldState<K> } = {};
+      for (const key of Object.keys(resolvedDefaultValues) as (keyof T)[]) {
+        acc[key] = {
+          isRegistered: false,
+          name: key,
+          validation: VALIDATION_STATE_UNDETERMINED,
+          value: resolvedDefaultValues[key],
+        };
+      }
       return acc;
-    }, {}),
+    })(),
   );
 
   /**
@@ -251,53 +253,49 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
   // -- EXPORTS --
 
-  const getFormValues = useCallback<FormContextApi<T>['getFormValues']>(
-    () =>
-      Object.keys(formStateRef.current).reduce<Partial<T>>((acc, name: keyof T) => {
+  const getFormValues = useCallback<FormContextApi<T>['getFormValues']>(() => {
+    const acc: Partial<T> = {};
+    for (const name of Object.keys(formStateRef.current) as (keyof T)[]) {
+      if (formStateRef.current[name]?.isRegistered) {
+        acc[name] = formStateRef.current[name]?.value;
+      }
+    }
+    return acc;
+  }, []);
+
+  const getFormValuesForNames = useCallback<FormInternal<T>['getFormValuesForNames']>(
+    <K extends keyof T>(names: K[]): FormValues<T, K> => {
+      const acc = {} as FormValues<T, K>;
+      for (const name of names) {
         if (formStateRef.current[name]?.isRegistered) {
           acc[name] = formStateRef.current[name]?.value;
         }
-        return acc;
-      }, {}),
+      }
+      return acc;
+    },
     [],
   );
 
-  const getFormValuesForNames = useCallback<FormInternal<T>['getFormValuesForNames']>(
-    <K extends keyof T>(names: K[]): FormValues<T, K> =>
-      names.reduce<FormValues<T, K>>(
-        (acc, name) => {
-          if (formStateRef.current[name]?.isRegistered) {
-            acc[name] = formStateRef.current[name]?.value;
-          }
-          return acc;
-        },
-        {} as FormValues<T, K>,
-      ),
-    [],
-  );
+  const getFormErrors = useCallback<FormInternal<T>['getFormErrors']>((): PartialRecord<keyof T, ValidationState> => {
+    const acc: PartialRecord<keyof T, ValidationState> = {};
+    for (const name of Object.keys(formStateRef.current) as (keyof T)[]) {
+      if (formStateRef.current[name]?.isRegistered) {
+        acc[name] = formStateRef.current[name]?.validation;
+      }
+    }
+    return acc;
+  }, []);
 
-  const getFormErrors = useCallback<FormInternal<T>['getFormErrors']>(
-    (): PartialRecord<keyof T, ValidationState> =>
-      Object.keys(formStateRef.current).reduce<PartialRecord<keyof T, ValidationState>>((acc, name: keyof T) => {
+  const getFormErrorsForNames = useCallback<FormInternal<T>['getFormErrorsForNames']>(
+    <K extends keyof T>(names: K[]): Record<K, ValidationState | undefined> => {
+      const acc = {} as Record<K, ValidationState | undefined>;
+      for (const name of names) {
         if (formStateRef.current[name]?.isRegistered) {
           acc[name] = formStateRef.current[name]?.validation;
         }
-        return acc;
-      }, {}),
-    [],
-  );
-
-  const getFormErrorsForNames = useCallback<FormInternal<T>['getFormErrorsForNames']>(
-    <K extends keyof T>(names: K[]): Record<K, ValidationState | undefined> =>
-      names.reduce<Record<K, ValidationState | undefined>>(
-        (acc, name) => {
-          if (formStateRef.current[name]?.isRegistered) {
-            acc[name] = formStateRef.current[name]?.validation;
-          }
-          return acc;
-        },
-        {} as Record<K, ValidationState | undefined>,
-      ),
+      }
+      return acc;
+    },
     [],
   );
 
