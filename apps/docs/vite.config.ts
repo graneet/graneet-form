@@ -6,6 +6,11 @@ import mdx from 'fumadocs-mdx/vite';
 import { nitro } from 'nitro/vite';
 
 export default defineConfig({
+  build: {
+    rolldownOptions: {
+      external: ['ts-morph'],
+    },
+  },
   plugins: [
     mdx(),
     tailwindcss(),
@@ -28,5 +33,8 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+  },
+  ssr: {
+    external: ['ts-morph'],
   },
 });
