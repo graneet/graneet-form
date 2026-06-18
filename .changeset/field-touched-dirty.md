@@ -1,5 +1,5 @@
 ---
-"graneet-form": minor
+'graneet-form': minor
 ---
 
 Add `isTouched` and `isDirty` field state, deprecate `isPristine`
