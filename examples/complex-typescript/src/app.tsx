@@ -72,6 +72,7 @@ export const App: FC = (): ReactNode => {
         <div>
           <h3>List of first names</h3>
           <div style={{ display: 'grid', gap: '8px', gridTemplateColumns: 'repeat(2, 1fr)', maxWidth: '400px' }}>
+            {/* oxlint-disable-next-line unicorn/no-new-array */}
             {new Array(10).fill(null).map((_, index) => (
               // oxlint-disable-next-line react/no-array-index-key : Index is stable for this static array
               <div key={index}>
