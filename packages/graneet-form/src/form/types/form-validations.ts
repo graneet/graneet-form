@@ -1,16 +1,16 @@
-import type { ChildPaths, FieldPath } from '../../shared/types/field-path';
+import type { FieldPath, PathHead, PathTail } from '../../shared/types/field-path';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { ValidationState } from '../../shared/types/validation';
 
 /**
- * Unconstrained nested projection of validation statuses over the watched path union `Keys`.
- * Mirrors `FormValues` but every watched leaf resolves to a `ValidationState`.
+ * Builds the nested validation shape covering the watched path union `P`. Mirrors `NestedValues`
+ * but every watched leaf resolves to a `ValidationState`.
  * @internal
  */
-type NestedValidations<T, Keys extends string> = {
-  [K in keyof T & string as K extends Keys ? K : ChildPaths<Keys, K> extends never ? never : K]?: K extends Keys
+type NestedValidations<T, P extends string> = {
+  [K in PathHead<P> & keyof T]?: [PathTail<P, K & string>] extends [never]
     ? ValidationState | undefined
-    : NestedValidations<NonNullable<T[K]>, ChildPaths<Keys, K>>;
+    : NestedValidations<NonNullable<T[K]>, PathTail<P, K & string>>;
 };
 
 /**

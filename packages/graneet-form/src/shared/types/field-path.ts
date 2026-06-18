@@ -44,5 +44,8 @@ export type FieldPathValue<T, P extends string> = P extends `${infer K}.${infer 
     ? T[P]
     : never;
 
-/** Remaining path under key `K` for every member of the path union `P` (e.g. `P='user.city', K='user'` → `'city'`). */
-export type ChildPaths<P extends string, K extends string> = P extends `${K}.${infer Rest}` ? Rest : never;
+/** First segment of a dotted path (e.g. `'user.address'` → `'user'`). Distributes over a union. */
+export type PathHead<P extends string> = P extends `${infer Head}.${string}` ? Head : P;
+
+/** Remaining path under head `H` for members of `P` that have one (e.g. `P='user.city', H='user'` → `'city'`). */
+export type PathTail<P extends string, H extends string> = P extends `${H}.${infer Rest}` ? Rest : never;

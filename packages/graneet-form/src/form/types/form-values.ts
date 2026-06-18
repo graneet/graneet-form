@@ -1,16 +1,14 @@
-import type { ChildPaths, FieldPath } from '../../shared/types/field-path';
+import type { FieldPath, PathHead, PathTail } from '../../shared/types/field-path';
 import type { FieldValues } from '../../shared/types/field-value';
 
 /**
- * Unconstrained nested projection: builds the nested object shape covering the watched path
- * union `Keys`. A key is kept when it is exactly watched (leaf → its value type) or when a
- * descendant path is watched (recurse into it).
- * @internal
+ * Builds the nested object shape covering the watched path union `P`. Only the watched branches are
+ * present: each path segment is followed down to its leaf, where the value resolves to `T[leaf]`.
  */
-type NestedValues<T, Keys extends string> = {
-  [K in keyof T & string as K extends Keys ? K : ChildPaths<Keys, K> extends never ? never : K]?: K extends Keys
+type NestedValues<T, P extends string> = {
+  [K in PathHead<P> & keyof T]?: [PathTail<P, K & string>] extends [never]
     ? T[K] | undefined
-    : NestedValues<NonNullable<T[K]>, ChildPaths<Keys, K>>;
+    : NestedValues<NonNullable<T[K]>, PathTail<P, K & string>>;
 };
 
 /**

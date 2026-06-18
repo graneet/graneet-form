@@ -5,7 +5,17 @@ import type { FormContextApi } from '../contexts/form-context';
 import type { FormValues } from '../types/form-values';
 import type { WatchMode } from '../types/watch-mode';
 
+/**
+ * Options for {@link useFieldsWatch}.
+ */
 export interface UseFormWatchOptions {
+  /**
+   * When the watched values are updated.
+   * - `'onChange'`: values update on every change (default).
+   * - `'onBlur'`: values update only when the field is blurred.
+   *
+   * @default 'onChange'
+   */
   mode?: WatchMode;
 }
 
