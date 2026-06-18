@@ -109,9 +109,8 @@ const step2Form = useForm();
 // Manual state synchronization, validation coordination...
 
 // ✅ Graneet Form: Built-in wizard
-const wizard = useWizard(
-  [{ name: 'step1' }, { name: 'step2' }, { name: 'step3' }],
-  (wizardValues) => submitRegistration(wizardValues),
+const wizard = useWizard([{ name: 'step1' }, { name: 'step2' }, { name: 'step3' }], (wizardValues) =>
+  submitRegistration(wizardValues),
 ); // Automatic state management and persistence across steps
 ```
 

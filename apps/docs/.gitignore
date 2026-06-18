@@ -17,3 +17,6 @@ node_modules
 
 .source
 .netlify
+
+# Auto-generated from packages/graneet-form/CHANGELOG.md (see scripts/generate-changelog.mjs)
+/content/docs/changelog.mdx
