@@ -1,5 +1,11 @@
 # graneet-form
 
+## 3.2.0
+
+### Minor Changes
+
+- [#160](https://github.com/graneet/graneet-form/pull/160) [`393b44a`](https://github.com/graneet/graneet-form/commit/393b44ab0288a304133cc439a87d84d20c78f749) Thanks [@victorduclos](https://github.com/victorduclos)! - Update dependencies
+
 ## 3.1.0
 
 ### Minor Changes
@@ -44,11 +50,11 @@
   ```typescript
   // Before (deprecated)
   const { initFormValues } = useStepForm();
-  initFormValues({ name: 'John', email: '' });
+  initFormValues({ name: "John", email: "" });
 
   // After (recommended)
   const { form } = useStepForm({
-    defaultValues: { name: 'John', email: '' },
+    defaultValues: { name: "John", email: "" },
   });
   ```
 
@@ -102,11 +108,11 @@
   ```typescript
   // Before (deprecated)
   const { initFormValues } = useStepForm();
-  initFormValues({ name: 'John', email: '' });
+  initFormValues({ name: "John", email: "" });
 
   // After (recommended)
   const { form } = useStepForm({
-    defaultValues: { name: 'John', email: '' },
+    defaultValues: { name: "John", email: "" },
   });
   ```
 
