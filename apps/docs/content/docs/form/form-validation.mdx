@@ -3,6 +3,8 @@ title: Form Validation
 description: Complete guide to implementing robust form validation with graneet-form's rule-based validation system
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
+
 # Form Validation
 
 Complete guide to implementing robust form validation with graneet-form's rule-based validation system.
@@ -182,9 +184,14 @@ function PasswordConfirmField() {
 
 Each field has a validation status with three possible values:
 
-- `VALID` - Field passes all validation rules
-- `INVALID` - Field fails one or more validation rules
-- `PENDING` - Validation is in progress (for async rules)
+- `valid` - Field passes all validation rules
+- `invalid` - Field fails one or more validation rules
+- `undetermined` - Not yet validated, or an async rule is still running
+
+<Callout type="info">
+  There is no separate `pending` status. While a debounced or async rule is resolving, the field stays `undetermined`
+  until it settles to `valid` or `invalid`.
+</Callout>
 
 ### Field State Properties
 
@@ -197,7 +204,7 @@ interface FieldState {
   isTouched: boolean; // true after the user has focused then blurred the field
   isDirty: boolean; // true after the user has changed the field value
   validationStatus: {
-    status: 'valid' | 'invalid' | 'pending';
+    status: 'valid' | 'invalid' | 'undetermined';
     message?: string; // Error message if status is invalid
   };
 }
@@ -221,9 +228,6 @@ interface FieldState {
           `}
           {...fieldProps}
         />
-
-        {/* Show loading indicator for async validation */}
-        {validationStatus.status === 'pending' && <span className="validation-pending">⏳ Checking...</span>}
 
         {/* Show error message */}
         {isTouched && validationStatus.status === 'invalid' && (
@@ -281,9 +285,9 @@ function ValidationSummary() {
       )}
 
       <div className="field-status">
-        <div className={`status ${email?.status?.toLowerCase()}`}>Email: {email?.status || 'UNDETERMINED'}</div>
-        <div className={`status ${password?.status?.toLowerCase()}`}>
-          Password: {password?.status || 'UNDETERMINED'}
+        <div className={`status ${email?.status ?? 'undetermined'}`}>Email: {email?.status ?? 'undetermined'}</div>
+        <div className={`status ${password?.status ?? 'undetermined'}`}>
+          Password: {password?.status ?? 'undetermined'}
         </div>
       </div>
     </div>
@@ -305,11 +309,11 @@ function SubmitButton() {
   return (
     <div className="submit-section">
       <div className="form-status">
-        Status: <span className={formStatus.toLowerCase()}>{formStatus}</span>
+        Status: <span className={formStatus}>{formStatus}</span>
       </div>
 
       <button type="submit" disabled={!isValid} className={`submit-btn ${isValid ? 'enabled' : 'disabled'}`}>
-        {formStatus === 'PENDING' ? 'Validating...' : 'Submit Form'}
+        Submit Form
       </button>
     </div>
   );

@@ -222,12 +222,8 @@ function StepValidationStatus() {
         return `✓ ${currentStep} step completed successfully`;
       case 'invalid':
         return `⚠ Please fix errors in ${currentStep} step`;
-      case 'pending':
-        return `⏳ Validating ${currentStep} step...`;
-      case 'undetermined':
-        return `📝 Complete ${currentStep} step to continue`;
       default:
-        return `Unknown status for ${currentStep} step`;
+        return `📝 Complete ${currentStep} step to continue`; // 'undetermined'
     }
   };
 

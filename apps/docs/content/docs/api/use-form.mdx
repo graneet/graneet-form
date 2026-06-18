@@ -111,15 +111,23 @@ form.resetForm();
 
 ### handleSubmit(callback)
 
-Creates a form submission handler with validation.
+Registers a submission handler that runs only when the whole form is valid. `handleSubmit` returns a function that you pass to the `onSubmit` prop of the [`Form`](/docs/api/components) component — `Form` renders the underlying `<form>` element and triggers validation on submit, calling your callback only if every field passes.
 
 ```tsx
-const handleSubmit = form.handleSubmit((formData) => {
-  console.log('Valid form data:', formData);
-});
+function MyForm() {
+  const form = useForm<FormData>();
 
-// Use with form element
-<form onSubmit={handleSubmit}>{/* form content */}</form>;
+  const onSubmit = (formData: FormData) => {
+    console.log('Valid form data:', formData);
+  };
+
+  return (
+    <Form form={form} onSubmit={form.handleSubmit(onSubmit)}>
+      {/* fields */}
+      <button type="submit">Submit</button>
+    </Form>
+  );
+}
 ```
 
 ## Performance Notes

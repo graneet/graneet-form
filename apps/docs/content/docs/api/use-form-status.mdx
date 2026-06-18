@@ -74,10 +74,8 @@ function FormWithStatusFeedback() {
         return 'green';
       case 'invalid':
         return 'red';
-      case 'pending':
-        return 'orange';
       default:
-        return 'gray';
+        return 'gray'; // 'undetermined'
     }
   };
 
@@ -93,7 +91,7 @@ function FormWithStatusFeedback() {
       {/* Form fields */}
 
       <button type="submit" disabled={!isValid}>
-        {formStatus === 'pending' ? 'Validating...' : 'Submit'}
+        Submit
       </button>
     </Form>
   );
@@ -106,8 +104,7 @@ The `formStatus` can be one of:
 
 - `'valid'` - All form fields are valid
 - `'invalid'` - One or more form fields are invalid
-- `'pending'` - Validation is in progress (async validation)
-- `'undetermined'` - Initial state or no validation rules
+- `'undetermined'` - Initial state, no validation rules, or async validation still running
 
 ## Performance Notes
 

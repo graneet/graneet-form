@@ -55,6 +55,8 @@ The Form component provides context to child components and handles form submiss
 
 ### Usage
 
+`Form` renders the underlying `<form>` element, so you don't wrap it in another `<form>`. Wire submission through its `onSubmit` prop using `form.handleSubmit`:
+
 ```tsx
 import { Form } from 'graneet-form';
 
@@ -67,18 +69,16 @@ import { Form } from 'graneet-form';
 function MyForm() {
   const form = useForm<FormData>();
 
-  const handleSubmit = form.handleSubmit((data) => {
+  const onSubmit = (data: FormData) => {
     console.log('Form data:', data);
-  });
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Form form={form}>
-        <Field name="username" render={...} />
-        <Field name="password" render={...} />
-        <button type="submit">Submit</button>
-      </Form>
-    </form>
+    <Form form={form} onSubmit={form.handleSubmit(onSubmit)}>
+      <Field name="username" render={...} />
+      <Field name="password" render={...} />
+      <button type="submit">Submit</button>
+    </Form>
   );
 }
 ```

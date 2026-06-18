@@ -86,7 +86,7 @@ interface FieldRenderState {
   isTouched: boolean; // true after the user has focused then blurred the field
   isDirty: boolean; // true after the user has changed the field value
   validationStatus: {
-    status: 'valid' | 'invalid' | 'pending';
+    status: 'valid' | 'invalid' | 'undetermined'; // 'undetermined' while async rules are still running
     message?: string; // Error message if invalid
   };
 }

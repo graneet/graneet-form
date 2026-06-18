@@ -12,7 +12,7 @@ The `useStepForm` hook integrates forms within wizard steps, providing automatic
 ```tsx
 import { useStepForm } from 'graneet-form';
 
-const { form, initFormValues } = useStepForm<WizardValues, StepName>(options);
+const { form } = useStepForm<WizardValues, StepName>(options);
 ```
 
 ## Parameters
@@ -286,19 +286,12 @@ The hook automatically:
 - Efficient re-rendering through granular subscriptions
 - Automatic cleanup when leaving steps
 
-## Migration from initFormValues
+## Setting Initial Values
 
-The `initFormValues` method is deprecated. Use `defaultValues` instead:
+Pass `defaultValues` to seed the step's fields. (The legacy `initFormValues` method was removed — use `defaultValues` instead.)
 
 ```tsx
-// ❌ Deprecated
-const { form, initFormValues } = useStepForm();
-useEffect(() => {
-  initFormValues({ name: '', email: '' });
-}, []);
-
-// ✅ Preferred
-const { form } = useStepForm({
+const { form } = useStepForm<WizardData, 'userInfo'>({
   defaultValues: { name: '', email: '' },
 });
 ```

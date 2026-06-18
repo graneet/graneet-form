@@ -76,11 +76,13 @@ Built from the ground up with TypeScript for excellent developer experience and 
 ### Render Optimization
 
 ```tsx
-// ❌ Other libraries: All fields re-render on any error
-form.setError('field1', 'Error'); // Re-renders 1000+ components
+// ❌ Other libraries: errors live in one shared object,
+// so any error change re-renders every component reading it.
+setError('field1', { message: 'Error' }); // Re-renders 1000+ components
 
-// ✅ Graneet Form: Only affected field re-renders
-form.setFieldError('field1', 'Error'); // Re-renders 1 component
+// ✅ Graneet Form: each field's validation status is an independent subscription.
+// When `field1` becomes invalid, only components watching `field1` re-render.
+const { field1 } = useValidations(form, ['field1']); // Re-renders 1 component
 ```
 
 ### Memory Usage
@@ -107,9 +109,10 @@ const step2Form = useForm();
 // Manual state synchronization, validation coordination...
 
 // ✅ Graneet Form: Built-in wizard
-const wizard = useWizard({
-  steps: [Step1, Step2, Step3],
-}); // Automatic state management
+const wizard = useWizard(
+  [{ name: 'step1' }, { name: 'step2' }, { name: 'step3' }],
+  (wizardValues) => submitRegistration(wizardValues),
+); // Automatic state management and persistence across steps
 ```
 
 ## Migration Guide
