@@ -16,7 +16,9 @@ function useGlobalValidationInternal<T extends FieldValues>(
 
   useEffect(() => {
     addGlobalValidationStatusSubscriber(setCurrentValidations);
-    return () => removeGlobalValidationStatusSubscriber(setCurrentValidations);
+    return () => {
+      removeGlobalValidationStatusSubscriber(setCurrentValidations);
+    };
   }, [addGlobalValidationStatusSubscriber, removeGlobalValidationStatusSubscriber]);
 
   return currentValidations;
@@ -29,15 +31,15 @@ function useValidationsInternal<T extends FieldValues, K extends keyof T>(
   const {
     formInternal: { addValidationStatusSubscriber, removeValidationStatusSubscriber },
   } = form;
-  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   const [currentValidations, setCurrentValidations] = useState<FormValidations<T, K>>({} as FormValidations<T, K>);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: names as string to avoid infinite re-render
-  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   useEffect(() => {
     addValidationStatusSubscriber(setCurrentValidations, names);
-    return () => removeValidationStatusSubscriber(setCurrentValidations, names);
-  }, [addValidationStatusSubscriber, names?.join(), removeValidationStatusSubscriber]);
+    return () => {
+      removeValidationStatusSubscriber(setCurrentValidations, names);
+    };
+    // oxlint-disable-next-line react-hooks/exhaustive-deps names as string to avoid infinite re-render
+  }, [addValidationStatusSubscriber, names?.join(','), removeValidationStatusSubscriber]);
 
   return currentValidations;
 }
@@ -86,15 +88,16 @@ export function useValidations<T extends FieldValues, K extends keyof T>(
   names: K[],
 ): FormValidations<T, K>;
 
+// oxlint-disable-next-line typescript/explicit-module-boundary-types
 export function useValidations<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T>,
   names: K[] | undefined,
 ) {
   if (names === undefined) {
-    // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
+    // oxlint-disable-next-line react-hooks/rules-of-hooks
     return useGlobalValidationInternal(form);
   }
 
-  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
+  // oxlint-disable-next-line react-hooks/rules-of-hooks
   return useValidationsInternal(form, names);
 }

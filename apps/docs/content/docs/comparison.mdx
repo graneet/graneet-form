@@ -28,7 +28,8 @@ React Hook Form is known for its excellent performance and API design. However, 
 - **Multi-step form complexity**: Integrating forms into our multi-step workflows proved challenging. We initially developed a solution on top of React Hook Form, but increasing complexity made our overlay unmaintainable
 
 <Callout type="info">
-  Check out our CTO's POC from several years ago: [React Hook Form Multi-step Discussion](https://github.com/orgs/react-hook-form/discussions/1979)
+  Check out our CTO's POC from several years ago: [React Hook Form Multi-step
+  Discussion](https://github.com/orgs/react-hook-form/discussions/1979)
 </Callout>
 
 These challenges led us to build a library tailored to our specific needs.
@@ -40,30 +41,35 @@ These challenges led us to build a library tailored to our specific needs.
 Graneet Form is built with performance as a core principle. Our key features include:
 
 #### 🎯 Granular Subscription System
+
 Watch specific fields or entire forms without unnecessary re-renders. Only components that actually need to update will re-render.
 
 #### 🚀 Optimized Error Handling
+
 Efficient error management that doesn't trigger cascade re-renders. Errors are handled per-field basis with smart subscription.
 
 #### 🗒️ Built-in Wizard System
+
 Native support for multi-step forms with seamless navigation. No additional overlays or complex state management needed.
 
 #### 📦 Zero Dependencies
+
 Completely self-contained with no external dependencies, keeping your bundle size minimal.
 
 #### 🔧 TypeScript First
+
 Built from the ground up with TypeScript for excellent developer experience and type safety.
 
 ## Performance Comparison
 
-| Feature | Graneet Form | React Hook Form | Formik |
-|---------|--------------|-----------------|--------|
-| **Large Forms (1000+ fields)** | ✅ Excellent | ⚠️ Good | ❌ Poor |
-| **Error Handling Performance** | ✅ Granular | ⚠️ Object-based | ❌ Re-renders all |
-| **Multi-step Forms** | ✅ Built-in | ⚠️ Complex setup | ⚠️ Manual |
-| **Bundle Size** | ✅ Small | ✅ Small | ❌ Large |
-| **Learning Curve** | ✅ Gentle | ⚠️ Moderate | ✅ Easy |
-| **TypeScript Support** | ✅ Excellent | ✅ Good | ⚠️ Basic |
+| Feature                        | Graneet Form | React Hook Form  | Formik            |
+| ------------------------------ | ------------ | ---------------- | ----------------- |
+| **Large Forms (1000+ fields)** | ✅ Excellent | ⚠️ Good          | ❌ Poor           |
+| **Error Handling Performance** | ✅ Granular  | ⚠️ Object-based  | ❌ Re-renders all |
+| **Multi-step Forms**           | ✅ Built-in  | ⚠️ Complex setup | ⚠️ Manual         |
+| **Bundle Size**                | ✅ Small     | ✅ Small         | ❌ Large          |
+| **Learning Curve**             | ✅ Gentle    | ⚠️ Moderate      | ✅ Easy           |
+| **TypeScript Support**         | ✅ Excellent | ✅ Good          | ⚠️ Basic          |
 
 ## Real-world Performance
 
@@ -102,7 +108,7 @@ const step2Form = useForm();
 
 // ✅ Graneet Form: Built-in wizard
 const wizard = useWizard({
-  steps: [Step1, Step2, Step3]
+  steps: [Step1, Step2, Step3],
 }); // Automatic state management
 ```
 
@@ -112,24 +118,31 @@ const wizard = useWizard({
 
 ```tsx
 // Before (React Hook Form)
-const { register, handleSubmit, formState: { errors } } = useForm();
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm();
 
-<input {...register('email', { required: 'Email is required' })} />
-{errors.email && <span>{errors.email.message}</span>}
+<input {...register('email', { required: 'Email is required' })} />;
+{
+  errors.email && <span>{errors.email.message}</span>;
+}
 
 // After (Graneet Form)
 const form = useForm();
 
-<Field name="email" render={(props, state) => (
-  <div>
-    <input {...props} />
-    {state.validationStatus.status === 'invalid' && (
-      <span>{state.validationStatus.message}</span>
-    )}
-  </div>
-)}>
+<Field
+  name="email"
+  render={(props, state) => (
+    <div>
+      <input {...props} />
+      {state.validationStatus.status === 'invalid' && <span>{state.validationStatus.message}</span>}
+    </div>
+  )}
+>
   <Rule validationFn={(value) => !!value} message="Email is required" />
-</Field>
+</Field>;
 ```
 
 ### From Formik
@@ -159,6 +172,7 @@ const form = useForm();
 ## When to Choose Graneet Form
 
 ### ✅ Perfect for:
+
 - Large forms with 100+ fields
 - Multi-step forms and wizards
 - Performance-critical applications
@@ -166,6 +180,7 @@ const form = useForm();
 - Applications requiring granular control
 
 ### ⚠️ Consider alternatives if:
+
 - Simple forms with < 10 fields
 - Tight integration with existing React Hook Form ecosystem
 - Need for specific third-party integrations

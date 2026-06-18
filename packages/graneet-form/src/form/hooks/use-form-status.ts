@@ -21,7 +21,7 @@ export interface FormStatus {
  * Retrieves the status of a form and its validation outcomes
  */
 export function useFormStatus<T extends FieldValues>(form: FormContextApi<T>): FormStatus {
-  const validations = useValidations(form, undefined);
+  const validations = useValidations(form);
   const [status, setStatus] = useState<ValidationStatus>('undetermined');
 
   useEffect(() => {

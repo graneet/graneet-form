@@ -38,7 +38,7 @@ interface UserForm {
 
 function CustomFormActions() {
   const form = useFormContext<UserForm>();
-  
+
   const handleReset = () => {
     form.resetForm();
   };
@@ -83,12 +83,8 @@ function FormStatusDisplay() {
 
   return (
     <div className="form-status">
-      <span className={`status ${formStatus}`}>
-        Status: {formStatus}
-      </span>
-      <span className={`validity ${isValid ? 'valid' : 'invalid'}`}>
-        {isValid ? '✓ Valid' : '✗ Invalid'}
-      </span>
+      <span className={`status ${formStatus}`}>Status: {formStatus}</span>
+      <span className={`validity ${isValid ? 'valid' : 'invalid'}`}>{isValid ? '✓ Valid' : '✗ Invalid'}</span>
     </div>
   );
 }
@@ -127,7 +123,7 @@ function CustomField({ name, label, placeholder }: CustomFieldProps) {
   return (
     <div className="custom-field">
       <label htmlFor={name}>{label}</label>
-      
+
       <Field name={name}>
         {(props, state) => (
           <input
@@ -139,9 +135,7 @@ function CustomField({ name, label, placeholder }: CustomFieldProps) {
         )}
       </Field>
 
-      {validation?.status === 'invalid' && (
-        <span className="error-message">{validation.message}</span>
-      )}
+      {validation?.status === 'invalid' && <span className="error-message">{validation.message}</span>}
     </div>
   );
 }
@@ -166,9 +160,7 @@ function ConditionalFields() {
         </>
       )}
 
-      {country === 'US' && (
-        <Field name="ssn" />
-      )}
+      {country === 'US' && <Field name="ssn" />}
     </div>
   );
 }
@@ -193,13 +185,7 @@ function AutoSave() {
     }
   }, [values]);
 
-  return (
-    <div className="auto-save">
-      {lastSaved && (
-        <span>✓ Auto-saved at {lastSaved.toLocaleTimeString()}</span>
-      )}
-    </div>
-  );
+  return <div className="auto-save">{lastSaved && <span>✓ Auto-saved at {lastSaved.toLocaleTimeString()}</span>}</div>;
 }
 ```
 
@@ -219,26 +205,19 @@ function FormNavigation() {
 
   return (
     <div className="form-navigation">
-      <button 
-        onClick={() => goToStep('step1')}
-        className={values.firstName ? 'completed' : 'pending'}
-      >
+      <button onClick={() => goToStep('step1')} className={values.firstName ? 'completed' : 'pending'}>
         Step 1: Personal Info
       </button>
-      
-      <button 
+
+      <button
         onClick={() => goToStep('step2')}
         disabled={!values.firstName}
         className={values.email ? 'completed' : 'pending'}
       >
         Step 2: Contact Info
       </button>
-      
-      <button 
-        onClick={() => goToStep('step3')}
-        disabled={!isValid}
-        className={isValid ? 'ready' : 'disabled'}
-      >
+
+      <button onClick={() => goToStep('step3')} disabled={!isValid} className={isValid ? 'ready' : 'disabled'}>
         Step 3: Review
       </button>
     </div>
@@ -257,7 +236,7 @@ function FormErrorSummary() {
     .filter(([_, validation]) => validation?.status === 'invalid')
     .map(([fieldName, validation]) => ({
       field: fieldName,
-      message: validation!.message
+      message: validation!.message,
     }));
 
   if (errors.length === 0) return null;
@@ -294,16 +273,13 @@ function FormProgress() {
   const { isValid } = useFormStatus(form);
 
   const requiredFields = ['firstName', 'lastName', 'email'];
-  const completedFields = requiredFields.filter(field => values[field]);
+  const completedFields = requiredFields.filter((field) => values[field]);
   const progress = (completedFields.length / requiredFields.length) * 100;
 
   return (
     <div className="form-progress">
       <div className="progress-bar">
-        <div 
-          className="progress-fill"
-          style={{ width: `${progress}%` }}
-        />
+        <div className="progress-fill" style={{ width: `${progress}%` }} />
       </div>
       <span className="progress-text">
         {completedFields.length} of {requiredFields.length} required fields completed

@@ -1,22 +1,42 @@
-import { type InferPageType, loader } from 'fumadocs-core/source';
-import { docs } from '@/.source';
+import { loader } from 'fumadocs-core/source';
+import { docs } from 'collections/server';
+import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
+import { docsRoute } from './shared';
 
-// See https://fumadocs.vercel.app/docs/headless/source-api for more info
 export const source = loader({
-  baseUrl: '/docs',
+  baseUrl: docsRoute,
+  plugins: [lucideIconsPlugin()],
   source: docs.toFumadocsSource(),
 });
 
-export function getPageImage(page: InferPageType<typeof source>) {
-  const segments = [...page.slugs, 'image.png'];
+export function markdownPathToSlugs(segs: string[]): string[] {
+  if (segs.length === 0) {
+    return [];
+  }
+
+  const out = [...segs];
+  out[out.length - 1] = out.at(-1)!.replace(/\.md$/, '');
+  if (out.length === 1 && out[0] === 'index') {
+    out.pop();
+  }
+  return out;
+}
+
+export function slugsToMarkdownPath(slugs: string[]): { segments: string[]; url: string } {
+  const segments = [...slugs];
+  if (segments.length === 0) {
+    segments.push('index.md');
+  } else {
+    segments[segments.length - 1] += '.md';
+  }
 
   return {
     segments,
-    url: `/og/docs/${segments.join('/')}`,
+    url: `${docsRoute}/${segments.join('/')}`,
   };
 }
 
-export async function getLLMText(page: InferPageType<typeof source>) {
+export async function getLLMText(page: (typeof source)['$inferPage']): Promise<string> {
   const processed = await page.data.getText('processed');
 
   return `# ${page.data.title} (${page.url})

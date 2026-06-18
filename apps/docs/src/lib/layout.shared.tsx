@@ -1,19 +1,14 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import Image from 'next/image';
+import { gitConfig } from './shared';
 
-/**
- * Shared layout configurations
- *
- * you can customise layouts individually from:
- * Home Layout: app/(home)/layout.tsx
- * Docs Layout: app/docs/layout.tsx
- */
 export function baseOptions(): BaseLayoutProps {
   return {
+    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
+    links: [],
     nav: {
       title: (
         <>
-          <Image
+          <img
             src="/graneet-form-logo.png"
             alt="Graneet Form Logo"
             width={24}
@@ -24,7 +19,5 @@ export function baseOptions(): BaseLayoutProps {
         </>
       ),
     },
-    // see https://fumadocs.dev/docs/ui/navigation/links
-    links: [],
   };
 }

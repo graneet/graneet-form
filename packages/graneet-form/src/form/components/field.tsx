@@ -1,4 +1,5 @@
-import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { AnyRecord } from '../../shared/types/any-record';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { ValidationState } from '../../shared/types/validation';
@@ -10,9 +11,9 @@ import { useRules } from '../hooks/use-rules';
 export interface FieldRenderProps<T extends FieldValues, K extends keyof T> {
   name: K;
   value: T[K] | undefined;
-  onFocus(): void;
-  onBlur(): void;
-  onChange(e: T[K] | undefined): void;
+  onFocus: () => void;
+  onBlur: () => void;
+  onChange: (e: T[K] | undefined) => void;
 }
 
 export interface FieldRenderState {
@@ -34,7 +35,7 @@ export interface FieldProps<T extends FieldValues, K extends keyof T> {
   /**
    * The function used to render the field component
    */
-  render(fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState): ReactNode | null;
+  render: (fieldProps: FieldRenderProps<T, K>, fieldState: FieldRenderState) => ReactNode | null;
 
   data?: AnyRecord;
 
@@ -62,22 +63,23 @@ export function Field<T extends FieldValues, K extends keyof T>({
   name,
   children = null,
   render,
-  data = undefined,
+  data,
   defaultValue,
-}: FieldProps<T, K>) {
+}: FieldProps<T, K>): ReactNode {
   const form = useFormContext<T>();
   const { ruleContext, rules, debouncedRules } = useRules();
 
-  const [value, setValue] = useState<T[K] | undefined>(undefined);
+  const [value, setValue] = useState<T[K] | undefined>();
   const [isPristine, setIsPristine] = useState<boolean>(true);
   const validationStatus = useFieldValidation(rules, debouncedRules, value);
 
   const hasFocusRef = useRef(false);
   const hasBeenFocusedRef = useRef(false);
 
-  useEffect(() => {
-    return form.formInternal.registerField(name, setValue, defaultValue);
-  }, [name, form.formInternal, defaultValue]);
+  useEffect(
+    () => form.formInternal.registerField(name, setValue, defaultValue),
+    [name, form.formInternal, defaultValue],
+  );
 
   useEffect(() => {
     form.formInternal.updateValidationStatus(name, validationStatus);
@@ -96,6 +98,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
 
   const onBlur = useCallback((): void => {
     hasFocusRef.current = false;
+    // oxlint-disable-next-line typescript/no-floating-promises
     form.formInternal.onFieldBlur(name, data);
   }, [name, form.formInternal, data]);
 
@@ -109,10 +112,10 @@ export function Field<T extends FieldValues, K extends keyof T>({
       {render(
         {
           name,
-          value,
-          onFocus,
           onBlur,
           onChange,
+          onFocus,
+          value,
         },
         {
           isPristine,

@@ -2,8 +2,8 @@
   "compilerOptions": {
     "allowJs": false,
     "module": "commonjs",
-    "target": "es6",
-    "moduleResolution": "node",
+    "target": "es2022",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx",
     "declaration": true,

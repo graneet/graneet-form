@@ -1,20 +1,24 @@
+// oxlint-disable-next-line import/no-nodejs-modules
 import { copyFileSync } from 'node:fs';
-import { defineConfig, type Options } from 'tsdown';
+import { defineConfig } from 'tsdown';
+import type { InlineConfig } from 'tsdown';
 
-const isProduction = (options: Options) => options.env?.['NODE_ENV'] === 'production';
+const isProduction = (options: InlineConfig) => options.env?.['NODE_ENV'] === 'production';
 
 export default defineConfig((options) => ({
-  entry: ['src/index.ts'],
-  format: ['esm'],
-  target: 'es2020',
   clean: true,
-  splitting: true,
-  treeshake: true,
-  watch: !isProduction(options),
-  sourcemap: !isProduction(options),
-  minify: isProduction(options),
   dts: true,
-  onSuccess: async () => {
+  entry: ['src/index.ts'],
+  exports: true,
+  format: ['esm'],
+  minify: isProduction(options),
+  onSuccess: () => {
     copyFileSync('../../README.md', 'README.md');
   },
+  publint: true,
+  sourcemap: !isProduction(options),
+  splitting: true,
+  target: 'es2020',
+  treeshake: true,
+  watch: !isProduction(options),
 }));

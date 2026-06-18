@@ -49,9 +49,7 @@ function ValidationSummary() {
   const validations = useValidations(form, undefined);
 
   const getValidationCount = (status: string) => {
-    return Object.values(validations).filter(
-      validation => validation?.status === status
-    ).length;
+    return Object.values(validations).filter((validation) => validation?.status === status).length;
   };
 
   return (
@@ -74,24 +72,14 @@ function PasswordFields() {
   return (
     <div>
       <Field name="password">
-        <Rule 
-          validationFn={(value) => value.length >= 8}
-          message="Password must be at least 8 characters"
-        />
+        <Rule validationFn={(value) => value.length >= 8} message="Password must be at least 8 characters" />
       </Field>
-      {password?.status === 'invalid' && (
-        <div className="error">{password.message}</div>
-      )}
+      {password?.status === 'invalid' && <div className="error">{password.message}</div>}
 
       <Field name="confirmPassword">
-        <Rule 
-          validationFn={(value, formData) => value === formData.password}
-          message="Passwords must match"
-        />
+        <Rule validationFn={(value, formData) => value === formData.password} message="Passwords must match" />
       </Field>
-      {confirmPassword?.status === 'invalid' && (
-        <div className="error">{confirmPassword.message}</div>
-      )}
+      {confirmPassword?.status === 'invalid' && <div className="error">{confirmPassword.message}</div>}
     </div>
   );
 }
@@ -108,7 +96,7 @@ function ErrorList() {
     .filter(([_, validation]) => validation?.status === 'invalid')
     .map(([fieldName, validation]) => ({
       field: fieldName,
-      message: validation!.message
+      message: validation!.message,
     }));
 
   if (errors.length === 0) return null;
@@ -138,23 +126,15 @@ function ConditionalValidation() {
   return (
     <div>
       <Field name="email">
-        <Rule 
+        <Rule
           validationFn={(value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)}
           message="Please enter a valid email address"
         />
       </Field>
 
-      {email?.status === 'valid' && (
-        <div className="success">
-          ✓ Email format is valid
-        </div>
-      )}
+      {email?.status === 'valid' && <div className="success">✓ Email format is valid</div>}
 
-      {email?.status === 'pending' && (
-        <div className="pending">
-          🔄 Checking email availability...
-        </div>
-      )}
+      {email?.status === 'pending' && <div className="pending">🔄 Checking email availability...</div>}
     </div>
   );
 }
@@ -167,17 +147,15 @@ function PersonalInfoSection() {
   const form = useFormContext<UserForm>();
   const personalFields = useValidations(form, ['firstName', 'lastName', 'dateOfBirth']);
 
-  const sectionIsValid = Object.values(personalFields).every(
-    validation => validation?.status === 'valid'
-  );
+  const sectionIsValid = Object.values(personalFields).every((validation) => validation?.status === 'valid');
 
   return (
     <fieldset className={sectionIsValid ? 'valid-section' : 'invalid-section'}>
       <legend>
-        Personal Information 
+        Personal Information
         {sectionIsValid && <span className="checkmark">✓</span>}
       </legend>
-      
+
       <Field name="firstName" />
       <Field name="lastName" />
       <Field name="dateOfBirth" />
@@ -196,24 +174,22 @@ function LiveValidationField({ name }: { name: keyof UserForm }) {
 
   const getValidationIcon = () => {
     switch (validation?.status) {
-      case 'valid': return '✓';
-      case 'invalid': return '✗';
-      case 'pending': return '⏳';
-      default: return '';
+      case 'valid':
+        return '✓';
+      case 'invalid':
+        return '✗';
+      case 'pending':
+        return '⏳';
+      default:
+        return '';
     }
   };
 
   return (
     <div className="field-container">
       <Field name={name} />
-      <span className={`validation-icon ${validation?.status}`}>
-        {getValidationIcon()}
-      </span>
-      {validation?.status === 'invalid' && (
-        <div className="validation-message">
-          {validation.message}
-        </div>
-      )}
+      <span className={`validation-icon ${validation?.status}`}>{getValidationIcon()}</span>
+      {validation?.status === 'invalid' && <div className="validation-message">{validation.message}</div>}
     </div>
   );
 }

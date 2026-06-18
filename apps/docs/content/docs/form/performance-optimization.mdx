@@ -41,7 +41,7 @@ Each field has a small registration cost, but the benefits outweigh the overhead
 function FormSummary() {
   const form = useFormContext<LargeFormData>();
   const allValues = useFieldsWatch(form, undefined);
-  
+
   return <div>Name: {allValues.name}</div>;
 }
 
@@ -49,7 +49,7 @@ function FormSummary() {
 function FormSummary() {
   const form = useFormContext<LargeFormData>();
   const { name } = useFieldsWatch(form, ['name']);
-  
+
   return <div>Name: {name}</div>;
 }
 ```
@@ -82,7 +82,7 @@ function ConditionalForm() {
     <Form form={form}>
       {/* Always render basic fields */}
       <BasicFields />
-      
+
       {/* Only register expensive fields when needed */}
       {showAdvanced && <AdvancedFields />}
     </Form>
@@ -113,17 +113,10 @@ function VirtualizedForm() {
   return (
     <div className="virtualized-container">
       {/* Only render fields in visible range */}
-      {Array.from({ length: visibleRange.end - visibleRange.start })
-        .map((_, index) => {
-          const fieldIndex = visibleRange.start + index;
-          return (
-            <Field
-              key={fieldIndex}
-              name={`field_${fieldIndex}`}
-              render={/* ... */}
-            />
-          );
-        })}
+      {Array.from({ length: visibleRange.end - visibleRange.start }).map((_, index) => {
+        const fieldIndex = visibleRange.start + index;
+        return <Field key={fieldIndex} name={`field_${fieldIndex}`} render={/* ... */} />;
+      })}
     </div>
   );
 }
@@ -141,13 +134,9 @@ Place cheap validations first, expensive ones last:
   <Rule validationFn={isRequired} message="Email is required" />
   <Rule validationFn={isValidEmailFormat} message="Invalid email format" />
   <Rule validationFn={isReasonableLength} message="Email too long" />
-  
+
   {/* Expensive async validation last */}
-  <Rule 
-    validationFn={checkEmailAvailability}
-    message="Email already exists"
-    isDebounced={true}
-  />
+  <Rule validationFn={checkEmailAvailability} message="Email already exists" isDebounced={true} />
 </Field>
 ```
 
@@ -157,28 +146,27 @@ Place cheap validations first, expensive ones last:
 // Custom debounced validation hook
 function useDebouncedValidation(validationFn: Function, delay: number = 500) {
   const timeoutRef = useRef<NodeJS.Timeout>();
-  
-  return useCallback((value: any) => {
-    return new Promise((resolve) => {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
-        resolve(validationFn(value));
-      }, delay);
-    });
-  }, [validationFn, delay]);
+
+  return useCallback(
+    (value: any) => {
+      return new Promise((resolve) => {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+          resolve(validationFn(value));
+        }, delay);
+      });
+    },
+    [validationFn, delay],
+  );
 }
 
 // Usage
 function AsyncValidatedField() {
   const debouncedValidation = useDebouncedValidation(expensiveApiCall, 1000);
-  
+
   return (
     <Field name="username" render={/* ... */}>
-      <Rule
-        validationFn={debouncedValidation}
-        message="Username validation failed"
-        isDebounced={true}
-      />
+      <Rule validationFn={debouncedValidation} message="Username validation failed" isDebounced={true} />
     </Field>
   );
 }
@@ -190,53 +178,45 @@ function AsyncValidatedField() {
 
 ```tsx
 // Memoize stable field components
-const MemoizedTextField = React.memo(<T extends FieldValues, K extends keyof T>({
-  name,
-  label,
-  placeholder
-}: {
-  name: K;
-  label: string;
-  placeholder: string;
-}) => (
-  <Field<T, K>
-    name={name}
-    render={(fieldProps, fieldState) => (
-      <div>
-        <label>{label}</label>
-        <input
-          placeholder={placeholder}
-          value={fieldProps.value || ''}
-          onChange={(e) => fieldProps.onChange(e.target.value)}
-          onBlur={fieldProps.onBlur}
-          onFocus={fieldProps.onFocus}
-        />
-        {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
-          <span>{fieldState.validationStatus.message}</span>
-        )}
-      </div>
-    )}
-  />
-));
+const MemoizedTextField = React.memo(
+  <T extends FieldValues, K extends keyof T>({
+    name,
+    label,
+    placeholder,
+  }: {
+    name: K;
+    label: string;
+    placeholder: string;
+  }) => (
+    <Field<T, K>
+      name={name}
+      render={(fieldProps, fieldState) => (
+        <div>
+          <label>{label}</label>
+          <input
+            placeholder={placeholder}
+            value={fieldProps.value || ''}
+            onChange={(e) => fieldProps.onChange(e.target.value)}
+            onBlur={fieldProps.onBlur}
+            onFocus={fieldProps.onFocus}
+          />
+          {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+            <span>{fieldState.validationStatus.message}</span>
+          )}
+        </div>
+      )}
+    />
+  ),
+);
 
 // Usage
-<MemoizedTextField 
-  name="email" 
-  label="Email Address" 
-  placeholder="Enter email" 
-/>
+<MemoizedTextField name="email" label="Email Address" placeholder="Enter email" />;
 ```
 
 #### Memoize Form Sections
 
 ```tsx
-const MemoizedFormSection = React.memo(({ 
-  title,
-  children 
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => (
+const MemoizedFormSection = React.memo(({ title, children }: { title: string; children: React.ReactNode }) => (
   <div className="form-section">
     <h3>{title}</h3>
     {children}
@@ -249,7 +229,7 @@ function OptimizedForm() {
       <MemoizedFormSection title="Basic Information">
         <BasicFields />
       </MemoizedFormSection>
-      
+
       <MemoizedFormSection title="Contact Details">
         <ContactFields />
       </MemoizedFormSection>
@@ -276,7 +256,7 @@ function updateUserProfile(userData: UserData) {
   form.setFormValues({
     name: userData.name,
     email: userData.email,
-    phone: userData.phone
+    phone: userData.phone,
   });
   // Single re-render for all subscribers
 }
@@ -289,7 +269,7 @@ function updateUserProfile(userData: UserData) {
 function FormDisplay() {
   const form = useFormContext();
   const values = form.getFormValues(); // Called on every render
-  
+
   return <div>{JSON.stringify(values)}</div>;
 }
 
@@ -297,7 +277,7 @@ function FormDisplay() {
 function FormDisplay() {
   const form = useFormContext();
   const values = useFieldsWatch(form, undefined); // Optimized subscription
-  
+
   return <div>{JSON.stringify(values)}</div>;
 }
 ```
@@ -310,30 +290,33 @@ function FormDisplay() {
 function useOptimizedFieldWatcher<T extends FieldValues>(
   form: FormContextApi<T>,
   criticalFields: (keyof T)[],
-  normalFields: (keyof T)[]
+  normalFields: (keyof T)[],
 ) {
   // Critical fields update immediately (onChange)
   const criticalValues = useFieldsWatch(form, criticalFields);
-  
+
   // Normal fields update on blur only
   const normalValues = useFieldsWatch(form, normalFields, { mode: 'onBlur' });
-  
-  return useMemo(() => ({
-    ...criticalValues,
-    ...normalValues
-  }), [criticalValues, normalValues]);
+
+  return useMemo(
+    () => ({
+      ...criticalValues,
+      ...normalValues,
+    }),
+    [criticalValues, normalValues],
+  );
 }
 
 // Usage
 function SmartFormWatcher() {
   const form = useFormContext<FormData>();
-  
+
   const values = useOptimizedFieldWatcher(
     form,
     ['searchQuery', 'liveFilter'], // Need immediate updates
-    ['description', 'notes', 'tags'] // Blur updates are sufficient
+    ['description', 'notes', 'tags'], // Blur updates are sufficient
   );
-  
+
   return <FormPreview values={values} />;
 }
 ```
@@ -344,33 +327,33 @@ function SmartFormWatcher() {
 function useDebouncedFormValues<T extends FieldValues>(
   form: FormContextApi<T>,
   fields: (keyof T)[],
-  delay: number = 300
+  delay: number = 300,
 ) {
   const values = useFieldsWatch(form, fields);
   const [debouncedValues, setDebouncedValues] = useState(values);
-  
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setDebouncedValues(values);
     }, delay);
-    
+
     return () => clearTimeout(timeout);
   }, [values, delay]);
-  
+
   return debouncedValues;
 }
 
 // Usage for expensive operations
 function ExpensiveFormProcessor() {
   const form = useFormContext<FormData>();
-  
+
   // Only process after 500ms of no changes
   const debouncedValues = useDebouncedFormValues(form, ['data'], 500);
-  
+
   const processedData = useMemo(() => {
     return performExpensiveCalculation(debouncedValues.data);
   }, [debouncedValues.data]);
-  
+
   return <div>{processedData}</div>;
 }
 ```
@@ -382,7 +365,7 @@ function ExpensiveFormProcessor() {
 ```tsx
 function FormWithCleanup() {
   const form = useForm<FormData>();
-  
+
   useEffect(() => {
     // Cleanup function
     return () => {
@@ -403,24 +386,24 @@ function FormWithCleanup() {
 function SafeAsyncField() {
   const [loading, setLoading] = useState(false);
   const mountedRef = useRef(true);
-  
+
   useEffect(() => {
     return () => {
       mountedRef.current = false;
     };
   }, []);
-  
+
   const handleAsyncValidation = useCallback(async (value: string) => {
     setLoading(true);
-    
+
     try {
       const result = await validateAsync(value);
-      
+
       // Only update state if component is still mounted
       if (mountedRef.current) {
         setLoading(false);
       }
-      
+
       return result;
     } catch (error) {
       if (mountedRef.current) {
@@ -429,14 +412,10 @@ function SafeAsyncField() {
       return false;
     }
   }, []);
-  
+
   return (
     <Field name="asyncField" render={/* ... */}>
-      <Rule
-        validationFn={handleAsyncValidation}
-        message="Validation failed"
-        isDebounced={true}
-      />
+      <Rule validationFn={handleAsyncValidation} message="Validation failed" isDebounced={true} />
     </Field>
   );
 }
@@ -451,26 +430,25 @@ function useFormPerformance<T extends FieldValues>(form: FormContextApi<T>) {
   const [metrics, setMetrics] = useState({
     renderCount: 0,
     lastRenderTime: Date.now(),
-    averageRenderTime: 0
+    averageRenderTime: 0,
   });
-  
+
   useEffect(() => {
     const startTime = Date.now();
-    
-    setMetrics(prev => {
+
+    setMetrics((prev) => {
       const renderTime = startTime - prev.lastRenderTime;
       const newRenderCount = prev.renderCount + 1;
-      const newAverageRenderTime = 
-        (prev.averageRenderTime * (newRenderCount - 1) + renderTime) / newRenderCount;
-      
+      const newAverageRenderTime = (prev.averageRenderTime * (newRenderCount - 1) + renderTime) / newRenderCount;
+
       return {
         renderCount: newRenderCount,
         lastRenderTime: startTime,
-        averageRenderTime: newAverageRenderTime
+        averageRenderTime: newAverageRenderTime,
       };
     });
   });
-  
+
   return metrics;
 }
 
@@ -478,11 +456,11 @@ function useFormPerformance<T extends FieldValues>(form: FormContextApi<T>) {
 function PerformanceMonitor() {
   const form = useFormContext();
   const metrics = useFormPerformance(form);
-  
+
   if (process.env.NODE_ENV !== 'development') {
     return null;
   }
-  
+
   return (
     <div className="performance-monitor">
       <div>Renders: {metrics.renderCount}</div>
@@ -515,11 +493,11 @@ const PaymentSection = React.lazy(() => import('./PaymentSection'));
 
 function OptimizedForm() {
   const [activeSection, setActiveSection] = useState('basic');
-  
+
   return (
     <Form form={form}>
       <BasicSection />
-      
+
       <Suspense fallback={<div>Loading...</div>}>
         {activeSection === 'advanced' && <AdvancedFormSection />}
         {activeSection === 'payment' && <PaymentSection />}

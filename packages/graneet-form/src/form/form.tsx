@@ -1,7 +1,9 @@
-import { type FormEventHandler, type FormHTMLAttributes, type ReactNode, useCallback } from 'react';
+import { useCallback } from 'react';
+import type { FormHTMLAttributes, ReactNode, SubmitEventHandler } from 'react';
 import type { FieldValues } from '../shared/types/field-value';
 import { mapValidationStatusesToOutcome } from '../shared/util/validation.util';
-import { FormContext, type FormContextApi } from './contexts/form-context';
+import { FormContext } from './contexts/form-context';
+import type { FormContextApi } from './contexts/form-context';
 
 interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
   children: ReactNode;
@@ -22,7 +24,7 @@ interface FormProps<T extends FieldValues> extends Omit<FormHTMLAttributes<HTMLF
  * )
  * ```
  */
-export function Form<T extends FieldValues>({ children, form, onSubmit, ...otherProps }: FormProps<T>) {
+export function Form<T extends FieldValues>({ children, form, onSubmit, ...otherProps }: FormProps<T>): ReactNode {
   const {
     getFormValues,
     formInternal: { getFormErrors, getHandleFormSubmit },
@@ -32,7 +34,7 @@ export function Form<T extends FieldValues>({ children, form, onSubmit, ...other
     onSubmit();
   }
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
       event.preventDefault();
 
@@ -51,6 +53,7 @@ export function Form<T extends FieldValues>({ children, form, onSubmit, ...other
 
   return (
     <FormContext.Provider value={form}>
+      {/* oxlint-disable-next-line react/jsx-props-no-spreading */}
       <form {...otherProps} onSubmit={handleSubmit}>
         {children}
       </form>

@@ -26,7 +26,7 @@ This hook takes no parameters and must be used within a wizard context.
 ## Status Values
 
 - `'valid'` - All fields in the current step are valid
-- `'invalid'` - One or more fields in the current step are invalid  
+- `'invalid'` - One or more fields in the current step are invalid
 - `'pending'` - Async validation is in progress
 - `'undetermined'` - No validation has been performed yet
 
@@ -47,19 +47,19 @@ function NextButton() {
 
   const getButtonClass = () => {
     switch (stepStatus) {
-      case 'valid': return 'btn-primary';
-      case 'invalid': return 'btn-disabled';
-      case 'pending': return 'btn-loading';
-      default: return 'btn-default';
+      case 'valid':
+        return 'btn-primary';
+      case 'invalid':
+        return 'btn-disabled';
+      case 'pending':
+        return 'btn-loading';
+      default:
+        return 'btn-default';
     }
   };
 
   return (
-    <button
-      onClick={goNext}
-      disabled={stepStatus !== 'valid'}
-      className={getButtonClass()}
-    >
+    <button onClick={goNext} disabled={stepStatus !== 'valid'} className={getButtonClass()}>
       {getButtonText()}
     </button>
   );
@@ -74,21 +74,31 @@ function StepStatusIndicator() {
 
   const getStatusIcon = () => {
     switch (stepStatus) {
-      case 'valid': return '✅';
-      case 'invalid': return '❌';
-      case 'pending': return '⏳';
-      case 'undetermined': return '⚪';
-      default: return '❓';
+      case 'valid':
+        return '✅';
+      case 'invalid':
+        return '❌';
+      case 'pending':
+        return '⏳';
+      case 'undetermined':
+        return '⚪';
+      default:
+        return '❓';
     }
   };
 
   const getStatusMessage = () => {
     switch (stepStatus) {
-      case 'valid': return 'Step completed successfully';
-      case 'invalid': return 'Please fix the errors below';
-      case 'pending': return 'Validating your input...';
-      case 'undetermined': return 'Fill out the required fields';
-      default: return 'Unknown status';
+      case 'valid':
+        return 'Step completed successfully';
+      case 'invalid':
+        return 'Please fix the errors below';
+      case 'pending':
+        return 'Validating your input...';
+      case 'undetermined':
+        return 'Fill out the required fields';
+      default:
+        return 'Unknown status';
     }
   };
 
@@ -107,14 +117,14 @@ function StepStatusIndicator() {
 function WizardProgressBar() {
   const { steps, currentStep } = useWizardContext();
   const currentStepStatus = useStepStatus();
-  
+
   const currentStepIndex = steps.indexOf(currentStep);
 
   return (
     <div className="progress-bar">
       {steps.map((stepName, index) => {
         let status: 'completed' | 'current' | 'pending' = 'pending';
-        
+
         if (index < currentStepIndex) {
           status = 'completed';
         } else if (index === currentStepIndex) {
@@ -122,10 +132,7 @@ function WizardProgressBar() {
         }
 
         return (
-          <div 
-            key={stepName}
-            className={`progress-step ${status}`}
-          >
+          <div key={stepName} className={`progress-step ${status}`}>
             <div className="step-indicator">
               {status === 'completed' && '✓'}
               {status === 'current' && (
@@ -158,11 +165,11 @@ function StepHelpText() {
     if (stepStatus === 'invalid') {
       return 'Please correct the errors highlighted in red before continuing.';
     }
-    
+
     if (stepStatus === 'pending') {
-      return 'We\'re validating your information. This may take a moment.';
+      return "We're validating your information. This may take a moment.";
     }
-    
+
     if (stepStatus === 'valid') {
       return 'Great! You can proceed to the next step.';
     }
@@ -227,11 +234,7 @@ function FormActions() {
 
   return (
     <div className="form-actions">
-      <button
-        onClick={goPrevious}
-        disabled={stepStatus === 'pending'}
-        className="btn-secondary"
-      >
+      <button onClick={goPrevious} disabled={stepStatus === 'pending'} className="btn-secondary">
         {isFirstStep ? 'Cancel' : 'Previous'}
       </button>
 
@@ -267,15 +270,15 @@ The hook automatically receives status updates from `useStepForm` when used in t
 
 ```tsx
 function MyWizardStep() {
-  const { form } = useStepForm({ /* options */ });
+  const { form } = useStepForm({
+    /* options */
+  });
   const stepStatus = useStepStatus(); // Automatically synced with form validation
 
   return (
     <div>
-      <Form form={form}>
-        {/* Your form fields */}
-      </Form>
-      
+      <Form form={form}>{/* Your form fields */}</Form>
+
       <StepStatusIndicator />
       <CustomNavigationButtons />
     </div>

@@ -1,6 +1,8 @@
-import { type Dispatch, type SetStateAction, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import type { FormContextApi } from '../../form/contexts/form-context';
-import { type UseFormOptions, useForm } from '../../form/hooks/use-form';
+import { useForm } from '../../form/hooks/use-form';
+import type { UseFormOptions } from '../../form/hooks/use-form';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
 import type { ValidationState, ValidationStatuses } from '../../shared/types/validation';
@@ -105,10 +107,14 @@ export function useStepForm<
       In case of big step with many inputs, stepStatus will stay UNDETERMINED until that the render
       is done and only after that, the timeout will be run
      */
-    setTimeout(() => addGlobalValidationStatusSubscriber(setFormStatusFromValidationStatuses), 0);
+    setTimeout(() => {
+      addGlobalValidationStatusSubscriber(setFormStatusFromValidationStatuses);
+    }, 0);
 
     return () => {
-      setValuesGetterForCurrentStep(() => undefined);
+      setValuesGetterForCurrentStep(() => {
+        // NOOP
+      });
       // On step switch, switch stepStatus, user will not be stuck on not clickable button
       stepStatusSetter('valid');
     };
