@@ -56,36 +56,42 @@ export function useFieldsWatch<T extends FieldValues = Record<string, unknown>, 
   options?: UseFormWatchOptions,
 ): Prettify<FormValues<T, K>>;
 
+// oxlint-disable-next-line typescript/explicit-module-boundary-types
 export function useFieldsWatch<T extends FieldValues, K extends keyof T>(
   form: FormContextApi<T>,
   names: K[] | undefined,
   options: UseFormWatchOptions = {},
 ) {
   const mode = options.mode ?? 'onChange';
-  // biome-ignore lint/suspicious/noExplicitAny: setCurrentValues needs to handle both Partial<T> and FormValues<T, K> signatures
+  // oxlint-disable-next-line typescript/no-explicit-any typescript/no-unsafe-assignment : setCurrentValues needs to handle both Partial<T> and FormValues<T, K> signatures
   const [currentValues, setCurrentValues] = useState<any>({});
 
   const {
     formInternal: { addGlobalValueSubscriber, removeGlobalValueSubscriber, addValueSubscriber, removeValueSubscriber },
   } = form;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: names is transformed to string to ensure consistent ref
   useEffect(() => {
     if (names === undefined) {
       addGlobalValueSubscriber(setCurrentValues, mode);
-      return () => removeGlobalValueSubscriber(setCurrentValues, mode);
-    } else {
-      addValueSubscriber(setCurrentValues, mode, names);
-      return () => removeValueSubscriber(setCurrentValues, mode, names);
+      return () => {
+        removeGlobalValueSubscriber(setCurrentValues, mode);
+      };
     }
+    addValueSubscriber(setCurrentValues, mode, names);
+    return () => {
+      removeValueSubscriber(setCurrentValues, mode, names);
+    };
+    // oxlint-disable-next-line react-hooks/exhaustive-deps names is transformed to string to ensure consistent ref
   }, [
     addGlobalValueSubscriber,
     removeGlobalValueSubscriber,
     addValueSubscriber,
     removeValueSubscriber,
-    names?.join(),
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+    names?.join(','),
     mode,
   ]);
 
+  // oxlint-disable-next-line typescript/no-unsafe-return
   return currentValues;
 }

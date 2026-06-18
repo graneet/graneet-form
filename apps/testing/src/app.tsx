@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { FieldTests } from './screens/FieldTests.tsx';
-import { WizardTests } from './screens/WizardTests.tsx';
+import { FieldTests } from './screens/field-tests.tsx';
+import { WizardTests } from './screens/wizard-tests.tsx';
 
-function App() {
+function App(): ReactNode {
   const [screen, setScreen] = useState<'form' | 'wizard'>();
 
   return (
@@ -27,7 +28,7 @@ function App() {
       <br />
       <br />
 
-      <div style={{ height: '100%', border: '1px solid gray', padding: '1rem' }}>
+      <div style={{ border: '1px solid gray', height: '100%', padding: '1rem' }}>
         {screen === 'form' && <FieldTests />}
         {screen === 'wizard' && <WizardTests />}
       </div>

@@ -1,0 +1,21 @@
+name: Code quality
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+
+      - name: Install
+        uses: ./.github/composite-actions/install
+      - name: Lint
+        run: pnpm lint
+      - name: Format check
+        run: pnpm format:check

@@ -26,6 +26,7 @@ const wizard = useWizard(steps, onFinish, onQuit);
 <AutoTypeTable path="../../packages/graneet-form/src/wizard/hooks/use-wizard.ts" name="Steps" />
 
 Each step in the array should have:
+
 - `name` - Unique identifier for the step
 - `onNext?` - Optional validation function called before proceeding to next step
 
@@ -41,17 +42,13 @@ The hook returns a wizard context API object:
 
 ```tsx
 interface WizardData {
-  userInfo: { name: string; email: string; };
-  preferences: { theme: 'light' | 'dark'; notifications: boolean; };
-  confirmation: { agreed: boolean; };
+  userInfo: { name: string; email: string };
+  preferences: { theme: 'light' | 'dark'; notifications: boolean };
+  confirmation: { agreed: boolean };
 }
 
 function RegistrationWizard() {
-  const steps: Steps<WizardData> = [
-    { name: 'userInfo' },
-    { name: 'preferences' },
-    { name: 'confirmation' }
-  ];
+  const steps: Steps<WizardData> = [{ name: 'userInfo' }, { name: 'preferences' }, { name: 'confirmation' }];
 
   const wizard = useWizard<WizardData>(
     steps,
@@ -62,7 +59,7 @@ function RegistrationWizard() {
     () => {
       console.log('Wizard cancelled');
       router.push('/');
-    }
+    },
   );
 
   return (
@@ -78,7 +75,7 @@ function RegistrationWizard() {
 
 ```tsx
 const steps: Steps<WizardData> = [
-  { 
+  {
     name: 'userInfo',
     onNext: async (stepData) => {
       // Validate email uniqueness before proceeding
@@ -90,16 +87,16 @@ const steps: Steps<WizardData> = [
         }
       }
       return true;
-    }
+    },
   },
-  { 
+  {
     name: 'preferences',
     onNext: (stepData) => {
       // Simple validation
       return stepData.theme !== undefined;
-    }
+    },
   },
-  { name: 'confirmation' }
+  { name: 'confirmation' },
 ];
 ```
 
@@ -108,7 +105,7 @@ const steps: Steps<WizardData> = [
 ```tsx
 function WizardNavigation() {
   const wizard = useWizardContext<WizardData>();
-  
+
   return (
     <div className="wizard-nav">
       <div className="steps-indicator">
@@ -125,17 +122,11 @@ function WizardNavigation() {
       </div>
 
       <div className="navigation-buttons">
-        <button 
-          onClick={wizard.goPrevious}
-          disabled={wizard.isFirstStep}
-        >
+        <button onClick={wizard.goPrevious} disabled={wizard.isFirstStep}>
           {wizard.isFirstStep ? 'Cancel' : 'Previous'}
         </button>
 
-        <button 
-          onClick={wizard.goNext}
-          disabled={!wizard.isStepReady}
-        >
+        <button onClick={wizard.goNext} disabled={!wizard.isStepReady}>
           {wizard.isLastStep ? 'Finish' : 'Next'}
         </button>
       </div>
@@ -163,11 +154,7 @@ function WizardContent() {
     }
   };
 
-  return (
-    <div className="wizard-content">
-      {renderStep()}
-    </div>
-  );
+  return <div className="wizard-content">{renderStep()}</div>;
 }
 ```
 
@@ -179,17 +166,17 @@ function ConfirmationStep() {
 
   // Get data from specific step
   const userInfo = wizard.getValuesOfStep('userInfo');
-  
+
   // Get data from current step
   const currentData = wizard.getValuesOfCurrentStep();
-  
+
   // Get all wizard data
   const allData = wizard.getValuesOfSteps();
 
   return (
     <div>
       <h2>Confirm Your Information</h2>
-      
+
       <div>
         <h3>User Information</h3>
         <p>Name: {userInfo?.name}</p>
@@ -212,10 +199,7 @@ function ConditionalWizard() {
   const [userType, setUserType] = useState<'personal' | 'business'>('personal');
 
   const steps: Steps<WizardData> = useMemo(() => {
-    const baseSteps = [
-      { name: 'userInfo' },
-      { name: 'preferences' }
-    ];
+    const baseSteps = [{ name: 'userInfo' }, { name: 'preferences' }];
 
     if (userType === 'business') {
       baseSteps.splice(1, 0, { name: 'businessInfo' });

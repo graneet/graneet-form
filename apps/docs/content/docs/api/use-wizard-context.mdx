@@ -31,22 +31,14 @@ Returns the `WizardContextApi<WizardValues>` object:
 
 ```tsx
 interface WizardData {
-  userInfo: { firstName: string; lastName: string; email: string; };
-  preferences: { theme: 'light' | 'dark'; notifications: boolean; };
-  confirmation: { agreed: boolean; };
+  userInfo: { firstName: string; lastName: string; email: string };
+  preferences: { theme: 'light' | 'dark'; notifications: boolean };
+  confirmation: { agreed: boolean };
 }
 
 function WizardNavigation() {
-  const {
-    steps,
-    currentStep,
-    goNext,
-    goPrevious,
-    goBackTo,
-    isFirstStep,
-    isLastStep,
-    isStepReady
-  } = useWizardContext<WizardData>();
+  const { steps, currentStep, goNext, goPrevious, goBackTo, isFirstStep, isLastStep, isStepReady } =
+    useWizardContext<WizardData>();
 
   return (
     <div className="wizard-navigation">
@@ -73,19 +65,11 @@ function WizardNavigation() {
       </div>
 
       <div className="navigation-buttons">
-        <button
-          onClick={goPrevious}
-          disabled={isFirstStep}
-          className="btn-secondary"
-        >
+        <button onClick={goPrevious} disabled={isFirstStep} className="btn-secondary">
           {isFirstStep ? 'Cancel' : 'Previous'}
         </button>
 
-        <button
-          onClick={goNext}
-          disabled={!isStepReady}
-          className={isStepReady ? 'btn-primary' : 'btn-disabled'}
-        >
+        <button onClick={goNext} disabled={!isStepReady} className={isStepReady ? 'btn-primary' : 'btn-disabled'}>
           {isLastStep ? 'Complete' : 'Next'}
         </button>
       </div>
@@ -99,17 +83,14 @@ function WizardNavigation() {
 ```tsx
 function WizardProgressBar() {
   const { steps, currentStep } = useWizardContext<WizardData>();
-  
+
   const currentStepIndex = steps.indexOf(currentStep);
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
 
   return (
     <div className="wizard-progress">
       <div className="progress-bar">
-        <div 
-          className="progress-fill"
-          style={{ width: `${progress}%` }}
-        />
+        <div className="progress-fill" style={{ width: `${progress}%` }} />
       </div>
       <div className="progress-text">
         Step {currentStepIndex + 1} of {steps.length}: {currentStep}
@@ -128,18 +109,20 @@ function WizardSummary() {
   // Get data from specific steps
   const userInfo = getValuesOfStep('userInfo');
   const preferences = getValuesOfStep('preferences');
-  
+
   // Get all wizard data
   const allData = getValuesOfSteps();
 
   return (
     <div className="wizard-summary">
       <h2>Registration Summary</h2>
-      
+
       {userInfo && (
         <div className="summary-section">
           <h3>Personal Information</h3>
-          <p>Name: {userInfo.firstName} {userInfo.lastName}</p>
+          <p>
+            Name: {userInfo.firstName} {userInfo.lastName}
+          </p>
           <p>Email: {userInfo.email}</p>
         </div>
       )}
@@ -166,34 +149,30 @@ function WizardSummary() {
 ```tsx
 function StepContent() {
   const { currentStep, getValuesOfStep } = useWizardContext<WizardData>();
-  
+
   const userInfo = getValuesOfStep('userInfo');
 
   const renderStep = () => {
     switch (currentStep) {
       case 'userInfo':
         return <UserInfoStep />;
-        
+
       case 'preferences':
         return <PreferencesStep />;
-        
+
       case 'confirmation':
         // Show different content based on previous step data
         if (userInfo?.email?.includes('@company.com')) {
           return <BusinessConfirmationStep />;
         }
         return <PersonalConfirmationStep />;
-        
+
       default:
         return <div>Unknown step: {currentStep}</div>;
     }
   };
 
-  return (
-    <div className="step-content">
-      {renderStep()}
-    </div>
-  );
+  return <div className="step-content">{renderStep()}</div>;
 }
 ```
 
@@ -202,7 +181,7 @@ function StepContent() {
 ```tsx
 function WizardBreadcrumbs() {
   const { steps, currentStep, goBackTo } = useWizardContext<WizardData>();
-  
+
   const currentStepIndex = steps.indexOf(currentStep);
 
   return (
@@ -214,12 +193,9 @@ function WizardBreadcrumbs() {
         return (
           <span key={stepName} className="breadcrumb-item">
             {index > 0 && <span className="separator"> › </span>}
-            
+
             {isAccessible ? (
-              <button
-                onClick={() => goBackTo(stepName)}
-                className={`breadcrumb-link ${isCurrent ? 'current' : ''}`}
-              >
+              <button onClick={() => goBackTo(stepName)} className={`breadcrumb-link ${isCurrent ? 'current' : ''}`}>
                 {stepName}
               </button>
             ) : (
@@ -255,11 +231,7 @@ function StepValidationStatus() {
     }
   };
 
-  return (
-    <div className={`step-status status-${stepStatus}`}>
-      {getStatusMessage()}
-    </div>
-  );
+  return <div className={`step-status status-${stepStatus}`}>{getStatusMessage()}</div>;
 }
 ```
 
@@ -273,23 +245,26 @@ function WizardDataExport() {
     const allData = getValuesOfSteps();
     const dataStr = JSON.stringify(allData, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    
+
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
     link.download = 'wizard-data.json';
     link.click();
-    
+
     URL.revokeObjectURL(url);
   };
 
   const saveProgress = () => {
     const allData = getValuesOfSteps();
-    localStorage.setItem('wizardProgress', JSON.stringify({
-      currentStep,
-      data: allData,
-      timestamp: new Date().toISOString()
-    }));
+    localStorage.setItem(
+      'wizardProgress',
+      JSON.stringify({
+        currentStep,
+        data: allData,
+        timestamp: new Date().toISOString(),
+      }),
+    );
   };
 
   return (
@@ -358,10 +333,8 @@ function WizardLayout({ children }: { children: React.ReactNode }) {
           <h2>{currentStep}</h2>
           <StepTimer />
         </div>
-        
-        <div className="step-content">
-          {children}
-        </div>
+
+        <div className="step-content">{children}</div>
       </main>
 
       <footer className="wizard-footer">

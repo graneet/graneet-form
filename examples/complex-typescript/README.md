@@ -12,11 +12,13 @@ This example demonstrates advanced TypeScript features with graneet-form, specif
 ## Key Concepts
 
 ### Template Literal Types
+
 ```typescript
 type FieldName = `firstName-${number}`;
 ```
 
 ### Form Interface
+
 ```typescript
 interface FormValues {
   [firstNameField: FieldName]: string;
@@ -25,6 +27,7 @@ interface FormValues {
 ```
 
 ### Type Guard Function
+
 ```typescript
 const isFirstName = (fieldName: string): fieldName is FieldName => {
   return fieldName.split('-')[0] === 'firstName';
@@ -34,11 +37,13 @@ const isFirstName = (fieldName: string): fieldName is FieldName => {
 ## Running the Example
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Start the development server:
+
    ```bash
    npm run dev
    ```

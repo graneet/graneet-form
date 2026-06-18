@@ -1,7 +1,8 @@
-import { type FieldValues, Step, type StepValidator, useWizard, useWizardContext, WizardContext } from 'graneet-form';
+import type { FieldValues, Steps, StepValidator } from 'graneet-form';
+import { Step, WizardContext, useWizard, useWizardContext } from 'graneet-form';
 import type { ReactNode } from 'react';
 
-export interface StepExampleProps<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues> {
+interface StepExampleProps<WizardValues extends Record<string, FieldValues>, Step extends keyof WizardValues> {
   name: Step;
   children: ReactNode;
   onNext?: StepValidator<WizardValues, Step>;
@@ -18,20 +19,31 @@ function StepExample<
   return (
     <Step name={name} onNext={onNext} noFooter={noFooter} title={title}>
       <div>
-        <button type="button" onClick={wizardContext.handleOnPrevious}>
+        <button
+          type="button"
+          onClick={() => {
+            wizardContext.goPrevious();
+          }}
+        >
           Go previous step
         </button>
-        <button type="button" onClick={wizardContext.handleOnNext}>
+        <button
+          type="button"
+          onClick={() => {
+            // oxlint-disable-next-line typescript/no-floating-promises
+            wizardContext.goNext();
+          }}
+        >
           Go next step
         </button>
       </div>
 
       <div
         style={{
-          display: 'flex',
-          width: '100%',
-          height: '45rem',
           border: '1px solid red',
+          display: 'flex',
+          height: '45rem',
+          width: '100%',
         }}
       >
         {children}
@@ -40,10 +52,10 @@ function StepExample<
   );
 }
 
-export interface WizardProps<WizardValues extends Record<string, FieldValues>> {
+interface WizardProps<WizardValues extends Record<string, FieldValues>> {
   children: ReactNode;
-  onQuit(): void | Promise<void>;
-  onFinish(wizardValues: WizardValues): void;
+  onQuit: () => void | Promise<void>;
+  onFinish: Steps<WizardValues>;
 }
 
 function WizardExampleComponent<WizardValues extends Record<string, FieldValues>>({
@@ -51,13 +63,13 @@ function WizardExampleComponent<WizardValues extends Record<string, FieldValues>
   onQuit,
   children,
 }: WizardProps<WizardValues>) {
-  const wizard = useWizard(onFinish, onQuit);
+  const wizard = useWizard<WizardValues>(onFinish, onQuit);
 
   return (
-    <WizardContext.Provider value={wizard}>
+    <WizardContext value={wizard}>
       <div>The Wizard</div>
       {children}
-    </WizardContext.Provider>
+    </WizardContext>
   );
 }
 

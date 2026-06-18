@@ -2,26 +2,26 @@ import { useCallback, useMemo, useState } from 'react';
 import type { RuleContextApi } from '../contexts/rule-context';
 import type { Validator } from '../types/validation';
 
-export interface IRule {
+interface IRule {
   validatorFn: Validator;
   errorMessage: string;
 }
 
-type UseRules = {
+interface UseRules {
   ruleContext: RuleContextApi;
   rules: IRule[];
   debouncedRules: IRule[];
-};
+}
 
-export function useRules(): UseRules {
+function useRules(): UseRules {
   const [rules, setRules] = useState<IRule[]>([]);
   const [debouncedRules, setDebouncedRules] = useState<IRule[]>([]);
 
   const registerRule = useCallback((testFn: Validator, errorMessage: string, isDebounced: boolean): void => {
     if (isDebounced) {
-      setDebouncedRules((prev) => [...prev, { validatorFn: testFn, errorMessage }]);
+      setDebouncedRules((prev) => [...prev, { errorMessage, validatorFn: testFn }]);
     } else {
-      setRules((prev) => [...prev, { validatorFn: testFn, errorMessage }]);
+      setRules((prev) => [...prev, { errorMessage, validatorFn: testFn }]);
     }
   }, []);
 
@@ -45,10 +45,13 @@ export function useRules(): UseRules {
 
   return useMemo(
     () => ({
+      debouncedRules,
       ruleContext,
       rules,
-      debouncedRules,
     }),
     [debouncedRules, ruleContext, rules],
   );
 }
+
+export type { IRule };
+export { useRules };

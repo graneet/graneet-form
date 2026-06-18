@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ValidationStatus } from '../../shared/types/validation';
 import { useWizardContext } from '../contexts/wizard-context';
 
-export function useStepStatus() {
+export function useStepStatus(): ValidationStatus {
   const {
     wizardInternal: { registerStepStatusListener, unregisterStepStatusListener },
   } = useWizardContext();
@@ -11,7 +11,9 @@ export function useStepStatus() {
 
   useEffect(() => {
     registerStepStatusListener(setStepStatus);
-    return () => unregisterStepStatusListener(setStepStatus);
+    return () => {
+      unregisterStepStatusListener(setStepStatus);
+    };
   }, [registerStepStatusListener, unregisterStepStatusListener]);
 
   return stepStatus;

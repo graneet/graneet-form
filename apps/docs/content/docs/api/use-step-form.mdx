@@ -29,8 +29,8 @@ const { form, initFormValues } = useStepForm<WizardValues, StepName>(options);
 
 ```tsx
 interface WizardData {
-  userInfo: { firstName: string; lastName: string; email: string; };
-  preferences: { theme: 'light' | 'dark'; notifications: boolean; };
+  userInfo: { firstName: string; lastName: string; email: string };
+  preferences: { theme: 'light' | 'dark'; notifications: boolean };
 }
 
 function UserInfoStep() {
@@ -38,8 +38,8 @@ function UserInfoStep() {
     defaultValues: {
       firstName: '',
       lastName: '',
-      email: ''
-    }
+      email: '',
+    },
   });
 
   return (
@@ -47,11 +47,11 @@ function UserInfoStep() {
       <Field name="firstName">
         <Rule validationFn={(value) => value.length > 0} message="First name is required" />
       </Field>
-      
+
       <Field name="lastName">
         <Rule validationFn={(value) => value.length > 0} message="Last name is required" />
       </Field>
-      
+
       <Field name="email">
         <Rule validationFn={(value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)} message="Valid email is required" />
       </Field>
@@ -67,27 +67,24 @@ function PreferencesStep() {
   const { form } = useStepForm<WizardData, 'preferences'>({
     defaultValues: {
       theme: 'light',
-      notifications: true
+      notifications: true,
     },
     onUpdateAfterBlur: async (fieldName, value, formData, { setFormValues }) => {
       if (fieldName === 'theme' && value === 'dark') {
         // Auto-configure for dark theme
         setFormValues({
-          notifications: false // Dark theme users prefer fewer notifications
+          notifications: false, // Dark theme users prefer fewer notifications
         });
       }
-    }
+    },
   });
 
   return (
     <Form form={form}>
       <Field name="theme">
-        <Rule 
-          validationFn={(value) => ['light', 'dark'].includes(value)} 
-          message="Please select a valid theme" 
-        />
+        <Rule validationFn={(value) => ['light', 'dark'].includes(value)} message="Please select a valid theme" />
       </Field>
-      
+
       <Field name="notifications" />
     </Form>
   );
@@ -102,27 +99,24 @@ function ConfirmationStep() {
   const { form } = useStepForm<WizardData, 'confirmation'>({
     defaultValues: {
       confirmEmail: '',
-      agreed: false
-    }
+      agreed: false,
+    },
   });
 
   return (
     <Form form={form}>
       <Field name="confirmEmail">
-        <Rule 
+        <Rule
           validationFn={(value) => {
             const userInfo = wizard.getValuesOfStep('userInfo');
             return value === userInfo?.email;
           }}
-          message="Email confirmation must match" 
+          message="Email confirmation must match"
         />
       </Field>
-      
+
       <Field name="agreed">
-        <Rule 
-          validationFn={(value) => value === true} 
-          message="You must agree to the terms" 
-        />
+        <Rule validationFn={(value) => value === true} message="You must agree to the terms" />
       </Field>
     </Form>
   );
@@ -138,8 +132,8 @@ function DynamicFieldsStep() {
       userType: 'personal',
       companyName: '',
       taxId: '',
-      personalId: ''
-    }
+      personalId: '',
+    },
   });
 
   const { userType } = useFieldsWatch(form, ['userType']);
@@ -155,7 +149,7 @@ function DynamicFieldsStep() {
           <Field name="companyName">
             <Rule validationFn={(value) => value.length > 0} message="Company name is required" />
           </Field>
-          
+
           <Field name="taxId">
             <Rule validationFn={(value) => value.length > 0} message="Tax ID is required" />
           </Field>
@@ -179,23 +173,23 @@ function DocumentUploadStep() {
   const { form } = useStepForm<WizardData, 'documents'>({
     defaultValues: {
       profilePicture: null,
-      idDocument: null
-    }
+      idDocument: null,
+    },
   });
 
   return (
     <Form form={form}>
       <Field name="profilePicture">
-        <Rule 
+        <Rule
           validationFn={(file) => file && file.size < 5 * 1024 * 1024}
-          message="Profile picture must be less than 5MB" 
+          message="Profile picture must be less than 5MB"
         />
       </Field>
-      
+
       <Field name="idDocument">
-        <Rule 
+        <Rule
           validationFn={(file) => file && ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type)}
-          message="ID document must be JPG, PNG, or PDF" 
+          message="ID document must be JPG, PNG, or PDF"
         />
       </Field>
     </Form>
@@ -210,8 +204,8 @@ function SummaryStep() {
   const wizard = useWizardContext<WizardData>();
   const { form } = useStepForm<WizardData, 'summary'>({
     defaultValues: {
-      notes: ''
-    }
+      notes: '',
+    },
   });
 
   // Access data from previous steps
@@ -221,10 +215,12 @@ function SummaryStep() {
   return (
     <div>
       <h2>Summary</h2>
-      
+
       <div className="summary-section">
         <h3>User Information</h3>
-        <p>Name: {userInfo?.firstName} {userInfo?.lastName}</p>
+        <p>
+          Name: {userInfo?.firstName} {userInfo?.lastName}
+        </p>
         <p>Email: {userInfo?.email}</p>
       </div>
 
@@ -248,17 +244,17 @@ function SummaryStep() {
 function EmailVerificationStep() {
   const { form } = useStepForm<WizardData, 'emailVerification'>({
     defaultValues: {
-      verificationCode: ''
-    }
+      verificationCode: '',
+    },
   });
 
   return (
     <Form form={form}>
       <Field name="verificationCode">
-        <Rule 
+        <Rule
           validationFn={async (code) => {
             if (!code || code.length !== 6) return false;
-            
+
             try {
               const isValid = await verifyEmailCode(code);
               return isValid;
@@ -266,7 +262,7 @@ function EmailVerificationStep() {
               return false;
             }
           }}
-          message="Please enter a valid 6-digit verification code" 
+          message="Please enter a valid 6-digit verification code"
         />
       </Field>
     </Form>
@@ -303,6 +299,6 @@ useEffect(() => {
 
 // ✅ Preferred
 const { form } = useStepForm({
-  defaultValues: { name: '', email: '' }
+  defaultValues: { name: '', email: '' },
 });
 ```

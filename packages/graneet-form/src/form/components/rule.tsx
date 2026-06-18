@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { useRuleContext } from '../contexts/rule-context';
 import type { Validator } from '../types/validation';
@@ -31,12 +32,14 @@ interface RuleProps {
  * </TextField>
  * ```
  */
-export function Rule({ message, validationFn, isDebounced = false }: RuleProps) {
+export function Rule({ message, validationFn, isDebounced = false }: RuleProps): ReactNode {
   const { registerRule, unregisterRule } = useRuleContext();
 
   useEffect(() => {
     registerRule(validationFn, message, isDebounced);
-    return () => unregisterRule(validationFn, isDebounced);
+    return () => {
+      unregisterRule(validationFn, isDebounced);
+    };
   }, [isDebounced, message, registerRule, unregisterRule, validationFn]);
 
   return null;

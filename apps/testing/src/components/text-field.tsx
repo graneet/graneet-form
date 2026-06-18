@@ -1,5 +1,6 @@
-import { Field, type FieldValues, Rule } from 'graneet-form';
-import type { ChangeEventHandler } from 'react';
+import { Field, Rule } from 'graneet-form';
+import type { FieldValues } from 'graneet-form';
+import type { ChangeEventHandler, ReactNode } from 'react';
 
 type KeysMatching<T, V> = {
   [K in keyof T]-?: T[K] extends V ? K : never;
@@ -14,11 +15,12 @@ interface TextFieldProps<T extends FieldValues, K extends KeysMatching<T, TextFi
 export function TextField<
   T extends FieldValues = Record<string, unknown>,
   K extends KeysMatching<T, TextFieldValue> = KeysMatching<T, TextFieldValue>,
->({ name }: TextFieldProps<T, K>) {
+>({ name }: TextFieldProps<T, K>): ReactNode {
   return (
     <Field<T, K>
       name={name}
       render={(properties) => {
+        // oxlint-disable-next-line typescript/unbound-method
         const { value, onChange, onBlur, onFocus } = properties;
 
         const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -28,7 +30,7 @@ export function TextField<
         return <input value={value} onChange={handleChange} onBlur={onBlur} onFocus={onFocus} />;
       }}
     >
-      <Rule validationFn={(v) => !!v} message="false" />
+      <Rule validationFn={(v) => Boolean(v)} message="false" />
     </Field>
   );
 }

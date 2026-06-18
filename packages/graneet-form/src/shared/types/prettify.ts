@@ -1,1 +1,2 @@
+// oxlint-disable-next-line typescript/ban-types
 export type Prettify<T extends Record<string, unknown>> = { [K in keyof T]: T[K] } & {};

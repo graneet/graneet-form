@@ -1,4 +1,5 @@
-import { type ReactNode, useEffect } from 'react';
+import { useEffect } from 'react';
+import type { ReactNode } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
 import { useWizardContext } from '../contexts/wizard-context';
 import type { StepValidator } from '../types/step-validator';
@@ -30,7 +31,7 @@ export interface StepProps<WizardValues extends Record<string, FieldValues>, Ste
 export function Step<
   WizardValues extends Record<string, FieldValues> = Record<never, FieldValues>,
   Step extends keyof WizardValues = keyof WizardValues,
->({ children, name }: StepProps<WizardValues, Step>) {
+>({ children, name }: StepProps<WizardValues, Step>): ReactNode {
   const wizard = useWizardContext<WizardValues>();
 
   const {
@@ -48,5 +49,6 @@ export function Step<
     return null;
   }
 
+  // oxlint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 }

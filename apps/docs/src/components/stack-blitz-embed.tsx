@@ -1,13 +1,14 @@
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
 const TEMPLATES = {
-  'simple-form': {
-    title: 'Simple Form Example - Graneet Form',
-    defaultFile: 'src/simple-form.tsx',
-  },
   'complex-typescript': {
-    title: 'Complex TypeScript Example - Graneet Form',
     defaultFile: 'src/app.tsx',
+    title: 'Complex TypeScript Example - Graneet Form',
+  },
+  'simple-form': {
+    defaultFile: 'src/simple-form.tsx',
+    title: 'Simple Form Example - Graneet Form',
   },
 };
 
@@ -25,7 +26,7 @@ export function StackBlitzEmbed({
   view = 'editor',
   hideExplorer = false,
   hideNavigation = false,
-}: StackBlitzEmbedProps) {
+}: StackBlitzEmbedProps): ReactNode {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
   const { title, defaultFile } = TEMPLATES[name];
@@ -37,8 +38,10 @@ export function StackBlitzEmbed({
     };
     update();
     const observer = new MutationObserver(update);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
+    observer.observe(document.documentElement, { attributeFilter: ['class'], attributes: true });
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   const buildUrl = () => {
@@ -58,15 +61,15 @@ export function StackBlitzEmbed({
     return (
       <div
         style={{
+          alignItems: 'center',
+          background: '#f8f9fa',
           border: '1px solid #e2e8f0',
           borderRadius: '8px',
-          overflow: 'hidden',
-          marginBottom: '1.5rem',
-          height,
-          background: '#f8f9fa',
           display: 'flex',
-          alignItems: 'center',
+          height,
           justifyContent: 'center',
+          marginBottom: '1.5rem',
+          overflow: 'hidden',
         }}
       >
         Loading...
@@ -79,21 +82,22 @@ export function StackBlitzEmbed({
       style={{
         border: '1px solid #e2e8f0',
         borderRadius: '8px',
-        overflow: 'hidden',
         marginBottom: '1.5rem',
+        overflow: 'hidden',
       }}
     >
       <iframe
         key={`${name}-${theme}`}
         src={buildUrl()}
         style={{
-          width: '100%',
-          height,
           border: 'none',
           borderRadius: '8px',
+          height,
+          width: '100%',
         }}
         title={title}
         allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+        // oxlint-disable-next-line react/iframe-missing-sandbox
         sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
         loading="lazy"
       />

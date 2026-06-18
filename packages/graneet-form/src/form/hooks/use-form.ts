@@ -1,4 +1,5 @@
-import { type Dispatch, type SetStateAction, useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import type { AnyRecord } from '../../shared/types/any-record';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
@@ -45,12 +46,12 @@ export interface UseFormOptions<T extends FieldValues> {
    * });
    * ```
    */
-  onUpdateAfterBlur?<K extends keyof T>(
+  onUpdateAfterBlur?: <K extends keyof T>(
     name: K,
     value: T[K] | undefined,
     data: AnyRecord,
     formPartial: Pick<FormContextApi<T>, 'getFormValues' | 'setFormValues' | 'resetForm'>,
-  ): Promise<void> | void;
+  ) => Promise<void> | void;
 
   /**
    * Default values for form fields.
@@ -179,19 +180,16 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     isRegistered: boolean;
   }
   const formStateRef = useRef<{ [K in keyof T]?: FieldState<K> }>(
-    (Object.keys(resolvedDefaultValues) as (keyof T)[]).reduce(
-      (acc, key) => {
-        acc[key] = {
-          name: key,
-          value: resolvedDefaultValues[key],
-          validation: VALIDATION_STATE_UNDETERMINED,
-          isRegistered: false,
-        };
+    (Object.keys(resolvedDefaultValues) as (keyof T)[]).reduce<{ [K in keyof T]?: FieldState<K> }>((acc, key) => {
+      acc[key] = {
+        isRegistered: false,
+        name: key,
+        validation: VALIDATION_STATE_UNDETERMINED,
+        value: resolvedDefaultValues[key],
+      };
 
-        return acc;
-      },
-      {} as { [K in keyof T]?: FieldState<K> },
-    ),
+      return acc;
+    }, {}),
   );
 
   /**
@@ -200,7 +198,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
    */
   const focusedFieldNamesRef = useRef(new Set<keyof T>());
 
-  const handleFormSubmitRef = useRef<(formValues: T) => void | Promise<void> | undefined>(undefined);
+  const handleFormSubmitRef = useRef<(formValues: T) => (void | Promise<void>) | undefined>(undefined);
 
   // -- SUBSCRIPTION --
 
@@ -210,17 +208,17 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       global: Set<Dispatch<SetStateAction<Partial<T>>>>;
       scoped: PartialRecord<
         keyof T,
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        // oxlint-disable-next-line typescript/no-explicit-any
         Set<Dispatch<SetStateAction<FormValues<T, any>>>>
       >;
     }
   >;
   const formValuesSubscribersRef = useRef<FormValueSubscribersRef>({
-    onChange: {
+    onBlur: {
       global: new Set(),
       scoped: {},
     },
-    onBlur: {
+    onChange: {
       global: new Set(),
       scoped: {},
     },
@@ -234,32 +232,39 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     }
   >;
   const formErrorsSubscribersRef = useRef<FormErrorSubscribersRef>({
-    onChange: {
+    onBlur: {
       global: new Set(),
       scoped: {},
     },
-    onBlur: {
+    onChange: {
       global: new Set(),
       scoped: {},
     },
   });
 
-  const onUpdateAfterBlurRef = useCallbackRef(onUpdateAfterBlur ?? (() => {}));
+  const onUpdateAfterBlurRef = useCallbackRef(
+    onUpdateAfterBlur ??
+      (() => {
+        // NOOP
+      }),
+  );
 
   // -- EXPORTS --
 
-  const getFormValues = useCallback<FormContextApi<T>['getFormValues']>(() => {
-    return Object.keys(formStateRef.current).reduce<Partial<T>>((acc, name: keyof T) => {
-      if (formStateRef.current[name]?.isRegistered) {
-        acc[name] = formStateRef.current[name]?.value;
-      }
-      return acc;
-    }, {});
-  }, []);
+  const getFormValues = useCallback<FormContextApi<T>['getFormValues']>(
+    () =>
+      Object.keys(formStateRef.current).reduce<Partial<T>>((acc, name: keyof T) => {
+        if (formStateRef.current[name]?.isRegistered) {
+          acc[name] = formStateRef.current[name]?.value;
+        }
+        return acc;
+      }, {}),
+    [],
+  );
 
   const getFormValuesForNames = useCallback<FormInternal<T>['getFormValuesForNames']>(
-    <K extends keyof T>(names: K[]): FormValues<T, K> => {
-      return names.reduce<FormValues<T, K>>(
+    <K extends keyof T>(names: K[]): FormValues<T, K> =>
+      names.reduce<FormValues<T, K>>(
         (acc, name) => {
           if (formStateRef.current[name]?.isRegistered) {
             acc[name] = formStateRef.current[name]?.value;
@@ -267,23 +272,24 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
           return acc;
         },
         {} as FormValues<T, K>,
-      );
-    },
+      ),
     [],
   );
 
-  const getFormErrors = useCallback<FormInternal<T>['getFormErrors']>((): PartialRecord<keyof T, ValidationState> => {
-    return Object.keys(formStateRef.current).reduce<PartialRecord<keyof T, ValidationState>>((acc, name: keyof T) => {
-      if (formStateRef.current[name]?.isRegistered) {
-        acc[name] = formStateRef.current[name]?.validation;
-      }
-      return acc;
-    }, {});
-  }, []);
+  const getFormErrors = useCallback<FormInternal<T>['getFormErrors']>(
+    (): PartialRecord<keyof T, ValidationState> =>
+      Object.keys(formStateRef.current).reduce<PartialRecord<keyof T, ValidationState>>((acc, name: keyof T) => {
+        if (formStateRef.current[name]?.isRegistered) {
+          acc[name] = formStateRef.current[name]?.validation;
+        }
+        return acc;
+      }, {}),
+    [],
+  );
 
   const getFormErrorsForNames = useCallback<FormInternal<T>['getFormErrorsForNames']>(
-    <K extends keyof T>(names: K[]): Record<K, ValidationState | undefined> => {
-      return names.reduce<Record<K, ValidationState | undefined>>(
+    <K extends keyof T>(names: K[]): Record<K, ValidationState | undefined> =>
+      names.reduce<Record<K, ValidationState | undefined>>(
         (acc, name) => {
           if (formStateRef.current[name]?.isRegistered) {
             acc[name] = formStateRef.current[name]?.validation;
@@ -291,8 +297,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
           return acc;
         },
         {} as Record<K, ValidationState | undefined>,
-      );
-    },
+      ),
     [],
   );
 
@@ -322,7 +327,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         }
       }
 
-      if (formValuesSubscribersRef.current[watchMode].global.size) {
+      if (formValuesSubscribersRef.current[watchMode].global.size > 0) {
         /*
           If there is a global subscriber and a lot of fields are render, avoid spam of refresh on this subscriber
         */
@@ -370,7 +375,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
           });
         }
       }
-      if (formErrorsSubscribersRef.current[watchMode].global.size) {
+      if (formErrorsSubscribersRef.current[watchMode].global.size > 0) {
         /*
           If there is a global subscriber and a lot of fields are render, avoid spam of refresh on this subscriber
         */
@@ -449,7 +454,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
   const removeGlobalValueSubscriber = useCallback<FormInternal<T>['removeGlobalValueSubscriber']>(
     (publish: Dispatch<SetStateAction<Partial<T>>>, watchMode: WatchMode): void => {
-      formValuesSubscribersRef.current[watchMode].global.delete(publish as Dispatch<SetStateAction<Partial<T>>>);
+      formValuesSubscribersRef.current[watchMode].global.delete(publish);
     },
     [],
   );
@@ -479,7 +484,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
         formErrorsSubscribersRef.current.onChange.scoped[
           name
-          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+          // oxlint-disable-next-line typescript/no-explicit-any typescript/no-unsafe-argument
         ]?.add(publish as any);
         publish(getFormErrorsForNames(names));
       }
@@ -495,10 +500,10 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       }
 
       formStateRef.current[name] = {
-        name,
         isRegistered: true,
-        value: previousValueStored ?? defaultValue,
+        name,
         validation: VALIDATION_STATE_UNDETERMINED,
+        value: previousValueStored ?? defaultValue,
       };
 
       const watcher = (publish: SetStateAction<FormValues<T, K>>) => {
@@ -548,17 +553,17 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
   const setFormValues = useCallback<FormContextApi<T>['setFormValues']>(
     (newValues: Partial<T>) => {
-      for (const name of Object.keys(newValues) as Array<keyof T>) {
+      for (const name of Object.keys(newValues) as (keyof T)[]) {
         // If the field is already stored, only update the value
         if (formStateRef.current[name]) {
           formStateRef.current[name].value = newValues[name];
         } else {
           // Else, save a new line in the context for the given name. When the field is registered later, he will have access to the value
           formStateRef.current[name] = {
-            name,
             isRegistered: false,
-            value: newValues[name],
+            name,
             validation: VALIDATION_STATE_UNDETERMINED,
+            value: newValues[name],
           };
         }
         updateValueForAllTypeOfSubscribers(name);
@@ -568,7 +573,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const onFieldChange = useCallback<FormInternal<T>['onFieldChange']>(
-    <K extends keyof T>(name: K, value: T[K], hasFocus: boolean): void => {
+    <K extends keyof T>(name: K, value: T[K] | undefined, hasFocus: boolean): void => {
       if (!formStateRef.current[name]) {
         throw new Error(`Field "${String(name)}" is not registered`);
       }
@@ -607,8 +612,8 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       if (focusedFieldNamesRef.current.has(name) && formStateRef.current[name].validation.status === 'valid') {
         await onUpdateAfterBlurRef(name, formStateRef.current[name].value, data, {
           getFormValues,
-          setFormValues,
           resetForm,
+          setFormValues,
         });
       }
       focusedFieldNamesRef.current.delete(name);
@@ -638,29 +643,29 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   return useMemo<FormContextApi<T>>(
     () => ({
       formInternal: {
-        registerField,
-        addGlobalValueSubscriber,
-        addValueSubscriber,
-        removeGlobalValueSubscriber,
-        removeValueSubscriber,
         addGlobalValidationStatusSubscriber,
+        addGlobalValueSubscriber,
         addValidationStatusSubscriber,
-        removeGlobalValidationStatusSubscriber,
-        removeValidationStatusSubscriber,
-        onFieldChange,
-        onFieldBlur,
-        getFormValuesForNames,
+        addValueSubscriber,
         getFormErrors,
         getFormErrorsForNames,
-        updateValidationStatus,
+        getFormValuesForNames,
         get getHandleFormSubmit() {
           return () => handleFormSubmitRef.current;
         },
+        onFieldBlur,
+        onFieldChange,
+        registerField,
+        removeGlobalValidationStatusSubscriber,
+        removeGlobalValueSubscriber,
+        removeValidationStatusSubscriber,
+        removeValueSubscriber,
+        updateValidationStatus,
       },
       getFormValues,
+      handleSubmit,
       resetForm,
       setFormValues,
-      handleSubmit: handleSubmit,
     }),
     [
       registerField,

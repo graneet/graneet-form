@@ -16,21 +16,9 @@ Get up and running with Graneet Form in just a few minutes. This guide will walk
 Install Graneet Form using your preferred package manager:
 
 <Tabs items={['pnpm', 'npm', 'yarn']}>
-  <Tab value="pnpm">
-    ```bash
-    pnpm install graneet-form
-    ```
-  </Tab>
-  <Tab value="npm">
-    ```bash
-    npm install graneet-form
-    ```
-  </Tab>
-  <Tab value="yarn">
-    ```bash
-    yarn add graneet-form
-    ```
-  </Tab>
+  <Tab value="pnpm">```bash pnpm install graneet-form ```</Tab>
+  <Tab value="npm">```bash npm install graneet-form ```</Tab>
+  <Tab value="yarn">```bash yarn add graneet-form ```</Tab>
 </Tabs>
 
 ## Your First Form
@@ -60,12 +48,10 @@ export function SimpleForm() {
   return (
     <div style={{ maxWidth: '400px', margin: '2rem auto', padding: '2rem' }}>
       <h1>Simple Form Example</h1>
-      
+
       <Form form={form} onSubmit={form.handleSubmit(onSubmit)}>
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-            Name:
-          </label>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>Name:</label>
           <Field<FormValues, 'name'>
             name="name"
             render={({ value, onChange, onBlur, onFocus }) => (
@@ -79,22 +65,17 @@ export function SimpleForm() {
                   width: '100%',
                   padding: '0.5rem',
                   border: '1px solid #ccc',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
                 }}
               />
             )}
           >
-            <Rule 
-              validationFn={(value) => !!value && value.length > 0} 
-              message="Name is required" 
-            />
+            <Rule validationFn={(value) => !!value && value.length > 0} message="Name is required" />
           </Field>
         </div>
 
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-            Email:
-          </label>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email:</label>
           <Field<FormValues, 'email'>
             name="email"
             render={({ value, onChange, onBlur, onFocus }) => (
@@ -108,19 +89,19 @@ export function SimpleForm() {
                   width: '100%',
                   padding: '0.5rem',
                   border: '1px solid #ccc',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
                 }}
               />
             )}
           >
-            <Rule 
-              validationFn={(value) => !!value && /\S+@\S+\.\S+/.test(value)} 
-              message="Please enter a valid email address" 
+            <Rule
+              validationFn={(value) => !!value && /\S+@\S+\.\S+/.test(value)}
+              message="Please enter a valid email address"
             />
           </Field>
         </div>
 
-        <button 
+        <button
           type="submit"
           style={{
             backgroundColor: '#007bff',
@@ -128,7 +109,7 @@ export function SimpleForm() {
             padding: '0.75rem 1.5rem',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
         >
           Submit
@@ -142,10 +123,12 @@ export function SimpleForm() {
 <StackBlitzEmbed name="simple-form" height="600px" hideNavigation={false} />
 
 This example demonstrates the core concepts of Graneet Form:
+
 - **Form Setup**: Using `useForm` hook to manage form state
 - **Field Management**: Using `Field` components with render props
 - **Validation**: Adding `Rule` components for field validation
 - **Submission**: Handling form submission with proper TypeScript types
+
 ## Common Patterns
 
 ### Text Input
@@ -208,5 +191,7 @@ This example demonstrates the core concepts of Graneet Form:
 ```
 
 <Callout type="info">
-  **Next Steps**: Now that you understand the basics, explore our comprehensive guides on validation, field management, and advanced features! Don't forget to check out our [StackBlitz Integration](/stackblitz-integration) guide for more ways to experiment and share your forms.
+  **Next Steps**: Now that you understand the basics, explore our comprehensive guides on validation, field management,
+  and advanced features! Don't forget to check out our [StackBlitz Integration](/stackblitz-integration) guide for more
+  ways to experiment and share your forms.
 </Callout>

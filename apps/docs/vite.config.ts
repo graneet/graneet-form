@@ -6,9 +6,6 @@ import mdx from 'fumadocs-mdx/vite';
 import { nitro } from 'nitro/vite';
 
 export default defineConfig({
-  server: {
-    port: 3000,
-  },
   plugins: [
     mdx(),
     tailwindcss(),
@@ -18,15 +15,18 @@ export default defineConfig({
       },
     }),
     react(),
-    // please see https://tanstack.com/start/latest/docs/framework/react/guide/hosting#nitro for guides on hosting
+    // Please see https://tanstack.com/start/latest/docs/framework/react/guide/hosting#nitro for guides on hosting
     nitro({
-      preset: 'vercel',
+      preset: 'netlify',
     }),
   ],
   resolve: {
-    tsconfigPaths: true,
     alias: {
       tslib: 'tslib/tslib.es6.js',
     },
+    tsconfigPaths: true,
+  },
+  server: {
+    port: 3000,
   },
 });

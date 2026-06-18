@@ -1,7 +1,7 @@
 {
   "name": "testing",
-  "private": true,
   "version": "0.0.1",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --force",
@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "graneet-form": "3.1.0",
     "react": "19.2.7",
-    "react-dom": "19.2.7",
-    "graneet-form": "workspace:*"
+    "react-dom": "19.2.7"
   },
   "devDependencies": {
     "@types/react": "19.2.17",

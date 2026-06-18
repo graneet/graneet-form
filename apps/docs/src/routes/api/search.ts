@@ -10,6 +10,7 @@ const server = createFromSource(source, {
 export const Route = createFileRoute('/api/search')({
   server: {
     handlers: {
+      // oxlint-disable-next-line new-cap require-await
       GET: async ({ request }) => server.GET(request),
     },
   },

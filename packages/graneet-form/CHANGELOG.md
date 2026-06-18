@@ -44,11 +44,11 @@
   ```typescript
   // Before (deprecated)
   const { initFormValues } = useStepForm();
-  initFormValues({ name: "John", email: "" });
+  initFormValues({ name: 'John', email: '' });
 
   // After (recommended)
   const { form } = useStepForm({
-    defaultValues: { name: "John", email: "" },
+    defaultValues: { name: 'John', email: '' },
   });
   ```
 
@@ -102,11 +102,11 @@
   ```typescript
   // Before (deprecated)
   const { initFormValues } = useStepForm();
-  initFormValues({ name: "John", email: "" });
+  initFormValues({ name: 'John', email: '' });
 
   // After (recommended)
   const { form } = useStepForm({
-    defaultValues: { name: "John", email: "" },
+    defaultValues: { name: 'John', email: '' },
   });
   ```
 

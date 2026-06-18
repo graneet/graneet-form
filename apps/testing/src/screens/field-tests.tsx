@@ -1,23 +1,26 @@
 import { Form, useForm } from 'graneet-form';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import { TextField } from '../components/TextField.tsx';
+import { TextField } from '../components/text-field.tsx';
 
 interface FormValues {
   foo: string;
 }
 
-export function FieldTests() {
+export function FieldTests(): ReactNode {
   const [trigger, setTrigger] = useState('');
   const form = useForm<FormValues>({
-    onUpdateAfterBlur: () => {
-      console.log(trigger);
-    },
     defaultValues: {
       foo: 'Victor',
+    },
+    onUpdateAfterBlur: () => {
+      // oxlint-disable-next-line no-console
+      console.log(trigger);
     },
   });
 
   useEffect(() => {
+    // oxlint-disable-next-line no-console
     console.log('render', form);
   }, [form]);
 

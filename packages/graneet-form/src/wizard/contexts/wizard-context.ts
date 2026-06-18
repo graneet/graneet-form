@@ -1,4 +1,5 @@
-import { createContext, type Dispatch, type SetStateAction, use } from 'react';
+import { createContext, use } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { ValidationStatus } from '../../shared/types/validation';
 
@@ -14,7 +15,7 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
    * const userInfoValues = getValuesOfStep('userInfo');
    * ```
    */
-  getValuesOfStep<Step extends keyof WizardValues>(stepName: Step): WizardValues[Step] | undefined;
+  getValuesOfStep: <Step extends keyof WizardValues>(stepName: Step) => WizardValues[Step] | undefined;
 
   /**
    * Retrieves the form values for the currently active wizard step.
@@ -24,7 +25,7 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
    * const currentStepValues = getValuesOfCurrentStep();
    * ```
    */
-  getValuesOfCurrentStep<Step extends keyof WizardValues>(): WizardValues[Step] | undefined;
+  getValuesOfCurrentStep: () => WizardValues[keyof WizardValues] | undefined;
 
   /**
    * Retrieves the form values for all wizard steps.
@@ -35,7 +36,7 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
    * console.log(allValues.userInfo, allValues.preferences);
    * ```
    */
-  getValuesOfSteps(): WizardValues;
+  getValuesOfSteps: () => WizardValues;
 
   /**
    * Sets the form values for a specific wizard step.
@@ -46,7 +47,7 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
    * setValuesOfStep('userInfo', { name: 'John', email: 'john@example.com' });
    * ```
    */
-  setValuesOfStep<Step extends keyof WizardValues>(stepName: Step, values: WizardValues[Step]): void;
+  setValuesOfStep: <Step extends keyof WizardValues>(stepName: Step, values: WizardValues[Step]) => void;
 
   /**
    * Internal API for wizard implementation details.
@@ -61,25 +62,25 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
      * Registers a listener for step validation status changes.
      * @param stepStatusSetter - React state setter function to update step validation status
      */
-    registerStepStatusListener(stepStatusSetter: ValidationStatusesSetter): void;
+    registerStepStatusListener: (stepStatusSetter: ValidationStatusesSetter) => void;
 
     /**
      * Unregisters a previously registered step validation status listener.
      * @param stepStatusSetter - The same setter function that was previously registered
      */
-    unregisterStepStatusListener(stepStatusSetter: ValidationStatusesSetter): void;
+    unregisterStepStatusListener: (stepStatusSetter: ValidationStatusesSetter) => void;
 
     /**
      * Sets the callback function used to retrieve form values for the current step.
      * @param stepValuesGetter - Function that returns the current step's form values
      */
-    setValuesGetterForCurrentStep(stepValuesGetter: () => FieldValues | undefined): void;
+    setValuesGetterForCurrentStep: (stepValuesGetter: () => FieldValues | undefined) => void;
 
     /**
      * Updates the validation status for the current step.
      * @param status - The new validation outcome status
      */
-    stepStatusSetter(status: ValidationStatus): void;
+    stepStatusSetter: (status: ValidationStatus) => void;
 
     /**
      * React state setter to update whether the current step is ready for navigation.
@@ -95,7 +96,7 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
    * goBackTo('userInfo'); // Jump back to the userInfo step
    * ```
    */
-  goBackTo(previousStep: keyof WizardValues): void;
+  goBackTo: (previousStep: keyof WizardValues) => void;
 
   /**
    * Advances to the next step in the wizard sequence, or triggers the finish callback if on the last step.
@@ -105,7 +106,7 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
    * await goNext(); // Move to next step or finish wizard
    * ```
    */
-  goNext(): Promise<void>;
+  goNext: () => Promise<void>;
 
   /**
    * Navigates to the previous step in the wizard sequence, or triggers the quit callback if on the first step.
@@ -114,7 +115,7 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
    * goPrevious(); // Go back one step or quit wizard
    * ```
    */
-  goPrevious(): void;
+  goPrevious: () => void;
 
   /**
    * Array of all step names in the wizard, in the order they appear.
@@ -152,7 +153,7 @@ export interface WizardContextApi<WizardValues extends Record<string, FieldValue
   isStepReady: boolean;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: How to do differently? :-(
+// oxlint-disable-next-line typescript/no-explicit-any How to do differently? :-(
 export const WizardContext = createContext<WizardContextApi<any> | null>(null);
 
 export function useWizardContext<

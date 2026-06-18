@@ -81,9 +81,9 @@ const form = useForm<UserRegistrationForm>({
     age: 18,
     preferences: {
       newsletter: false,
-      marketing: false
-    }
-  }
+      marketing: false,
+    },
+  },
 });
 ```
 
@@ -101,14 +101,12 @@ const validateEmail = (value: string): boolean => {
   render={(props, state) => (
     <div>
       <input {...props} type="email" />
-      {state.validationStatus.status === 'invalid' && (
-        <span>{state.validationStatus.message}</span>
-      )}
+      {state.validationStatus.status === 'invalid' && <span>{state.validationStatus.message}</span>}
     </div>
   )}
 >
   <Rule validationFn={validateEmail} message="Please enter a valid email" />
-</Field>
+</Field>;
 ```
 
 ### Type-safe Field Access
@@ -138,9 +136,9 @@ function useUserForm() {
       age: 18,
       preferences: {
         newsletter: false,
-        marketing: false
-      }
-    }
+        marketing: false,
+      },
+    },
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {

@@ -6,10 +6,6 @@ import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import { baseOptions } from '@/lib/layout.shared';
 import { Button } from '@/components/button';
 
-export const Route = createFileRoute('/')({
-  component: Home,
-});
-
 const START_CODE = `import { useForm, Form, Field, Rule } from 'graneet-form';
 
 interface ContactForm {
@@ -53,6 +49,7 @@ const ContactFormExample = () => {
 
 function Home() {
   return (
+    // oxlint-disable-next-line react/jsx-props-no-spreading
     <HomeLayout {...baseOptions()}>
       <main className="flex flex-1 flex-col">
         {/* Hero Section */}
@@ -68,7 +65,7 @@ function Home() {
               />
             </div>
 
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-800 to-teal-600 bg-clip-text text-transparent mb-6">
+            <h1 className="text-5xl font-bold bg-linear-to-r from-slate-800 to-teal-600 bg-clip-text text-transparent mb-6">
               Graneet Form
             </h1>
 
@@ -89,6 +86,7 @@ function Home() {
                 variant="secondary"
                 size="lg"
                 icon={
+                  // oxlint-disable-next-line react-perf/jsx-no-jsx-as-prop jsx-a11y/prefer-tag-over-role
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" role="img" aria-label="Github">
                     <path
                       fillRule="evenodd"
@@ -109,6 +107,7 @@ function Home() {
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12">Why Choose Graneet Form?</h2>
 
+            {/* oxlint-disable-next-line react/forbid-component-props */}
             <Cards className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
               <Card
                 icon="🚀"
@@ -149,3 +148,7 @@ function Home() {
     </HomeLayout>
   );
 }
+
+export const Route = createFileRoute('/')({
+  component: Home,
+});

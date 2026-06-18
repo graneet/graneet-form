@@ -51,14 +51,8 @@ The `Rule` component is the foundation of validation in graneet-form:
     </div>
   )}
 >
-  <Rule
-    validationFn={(value) => !!value && value.includes('@')}
-    message="Please enter a valid email address"
-  />
-  <Rule
-    validationFn={(value) => !value || value.length <= 100}
-    message="Email must be less than 100 characters"
-  />
+  <Rule validationFn={(value) => !!value && value.includes('@')} message="Please enter a valid email address" />
+  <Rule validationFn={(value) => !value || value.length <= 100} message="Email must be less than 100 characters" />
 </Field>
 ```
 
@@ -75,10 +69,7 @@ const isRequired = (value: unknown) => {
   return true;
 };
 
-<Rule
-  validationFn={isRequired}
-  message="This field is required"
-/>
+<Rule validationFn={isRequired} message="This field is required" />;
 ```
 
 ### Email Validation
@@ -90,10 +81,7 @@ const isValidEmail = (email: string) => {
   return emailRegex.test(email);
 };
 
-<Rule
-  validationFn={isValidEmail}
-  message="Please enter a valid email address"
-/>
+<Rule validationFn={isValidEmail} message="Please enter a valid email address" />;
 ```
 
 ### Password Strength
@@ -101,25 +89,19 @@ const isValidEmail = (email: string) => {
 ```tsx
 const isStrongPassword = (password: string) => {
   if (!password) return false;
-  return password.length >= 8 && 
-         /[A-Z]/.test(password) && 
-         /[a-z]/.test(password) && 
-         /\d/.test(password);
+  return password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password);
 };
 
 <Rule
   validationFn={isStrongPassword}
   message="Password must be at least 8 characters with uppercase, lowercase, and number"
-/>
+/>;
 ```
 
 ### Number Range
 
 ```tsx
-<Rule
-  validationFn={(age: number) => age >= 18 && age <= 120}
-  message="Age must be between 18 and 120"
-/>
+<Rule validationFn={(age: number) => age >= 18 && age <= 120} message="Age must be between 18 and 120" />
 ```
 
 ### String Length
@@ -136,22 +118,10 @@ const isStrongPassword = (password: string) => {
 ### Multiple Rules per Field
 
 ```tsx
-<Field<FormData, 'username'>
-  name="username"
-  render={/* render function */}
->
-  <Rule
-    validationFn={(value) => !!value && value.length > 0}
-    message="Username is required"
-  />
-  <Rule
-    validationFn={(value) => !value || value.length >= 3}
-    message="Username must be at least 3 characters"
-  />
-  <Rule
-    validationFn={(value) => !value || value.length <= 20}
-    message="Username must be less than 20 characters"
-  />
+<Field<FormData, 'username'> name="username" render={/* render function */}>
+  <Rule validationFn={(value) => !!value && value.length > 0} message="Username is required" />
+  <Rule validationFn={(value) => !value || value.length >= 3} message="Username must be at least 3 characters" />
+  <Rule validationFn={(value) => !value || value.length <= 20} message="Username must be less than 20 characters" />
   <Rule
     validationFn={(value) => !value || /^[a-zA-Z0-9_]+$/.test(value)}
     message="Username can only contain letters, numbers, and underscores"
@@ -166,7 +136,7 @@ For expensive operations like API calls:
 ```tsx
 const checkUsernameAvailability = async (username: string): Promise<boolean> => {
   if (!username || username.length < 3) return true;
-  
+
   try {
     const response = await fetch(`/api/check-username/${username}`);
     const { available } = await response.json();
@@ -180,7 +150,7 @@ const checkUsernameAvailability = async (username: string): Promise<boolean> => 
   validationFn={checkUsernameAvailability}
   message="Username is already taken"
   isDebounced={true} // Debounces the API call
-/>
+/>;
 ```
 
 ### Cross-field Validation
@@ -193,10 +163,7 @@ function PasswordConfirmField() {
   const { password } = useFieldsWatch(form, ['password']);
 
   return (
-    <Field<FormData, 'confirmPassword'>
-      name="confirmPassword"
-      render={/* render function */}
-    >
+    <Field<FormData, 'confirmPassword'> name="confirmPassword" render={/* render function */}>
       <Rule
         validationFn={(confirmPassword) => {
           if (!confirmPassword) return false;
@@ -216,7 +183,7 @@ function PasswordConfirmField() {
 Each field has a validation status with three possible values:
 
 - `VALID` - Field passes all validation rules
-- `INVALID` - Field fails one or more validation rules  
+- `INVALID` - Field fails one or more validation rules
 - `PENDING` - Validation is in progress (for async rules)
 
 ### Field State Properties
@@ -240,7 +207,7 @@ interface FieldState {
   name="email"
   render={(fieldProps, fieldState) => {
     const { isPristine, validationStatus } = fieldState;
-    
+
     return (
       <div className="field-container">
         <input
@@ -251,21 +218,17 @@ interface FieldState {
           `}
           {...fieldProps}
         />
-        
+
         {/* Show loading indicator for async validation */}
-        {validationStatus.status === 'pending' && (
-          <span className="validation-pending">⏳ Checking...</span>
-        )}
-        
+        {validationStatus.status === 'pending' && <span className="validation-pending">⏳ Checking...</span>}
+
         {/* Show error message */}
         {!isPristine && validationStatus.status === 'invalid' && (
           <span className="validation-error">❌ {validationStatus.message}</span>
         )}
-        
+
         {/* Show success indicator */}
-        {!isPristine && validationStatus.status === 'valid' && (
-          <span className="validation-success">✅ Valid</span>
-        )}
+        {!isPristine && validationStatus.status === 'valid' && <span className="validation-success">✅ Valid</span>}
       </div>
     );
   }}
@@ -285,38 +248,37 @@ import { useValidations, useFormContext } from 'graneet-form';
 
 function ValidationSummary() {
   const form = useFormContext<FormData>();
-  
+
   // Watch specific fields
   const { email, password } = useValidations(form, ['email', 'password']);
-  
+
   // Watch all fields
   const allValidations = useValidations(form, undefined);
-  
-  const hasErrors = Object.values(allValidations).some(
-    validation => validation?.status === 'invalid'
-  );
-  
+
+  const hasErrors = Object.values(allValidations).some((validation) => validation?.status === 'invalid');
+
   return (
     <div className="validation-summary">
       <h3>Form Validation Status</h3>
-      
+
       {hasErrors && (
         <div className="error-summary">
           <p>Please fix the following errors:</p>
           <ul>
-            {Object.entries(allValidations).map(([field, validation]) => 
-              validation?.status === 'invalid' && (
-                <li key={field}>{field}: {validation.message}</li>
-              )
+            {Object.entries(allValidations).map(
+              ([field, validation]) =>
+                validation?.status === 'invalid' && (
+                  <li key={field}>
+                    {field}: {validation.message}
+                  </li>
+                ),
             )}
           </ul>
         </div>
       )}
-      
+
       <div className="field-status">
-        <div className={`status ${email?.status?.toLowerCase()}`}>
-          Email: {email?.status || 'UNDETERMINED'}
-        </div>
+        <div className={`status ${email?.status?.toLowerCase()}`}>Email: {email?.status || 'UNDETERMINED'}</div>
         <div className={`status ${password?.status?.toLowerCase()}`}>
           Password: {password?.status || 'UNDETERMINED'}
         </div>
@@ -342,12 +304,8 @@ function SubmitButton() {
       <div className="form-status">
         Status: <span className={formStatus.toLowerCase()}>{formStatus}</span>
       </div>
-      
-      <button 
-        type="submit" 
-        disabled={!isValid}
-        className={`submit-btn ${isValid ? 'enabled' : 'disabled'}`}
-      >
+
+      <button type="submit" disabled={!isValid} className={`submit-btn ${isValid ? 'enabled' : 'disabled'}`}>
         {formStatus === 'PENDING' ? 'Validating...' : 'Submit Form'}
       </button>
     </div>
@@ -356,6 +314,7 @@ function SubmitButton() {
 ```
 
 Form status values:
+
 - `valid` - All fields are valid
 - `invalid` - At least one field is invalid
 - `undetermined` - Some fields haven't been validated yet
@@ -366,7 +325,7 @@ Form status values:
 
 ```tsx
 // Reusable required field rule
-export function RequiredRule({ message = "This field is required" } = {}) {
+export function RequiredRule({ message = 'This field is required' } = {}) {
   return (
     <Rule
       validationFn={(value) => {
@@ -381,7 +340,7 @@ export function RequiredRule({ message = "This field is required" } = {}) {
 }
 
 // Reusable email validation rule
-export function EmailRule({ message = "Please enter a valid email" } = {}) {
+export function EmailRule({ message = 'Please enter a valid email' } = {}) {
   return (
     <Rule
       validationFn={(email: string) => {
@@ -397,7 +356,7 @@ export function EmailRule({ message = "Please enter a valid email" } = {}) {
 <Field name="email" render={/* ... */}>
   <RequiredRule />
   <EmailRule />
-</Field>
+</Field>;
 ```
 
 ### Complex Validation Rule Factory
@@ -412,7 +371,7 @@ interface LengthRuleOptions {
 export function LengthRule({ min, max, message }: LengthRuleOptions) {
   const validationFn = (value: string) => {
     if (!value) return true; // Allow empty unless required
-    
+
     const length = value.length;
     if (min !== undefined && length < min) return false;
     if (max !== undefined && length > max) return false;
@@ -423,22 +382,17 @@ export function LengthRule({ min, max, message }: LengthRuleOptions) {
     if (min && max) return `Must be between ${min} and ${max} characters`;
     if (min) return `Must be at least ${min} characters`;
     if (max) return `Must be less than ${max} characters`;
-    return "Invalid length";
+    return 'Invalid length';
   })();
 
-  return (
-    <Rule
-      validationFn={validationFn}
-      message={message || defaultMessage}
-    />
-  );
+  return <Rule validationFn={validationFn} message={message || defaultMessage} />;
 }
 
 // Usage
 <Field name="username" render={/* ... */}>
   <RequiredRule />
   <LengthRule min={3} max={20} />
-</Field>
+</Field>;
 ```
 
 ## Best Practices
@@ -452,13 +406,9 @@ Rules are executed in the order they appear. Place cheaper validations first:
   {/* Fast validations first */}
   <Rule validationFn={isRequired} message="Email is required" />
   <Rule validationFn={isValidEmailFormat} message="Invalid email format" />
-  
+
   {/* Expensive async validation last */}
-  <Rule 
-    validationFn={checkEmailExists}
-    message="Email already exists"
-    isDebounced={true}
-  />
+  <Rule validationFn={checkEmailExists} message="Email already exists" isDebounced={true} />
 </Field>
 ```
 
@@ -485,8 +435,8 @@ Use debounced validation for expensive operations:
 <Rule validationFn={expensiveApiValidation} message="..." />
 
 // ✅ Debounced API call
-<Rule 
-  validationFn={expensiveApiValidation} 
+<Rule
+  validationFn={expensiveApiValidation}
   message="..."
   isDebounced={true}
 />
@@ -502,10 +452,7 @@ function ConditionalValidationField() {
   return (
     <Field name="taxId" render={/* ... */}>
       {accountType === 'business' && (
-        <Rule
-          validationFn={(value) => !!value}
-          message="Tax ID is required for business accounts"
-        />
+        <Rule validationFn={(value) => !!value} message="Tax ID is required for business accounts" />
       )}
     </Field>
   );

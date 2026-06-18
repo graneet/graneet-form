@@ -21,10 +21,7 @@ type WizardValues = {
   preferences: { theme: 'light' | 'dark' };
 };
 
-const steps = [
-  { name: 'userInfo' as const },
-  { name: 'preferences' as const }
-];
+const steps = [{ name: 'userInfo' as const }, { name: 'preferences' as const }];
 
 const wizard = useWizard<WizardValues>(
   steps,
@@ -35,7 +32,7 @@ const wizard = useWizard<WizardValues>(
   () => {
     // Called when wizard is quit from first step
     console.log('Wizard quit');
-  }
+  },
 );
 ```
 
@@ -49,22 +46,16 @@ import { WizardContext, useWizardContext } from 'graneet-form';
 function WizardComponent() {
   const wizard = useWizard(steps, onFinish, onQuit);
 
-  return (
-    <WizardContext.Provider value={wizard}>
-      {/* Wizard steps */}
-    </WizardContext.Provider>
-  );
+  return <WizardContext.Provider value={wizard}>{/* Wizard steps */}</WizardContext.Provider>;
 }
 
 function NavigationButtons() {
   const { goNext, goPrevious, isFirstStep, isLastStep } = useWizardContext();
-  
+
   return (
     <div>
       {!isFirstStep && <button onClick={goPrevious}>Previous</button>}
-      <button onClick={goNext}>
-        {isLastStep ? 'Finish' : 'Next'}
-      </button>
+      <button onClick={goNext}>{isLastStep ? 'Finish' : 'Next'}</button>
     </div>
   );
 }
@@ -103,7 +94,7 @@ type WizardValues = {
 
 function UserInfoStep() {
   const { form } = useStepForm<WizardValues, 'userInfo'>({
-    defaultValues: { name: '', email: '' }
+    defaultValues: { name: '', email: '' },
   });
 
   return (
@@ -118,6 +109,7 @@ function UserInfoStep() {
 ```
 
 Key features of `useStepForm`:
+
 - **Automatic persistence**: Form values are saved when navigating between steps
 - **Validation sync**: Step validation status affects wizard navigation
 - **Value restoration**: Previously entered values are restored when returning to a step
@@ -135,10 +127,7 @@ function StepNavigation() {
   const { goNext, isStepReady } = useWizardContext();
 
   return (
-    <button 
-      onClick={goNext} 
-      disabled={!isStepReady || stepStatus !== 'valid'}
-    >
+    <button onClick={goNext} disabled={!isStepReady || stepStatus !== 'valid'}>
       Next Step
     </button>
   );
@@ -162,8 +151,8 @@ const steps = [
         return false; // Prevent navigation
       }
       return true; // Allow navigation
-    }
-  }
+    },
+  },
 ];
 ```
 
@@ -173,14 +162,14 @@ The wizard context provides several navigation methods:
 
 ```tsx
 const {
-  goNext,        // Move to next step or finish
-  goPrevious,    // Move to previous step or quit
-  goBackTo,      // Jump to a specific previous step
-  currentStep,   // Current active step
-  steps,         // Array of all step names
-  isFirstStep,   // Boolean - is current step the first?
-  isLastStep,    // Boolean - is current step the last?
-  isStepReady    // Boolean - is step ready for navigation?
+  goNext, // Move to next step or finish
+  goPrevious, // Move to previous step or quit
+  goBackTo, // Jump to a specific previous step
+  currentStep, // Current active step
+  steps, // Array of all step names
+  isFirstStep, // Boolean - is current step the first?
+  isLastStep, // Boolean - is current step the last?
+  isStepReady, // Boolean - is step ready for navigation?
 } = useWizardContext();
 
 // Jump back to a specific step
@@ -195,9 +184,9 @@ Retrieve form values from any step:
 
 ```tsx
 const {
-  getValuesOfStep,          // Get values from specific step
-  getValuesOfCurrentStep,   // Get values from current step
-  getValuesOfSteps         // Get all step values
+  getValuesOfStep, // Get values from specific step
+  getValuesOfCurrentStep, // Get values from current step
+  getValuesOfSteps, // Get all step values
 } = useWizardContext();
 
 // Get values from a specific step
@@ -210,14 +199,7 @@ const allValues = getValuesOfSteps();
 ## Complete Example
 
 ```tsx
-import { 
-  useWizard, 
-  useStepForm, 
-  WizardContext, 
-  Step, 
-  Form, 
-  Field 
-} from 'graneet-form';
+import { useWizard, useStepForm, WizardContext, Step, Form, Field } from 'graneet-form';
 
 type WizardValues = {
   userInfo: { name: string; email: string };
@@ -226,18 +208,18 @@ type WizardValues = {
 
 const steps = [
   { name: 'userInfo' as const },
-  { 
+  {
     name: 'preferences' as const,
     onNext: async (values) => {
       // Validate preferences step
       return values?.theme !== undefined;
-    }
-  }
+    },
+  },
 ];
 
 function UserInfoStep() {
   const { form } = useStepForm<WizardValues, 'userInfo'>({
-    defaultValues: { name: '', email: '' }
+    defaultValues: { name: '', email: '' },
   });
 
   return (
@@ -253,7 +235,7 @@ function UserInfoStep() {
 
 function PreferencesStep() {
   const { form } = useStepForm<WizardValues, 'preferences'>({
-    defaultValues: { theme: 'light', notifications: true }
+    defaultValues: { theme: 'light', notifications: true },
   });
 
   return (
@@ -271,26 +253,14 @@ function PreferencesStep() {
 }
 
 function WizardNavigation() {
-  const { 
-    goNext, 
-    goPrevious, 
-    isFirstStep, 
-    isLastStep, 
-    isStepReady,
-    currentStep 
-  } = useWizardContext();
+  const { goNext, goPrevious, isFirstStep, isLastStep, isStepReady, currentStep } = useWizardContext();
 
   return (
     <div>
       <p>Current step: {currentStep}</p>
       <div>
-        {!isFirstStep && (
-          <button onClick={goPrevious}>Previous</button>
-        )}
-        <button 
-          onClick={goNext} 
-          disabled={!isStepReady}
-        >
+        {!isFirstStep && <button onClick={goPrevious}>Previous</button>}
+        <button onClick={goNext} disabled={!isStepReady}>
           {isLastStep ? 'Finish' : 'Next'}
         </button>
       </div>
@@ -308,17 +278,17 @@ export function MyWizard() {
     () => {
       console.log('Wizard quit');
       // Handle wizard quit
-    }
+    },
   );
 
   return (
     <WizardContext.Provider value={wizard}>
       <div>
         <h1>Setup Wizard</h1>
-        
+
         <UserInfoStep />
         <PreferencesStep />
-        
+
         <WizardNavigation />
       </div>
     </WizardContext.Provider>

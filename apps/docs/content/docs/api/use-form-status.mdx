@@ -54,11 +54,7 @@ function SubmitButton() {
   const { isValid } = useFormStatus(form);
 
   return (
-    <button 
-      type="submit" 
-      disabled={!isValid}
-      className={isValid ? 'enabled' : 'disabled'}
-    >
+    <button type="submit" disabled={!isValid} className={isValid ? 'enabled' : 'disabled'}>
       Submit Form
     </button>
   );
@@ -74,10 +70,14 @@ function FormWithStatusFeedback() {
 
   const getStatusColor = () => {
     switch (formStatus) {
-      case 'valid': return 'green';
-      case 'invalid': return 'red';
-      case 'pending': return 'orange';
-      default: return 'gray';
+      case 'valid':
+        return 'green';
+      case 'invalid':
+        return 'red';
+      case 'pending':
+        return 'orange';
+      default:
+        return 'gray';
     }
   };
 
@@ -85,16 +85,13 @@ function FormWithStatusFeedback() {
     <Form form={form}>
       <div className="form-header">
         <h2>User Registration</h2>
-        <div 
-          className="status-indicator"
-          style={{ backgroundColor: getStatusColor() }}
-        >
+        <div className="status-indicator" style={{ backgroundColor: getStatusColor() }}>
           {formStatus}
         </div>
       </div>
-      
+
       {/* Form fields */}
-      
+
       <button type="submit" disabled={!isValid}>
         {formStatus === 'pending' ? 'Validating...' : 'Submit'}
       </button>

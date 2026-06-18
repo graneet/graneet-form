@@ -1,32 +1,10 @@
-import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router';
-import * as React from 'react';
+import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 import appCss from '@/styles/app.css?url';
 import { RootProvider } from 'fumadocs-ui/provider/tanstack';
 
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'Graneet Form',
-      },
-    ],
-    links: [
-      { rel: 'stylesheet', href: appCss },
-      { rel: 'icon', href: '/graneet-form-logo.png' },
-    ],
-  }),
-  component: RootComponent,
-});
-
 function RootComponent() {
   return (
+    // oxlint-disable-next-line jsx-a11y/html-has-lang jsx-a11y/lang
     <html suppressHydrationWarning>
       <head>
         <HeadContent />
@@ -40,3 +18,25 @@ function RootComponent() {
     </html>
   );
 }
+
+export const Route = createRootRoute({
+  component: RootComponent,
+  head: () => ({
+    links: [
+      { href: appCss, rel: 'stylesheet' },
+      { href: '/graneet-form-logo.png', rel: 'icon' },
+    ],
+    meta: [
+      {
+        charSet: 'utf8',
+      },
+      {
+        content: 'width=device-width, initial-scale=1',
+        name: 'viewport',
+      },
+      {
+        title: 'Graneet Form',
+      },
+    ],
+  }),
+});

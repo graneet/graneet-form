@@ -26,6 +26,7 @@ This example demonstrates how to use template literal types with graneet-form to
 ### Code Breakdown
 
 #### Template Literal Type Definition
+
 ```typescript
 type FieldName = `firstName-${number}`;
 
@@ -38,6 +39,7 @@ interface FormValues {
 This creates a type that accepts any string matching the pattern `firstName-{number}`, such as `firstName-0`, `firstName-1`, etc.
 
 #### Field Name Generator
+
 ```typescript
 const getFieldName = (index: number): FieldName => {
   return `firstName-${index}`;
@@ -47,6 +49,7 @@ const getFieldName = (index: number): FieldName => {
 A helper function that generates valid field names with proper typing.
 
 #### Type Guard Function
+
 ```typescript
 const isFirstName = (fieldName: string): fieldName is FieldName => {
   return fieldName.split('-')[0] === 'firstName';
@@ -56,6 +59,7 @@ const isFirstName = (fieldName: string): fieldName is FieldName => {
 This function provides both runtime validation and compile-time type narrowing. When used in an `if` statement, TypeScript knows that the field is of type `FieldName`.
 
 #### Usage in Form Processing
+
 ```typescript
 const onClick = () => {
   const formValues = form.getFormValues();
@@ -75,7 +79,8 @@ const onClick = () => {
 The type guard ensures that only fields matching the `firstName-${number}` pattern are processed, and TypeScript provides full autocomplete and type checking.
 
 <Callout type="info">
-  **Production Tip**: This pattern is excellent for forms with dynamic sections, such as adding/removing items in a list, where each item has multiple fields that need to be tracked individually.
+  **Production Tip**: This pattern is excellent for forms with dynamic sections, such as adding/removing items in a
+  list, where each item has multiple fields that need to be tracked individually.
 </Callout>
 
 ### When to Use This Pattern

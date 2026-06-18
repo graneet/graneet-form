@@ -3,6 +3,8 @@ import { gitConfig } from './shared';
 
 export function baseOptions(): BaseLayoutProps {
   return {
+    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
+    links: [],
     nav: {
       title: (
         <>
@@ -17,7 +19,5 @@ export function baseOptions(): BaseLayoutProps {
         </>
       ),
     },
-    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
-    links: [],
   };
 }

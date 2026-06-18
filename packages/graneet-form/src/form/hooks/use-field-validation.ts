@@ -13,8 +13,8 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
   );
   const metaStateRef = useRef({
     countRulesResolved: 0,
-    phaseId: 0,
     hasError: false,
+    phaseId: 0,
   });
 
   const testRules = useCallback(
@@ -47,10 +47,11 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
               setValidationStatus(VALIDATION_STATE_VALID);
             }
           })
-          .catch(({ message }) => {
+          // oxlint-disable-next-line typescript/use-unknown-in-catch-callback-variable
+          .catch(({ message }: { message: string | undefined }) => {
             const status: ValidationState = {
-              status: 'invalid',
               message,
+              status: 'invalid',
             };
             metaStateRef.current.hasError = true;
             setValidationStatus(status);
@@ -64,13 +65,15 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
     // When we don't have rules we do nothing
     if (!numberOfRules) {
       setValidationStatus(VALIDATION_STATE_VALID);
-      return () => {};
+      return () => {
+        // NOOP
+      };
     }
     setValidationStatus(VALIDATION_STATE_UNDETERMINED);
 
     const { current } = metaStateRef;
     // On each render, we increment phaseId,
-    // doing, so we ensure actions are done on right value
+    // Doing, so we ensure actions are done on right value
     current.phaseId += 1;
     current.countRulesResolved = 0;
     current.hasError = false;
@@ -80,7 +83,9 @@ export function useFieldValidation(rules: IRule[], debouncedRules: IRule[], valu
     const token = setTimeout(() => {
       testRules(debouncedRules, value, currentPhaseId);
     }, DEBOUNCE_TIME);
-    return () => clearTimeout(token);
+    return () => {
+      clearTimeout(token);
+    };
   }, [debouncedRules, numberOfRules, rules, testRules, value]);
 
   return validationStatus;

@@ -30,27 +30,22 @@ The render function also receives state information:
 ### Example
 
 ```tsx
-<Field 
-  name="email" 
+<Field
+  name="email"
   render={(props, state) => (
     <div>
-      <input 
+      <input
         type="email"
         value={props.value || ''}
         onChange={(e) => props.onChange(e.target.value)}
         onBlur={props.onBlur}
         onFocus={props.onFocus}
       />
-      {state.validationStatus.status === 'invalid' && (
-        <span className="error">{state.validationStatus.message}</span>
-      )}
+      {state.validationStatus.status === 'invalid' && <span className="error">{state.validationStatus.message}</span>}
     </div>
   )}
 >
-  <Rule 
-    validationFn={(value) => !!value?.includes('@')} 
-    message="Please enter a valid email" 
-  />
+  <Rule validationFn={(value) => !!value?.includes('@')} message="Please enter a valid email" />
 </Field>
 ```
 
@@ -63,9 +58,7 @@ The Form component provides context to child components and handles form submiss
 ```tsx
 import { Form } from 'graneet-form';
 
-<Form form={formInstance}>
-  {/* Your form fields */}
-</Form>
+<Form form={formInstance}>{/* Your form fields */}</Form>;
 ```
 
 ### Example with Submission
@@ -73,7 +66,7 @@ import { Form } from 'graneet-form';
 ```tsx
 function MyForm() {
   const form = useForm<FormData>();
-  
+
   const handleSubmit = form.handleSubmit((data) => {
     console.log('Form data:', data);
   });
@@ -98,15 +91,15 @@ The Rule component adds validation rules to fields. Multiple rules can be added 
 
 ```tsx
 <Field name="password" render={...}>
-  <Rule 
+  <Rule
     validationFn={(value) => (value?.length || 0) >= 8}
     message="Password must be at least 8 characters"
   />
-  <Rule 
+  <Rule
     validationFn={(value) => /[A-Z]/.test(value || '')}
     message="Password must contain an uppercase letter"
   />
-  <Rule 
+  <Rule
     validationFn={(value) => /[0-9]/.test(value || '')}
     message="Password must contain a number"
   />
@@ -117,7 +110,7 @@ The Rule component adds validation rules to fields. Multiple rules can be added 
 
 ```tsx
 <Field name="confirmPassword" render={...}>
-  <Rule 
+  <Rule
     validationFn={(value, formValues) => value === formValues.password}
     message="Passwords must match"
     when={(formValues) => !!formValues.password}

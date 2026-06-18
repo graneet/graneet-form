@@ -7,7 +7,9 @@ export const Route = createFileRoute('/docs/{$}.md')({
       GET: async ({ params }) => {
         const slugs = markdownPathToSlugs(params._splat?.split('/') ?? []);
         const page = source.getPage(slugs);
-        if (!page) throw notFound();
+        if (!page) {
+          throw notFound();
+        }
 
         return new Response(await getLLMText(page), {
           headers: {

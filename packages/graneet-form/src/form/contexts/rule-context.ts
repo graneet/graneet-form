@@ -2,8 +2,8 @@ import { createContext, use } from 'react';
 import type { Validator } from '../types/validation';
 
 export interface RuleContextApi {
-  registerRule(testFn: Validator, errorMessage: string, isDebounced: boolean): void;
-  unregisterRule(testFn: Validator, isDebounced: boolean): void;
+  registerRule: (testFn: Validator, errorMessage: string, isDebounced: boolean) => void;
+  unregisterRule: (testFn: Validator, isDebounced: boolean) => void;
 }
 
 export const RuleContext = createContext<RuleContextApi | null>(null);

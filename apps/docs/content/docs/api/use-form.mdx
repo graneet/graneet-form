@@ -39,15 +39,11 @@ function MyComponent() {
   const form = useForm<UserForm>({
     defaultValues: {
       name: '',
-      email: ''
-    }
+      email: '',
+    },
   });
 
-  return (
-    <Form form={form}>
-      {/* Your form fields */}
-    </Form>
-  );
+  return <Form form={form}>{/* Your form fields */}</Form>;
 }
 ```
 
@@ -57,7 +53,7 @@ function MyComponent() {
 const form = useForm<UserForm>({
   defaultValues: {
     name: '',
-    email: ''
+    email: '',
   },
   onUpdateAfterBlur: async (fieldName, value, data, { getFormValues, setFormValues }) => {
     if (fieldName === 'email' && value) {
@@ -67,7 +63,7 @@ const form = useForm<UserForm>({
         setFormValues({ name: userInfo.name });
       }
     }
-  }
+  },
 });
 ```
 
@@ -78,8 +74,8 @@ const form = useForm<UserForm>({
   defaultValues: () => ({
     name: user?.name || '',
     email: user?.email || '',
-    timestamp: Date.now()
-  })
+    timestamp: Date.now(),
+  }),
 });
 ```
 
@@ -101,7 +97,7 @@ Updates multiple form field values at once.
 ```tsx
 form.setFormValues({
   name: 'Jane Doe',
-  email: 'jane@example.com'
+  email: 'jane@example.com',
 });
 ```
 
@@ -123,9 +119,7 @@ const handleSubmit = form.handleSubmit((formData) => {
 });
 
 // Use with form element
-<form onSubmit={handleSubmit}>
-  {/* form content */}
-</form>
+<form onSubmit={handleSubmit}>{/* form content */}</form>;
 ```
 
 ## Performance Notes

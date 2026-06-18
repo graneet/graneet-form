@@ -72,7 +72,9 @@ function NameDisplay() {
   return (
     <div>
       {firstName && lastName && (
-        <p>Full Name: {firstName} {lastName}</p>
+        <p>
+          Full Name: {firstName} {lastName}
+        </p>
       )}
     </div>
   );
@@ -108,17 +110,15 @@ function ConditionalFields() {
   return (
     <div>
       <Field name="accountType" />
-      
+
       {accountType === 'business' && (
         <>
           <Field name="companyName" />
           <Field name="taxId" />
         </>
       )}
-      
-      {accountType === 'personal' && (
-        <Field name="dateOfBirth" />
-      )}
+
+      {accountType === 'personal' && <Field name="dateOfBirth" />}
     </div>
   );
 }
@@ -129,7 +129,7 @@ function ConditionalFields() {
 ```tsx
 function EfficientFormWatcher() {
   const form = useFormContext<UserForm>();
-  
+
   // Only watch fields that trigger expensive operations
   const { email } = useFieldsWatch(form, ['email'], { mode: 'onBlur' });
   const { city, country } = useFieldsWatch(form, ['city', 'country']);

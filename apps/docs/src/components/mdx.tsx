@@ -3,13 +3,16 @@ import { AutoTypeTable } from 'fumadocs-typescript/ui';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import type { MDXComponents } from 'mdx/types';
 import { StackBlitzEmbed } from './stack-blitz-embed';
+import type { ComponentProps } from 'react';
 
 const generator = createGenerator();
 
-export function getMDXComponents(components?: MDXComponents) {
+// oxlint-disable-next-line import/exports-last
+export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultMdxComponents,
-    AutoTypeTable: (props: React.ComponentProps<typeof AutoTypeTable>) => (
+    AutoTypeTable: (props: ComponentProps<typeof AutoTypeTable>) => (
+      // oxlint-disable-next-line react/jsx-props-no-spreading
       <AutoTypeTable {...props} generator={generator} />
     ),
     StackBlitzEmbed,
@@ -17,6 +20,7 @@ export function getMDXComponents(components?: MDXComponents) {
   } satisfies MDXComponents;
 }
 
+// oxlint-disable-next-line import/exports-last
 export const useMDXComponents = getMDXComponents;
 
 declare global {

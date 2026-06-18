@@ -1,7 +1,8 @@
 import { Form, useStepForm } from 'graneet-form';
+import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
-import { TextField } from '../components/TextField.tsx';
-import { WizardExample } from '../components/WizardExample/WizardExample.tsx';
+import { TextField } from '../components/text-field.tsx';
+import { WizardExample } from '../components/wizard-example/wizard-example.tsx';
 
 type WizardValues = {
   step1: {
@@ -11,7 +12,7 @@ type WizardValues = {
   step2: Record<never, never>;
 };
 
-export function Step1() {
+function Step1(): ReactNode {
   const { form } = useStepForm<WizardValues, 'step1'>({
     defaultValues: {
       text: 'step1',
@@ -19,29 +20,33 @@ export function Step1() {
   });
 
   return (
-    <Form form={form} style={{ background: '#869fa3' }}>
-      <TextField<WizardValues['step1']> name={'text'} />
+    <Form form={form}>
+      <TextField<WizardValues['step1']> name="text" />
       Step 1
     </Form>
   );
 }
 
-export function Step2() {
+function Step2(): ReactNode {
   return <div style={{ background: '#869fa3' }}>Step 2</div>;
 }
 
-export function WizardTests() {
+export function WizardTests(): ReactNode {
   const [message, setMessage] = useState('');
 
   const onFinish = useCallback(
     (wizardValues: WizardValues) => {
+      // oxlint-disable-next-line no-console
       console.info('WizardValues', wizardValues);
+      // oxlint-disable-next-line no-console
       console.info('Message', message);
     },
     [message],
   );
 
-  const onQuit = useCallback(() => {}, []);
+  const onQuit = useCallback(() => {
+    // NOOP
+  }, []);
 
   return (
     <WizardExample<WizardValues> onFinish={onFinish} onQuit={onQuit}>
