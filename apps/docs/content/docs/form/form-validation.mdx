@@ -45,7 +45,7 @@ The `Rule` component is the foundation of validation in graneet-form:
         onBlur={fieldProps.onBlur}
         onFocus={fieldProps.onFocus}
       />
-      {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+      {fieldState.isTouched && fieldState.validationStatus.status === 'invalid' && (
         <span className="error">{fieldState.validationStatus.message}</span>
       )}
     </div>
@@ -192,7 +192,10 @@ The `fieldState` object contains:
 
 ```tsx
 interface FieldState {
-  isPristine: boolean; // true if field hasn't been focused/modified
+  /** @deprecated Use `isTouched` or `isDirty` instead */
+  isPristine: boolean; // equivalent to !isDirty
+  isTouched: boolean; // true after the user has focused then blurred the field
+  isDirty: boolean; // true after the user has changed the field value
   validationStatus: {
     status: 'valid' | 'invalid' | 'pending';
     message?: string; // Error message if status is invalid
@@ -206,15 +209,15 @@ interface FieldState {
 <Field
   name="email"
   render={(fieldProps, fieldState) => {
-    const { isPristine, validationStatus } = fieldState;
+    const { isTouched, validationStatus } = fieldState;
 
     return (
       <div className="field-container">
         <input
           className={`
             input 
-            ${!isPristine && validationStatus.status === 'invalid' ? 'error' : ''}
-            ${!isPristine && validationStatus.status === 'valid' ? 'success' : ''}
+            ${isTouched && validationStatus.status === 'invalid' ? 'error' : ''}
+            ${isTouched && validationStatus.status === 'valid' ? 'success' : ''}
           `}
           {...fieldProps}
         />
@@ -223,12 +226,12 @@ interface FieldState {
         {validationStatus.status === 'pending' && <span className="validation-pending">⏳ Checking...</span>}
 
         {/* Show error message */}
-        {!isPristine && validationStatus.status === 'invalid' && (
+        {isTouched && validationStatus.status === 'invalid' && (
           <span className="validation-error">❌ {validationStatus.message}</span>
         )}
 
         {/* Show success indicator */}
-        {!isPristine && validationStatus.status === 'valid' && <span className="validation-success">✅ Valid</span>}
+        {isTouched && validationStatus.status === 'valid' && <span className="validation-success">✅ Valid</span>}
       </div>
     );
   }}

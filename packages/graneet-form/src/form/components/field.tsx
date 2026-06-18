@@ -17,7 +17,16 @@ export interface FieldRenderProps<T extends FieldValues, K extends keyof T> {
 }
 
 export interface FieldRenderState {
+  /**
+   * @deprecated Use `isTouched` or `isDirty` instead.
+   * `isPristine` will be removed in a future major version.
+   * Equivalent to `!isDirty`.
+   */
   isPristine: boolean;
+  /** `true` after the user has focused then blurred the field. Resets to `false` on `resetForm()`. */
+  isTouched: boolean;
+  /** `true` after the user has changed the field value. Resets to `false` on `resetForm()`. */
+  isDirty: boolean;
   validationStatus: ValidationState;
 }
 
@@ -70,14 +79,31 @@ export function Field<T extends FieldValues, K extends keyof T>({
   const { ruleContext, rules, debouncedRules } = useRules();
 
   const [value, setValue] = useState<T[K] | undefined>();
-  const [isPristine, setIsPristine] = useState<boolean>(true);
+  const [isTouched, setIsTouched] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const validationStatus = useFieldValidation(rules, debouncedRules, value);
 
   const hasFocusRef = useRef(false);
-  const hasBeenFocusedRef = useRef(false);
 
   useEffect(
-    () => form.formInternal.registerField(name, setValue, defaultValue),
+    () =>
+      form.formInternal.registerField(
+        name,
+        setValue,
+        {
+          onDirty: () => {
+            setIsDirty(true);
+          },
+          onReset: () => {
+            setIsTouched(false);
+            setIsDirty(false);
+          },
+          onTouch: () => {
+            setIsTouched(true);
+          },
+        },
+        defaultValue,
+      ),
     [name, form.formInternal, defaultValue],
   );
 
@@ -88,15 +114,15 @@ export function Field<T extends FieldValues, K extends keyof T>({
   const onChange = useCallback(
     (newValue: T[K] | undefined): void => {
       form.formInternal.onFieldChange(name, newValue, hasFocusRef.current);
-
-      if (hasBeenFocusedRef.current) {
-        setIsPristine(false);
-      }
+      setIsDirty(true);
     },
     [name, form.formInternal],
   );
 
   const onBlur = useCallback((): void => {
+    if (hasFocusRef.current) {
+      setIsTouched(true);
+    }
     hasFocusRef.current = false;
     // oxlint-disable-next-line typescript/no-floating-promises
     form.formInternal.onFieldBlur(name, data);
@@ -104,7 +130,6 @@ export function Field<T extends FieldValues, K extends keyof T>({
 
   const onFocus = useCallback(() => {
     hasFocusRef.current = true;
-    hasBeenFocusedRef.current = true;
   }, []);
 
   return (
@@ -118,7 +143,9 @@ export function Field<T extends FieldValues, K extends keyof T>({
           value,
         },
         {
-          isPristine,
+          isDirty,
+          isPristine: !isDirty,
+          isTouched,
           validationStatus,
         },
       )}

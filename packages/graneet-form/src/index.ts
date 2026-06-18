@@ -1,7 +1,7 @@
 export type { FieldRenderProps, FieldRenderState } from './form/components/field';
 export { Field } from './form/components/field';
 export { Rule } from './form/components/rule';
-export type { FormContextApi } from './form/contexts/form-context';
+export type { FormContextApi, SetFormValuesOptions } from './form/contexts/form-context';
 export { useFormContext } from './form/contexts/form-context';
 export { Form } from './form/form';
 export type { UseFormWatchOptions } from './form/hooks/use-fields-watch';

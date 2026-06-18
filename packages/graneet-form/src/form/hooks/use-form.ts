@@ -5,7 +5,7 @@ import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
 import type { ValidationState } from '../../shared/types/validation';
 import { useCallbackRef } from '../../shared/util/use-callback-ref';
-import type { FormContextApi, FormInternal } from '../contexts/form-context';
+import type { FieldCallbacks, FormContextApi, FormInternal, SetFormValuesOptions } from '../contexts/form-context';
 import type { FormValidations } from '../types/form-validations';
 import type { FormValues } from '../types/form-values';
 import { VALIDATION_STATE_UNDETERMINED } from '../types/validation';
@@ -199,6 +199,8 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
    * before triggering an on blur event.
    */
   const focusedFieldNamesRef = useRef(new Set<keyof T>());
+
+  const fieldCallbacksRef = useRef<Partial<Record<keyof T, FieldCallbacks>>>({});
 
   const handleFormSubmitRef = useRef<(formValues: T) => (void | Promise<void>) | undefined>(undefined);
 
@@ -491,7 +493,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const registerField = useCallback<FormInternal<T>['registerField']>(
-    <K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void, defaultValue?: T[K]): (() => void) => {
+    <K extends keyof T>(name: K, setValue: (value: T[K] | undefined) => void, callbacks: FieldCallbacks, defaultValue?: T[K]): (() => void) => {
       const previousValueStored = formStateRef.current[name]?.value;
       if (formStateRef.current[name]?.isRegistered) {
         throw new Error(`Attempting to register field "${String(name)}" a second time`);
@@ -503,6 +505,8 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         validation: VALIDATION_STATE_UNDETERMINED,
         value: previousValueStored ?? defaultValue,
       };
+
+      fieldCallbacksRef.current[name] = callbacks;
 
       const watcher = (publish: SetStateAction<FormValues<T, K>>) => {
         // FIXME publish({} as FormValues<T, K>)
@@ -523,6 +527,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         }
 
         formStateRef.current[name].isRegistered = false;
+        delete fieldCallbacksRef.current[name];
         removeValueSubscriber<K>(watcher, 'onChange', [name]);
         updateValueForAllTypeOfSubscribers(name);
         updateErrorForAllTypeOfSubscribers(name);
@@ -550,7 +555,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const setFormValues = useCallback<FormContextApi<T>['setFormValues']>(
-    (newValues: Partial<T>) => {
+    (newValues: Partial<T>, options?: SetFormValuesOptions) => {
       for (const name of Object.keys(newValues) as (keyof T)[]) {
         // If the field is already stored, only update the value
         if (formStateRef.current[name]) {
@@ -565,6 +570,13 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
           };
         }
         updateValueForAllTypeOfSubscribers(name);
+
+        if (options?.shouldDirty) {
+          fieldCallbacksRef.current[name]?.onDirty();
+        }
+        if (options?.shouldTouch) {
+          fieldCallbacksRef.current[name]?.onTouch();
+        }
       }
     },
     [updateValueForAllTypeOfSubscribers],
@@ -595,6 +607,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       if (formStateRef.current[fieldName]) {
         formStateRef.current[fieldName].value = undefined;
         updateValueForAllTypeOfSubscribers(fieldName);
+        fieldCallbacksRef.current[fieldName as keyof T]?.onReset();
       }
     }
   }, [updateValueForAllTypeOfSubscribers]);

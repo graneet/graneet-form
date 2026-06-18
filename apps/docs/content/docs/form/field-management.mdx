@@ -81,7 +81,10 @@ interface FieldRenderProps<T, K extends keyof T> {
 
 ```tsx
 interface FieldRenderState {
-  isPristine: boolean; // true if field hasn't been focused
+  /** @deprecated Use `isTouched` or `isDirty` instead */
+  isPristine: boolean; // equivalent to !isDirty
+  isTouched: boolean; // true after the user has focused then blurred the field
+  isDirty: boolean; // true after the user has changed the field value
   validationStatus: {
     status: 'valid' | 'invalid' | 'pending';
     message?: string; // Error message if invalid
@@ -106,9 +109,9 @@ interface FieldRenderState {
         onChange={(e) => fieldProps.onChange(e.target.value)}
         onBlur={fieldProps.onBlur}
         onFocus={fieldProps.onFocus}
-        className={!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' ? 'error' : ''}
+        className={fieldState.isTouched && fieldState.validationStatus.status === 'invalid' ? 'error' : ''}
       />
-      {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+      {fieldState.isTouched && fieldState.validationStatus.status === 'invalid' && (
         <span className="error-message">{fieldState.validationStatus.message}</span>
       )}
     </div>
@@ -203,7 +206,7 @@ const countries = [
         />
         I agree to the terms and conditions
       </label>
-      {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+      {fieldState.isTouched && fieldState.validationStatus.status === 'invalid' && (
         <span className="error-message">{fieldState.validationStatus.message}</span>
       )}
     </div>
@@ -269,7 +272,7 @@ interface FormData {
       />
       {/* Character counter */}
       <div className="char-counter">{(fieldProps.value || '').length} / 500 characters</div>
-      {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+      {fieldState.isTouched && fieldState.validationStatus.status === 'invalid' && (
         <span className="error-message">{fieldState.validationStatus.message}</span>
       )}
     </div>
@@ -311,7 +314,7 @@ interface FormData {
         </div>
       )}
 
-      {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+      {fieldState.isTouched && fieldState.validationStatus.status === 'invalid' && (
         <span className="error-message">{fieldState.validationStatus.message}</span>
       )}
     </div>
@@ -585,7 +588,7 @@ function SmartEmailField() {
             </div>
           )}
 
-          {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+          {fieldState.isTouched && fieldState.validationStatus.status === 'invalid' && (
             <span className="error">{fieldState.validationStatus.message}</span>
           )}
         </div>
@@ -636,10 +639,10 @@ function GenericField<T extends FieldValues, K extends keyof T>({
             onChange={(e) => fieldProps.onChange(e.target.value as T[K])}
             onBlur={fieldProps.onBlur}
             onFocus={fieldProps.onFocus}
-            className={!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' ? 'error' : ''}
+            className={fieldState.isTouched && fieldState.validationStatus.status === 'invalid' ? 'error' : ''}
           />
 
-          {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+          {fieldState.isTouched && fieldState.validationStatus.status === 'invalid' && (
             <span className="error-message">{fieldState.validationStatus.message}</span>
           )}
         </div>
