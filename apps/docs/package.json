@@ -4,12 +4,16 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
+    "changelog": "node scripts/generate-changelog.mjs",
+    "predev": "node scripts/generate-changelog.mjs",
     "dev": "vite dev",
+    "prebuild": "node scripts/generate-changelog.mjs",
     "build": "vite build",
     "start": "vite preview",
     "preview": "vite preview",
+    "pretypes:check": "node scripts/generate-changelog.mjs",
     "types:check": "fumadocs-mdx && tsc --noEmit",
-    "postinstall": "fumadocs-mdx"
+    "postinstall": "node scripts/generate-changelog.mjs && fumadocs-mdx"
   },
   "dependencies": {
     "@tanstack/react-router": "1.170.16",

@@ -200,7 +200,7 @@ const MemoizedTextField = React.memo(
             onBlur={fieldProps.onBlur}
             onFocus={fieldProps.onFocus}
           />
-          {!fieldState.isPristine && fieldState.validationStatus.status === 'invalid' && (
+          {fieldState.isTouched && fieldState.validationStatus.status === 'invalid' && (
             <span>{fieldState.validationStatus.message}</span>
           )}
         </div>

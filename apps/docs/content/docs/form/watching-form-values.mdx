@@ -3,6 +3,8 @@ title: Watching Form Values
 description: Learn how to efficiently watch and react to form value changes using graneet-form's subscription-based system
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
+
 # Watching Form Values
 
 Learn how to efficiently watch and react to form value changes using graneet-form's subscription-based system.
@@ -13,7 +15,9 @@ Graneet-form provides a powerful subscription system that allows components to w
 
 ## Watch Modes
 
-### `useFieldsWatch` - Real-time Updates
+`useFieldsWatch` accepts a `mode` option that controls _when_ updates are published: `onChange` (the default) or `onBlur`.
+
+### `onChange` (default) — Real-time Updates
 
 Updates immediately whenever a field value changes (on every keystroke).
 
@@ -35,9 +39,9 @@ function LiveFormDisplay() {
 }
 ```
 
-### `useFieldsWatch` with onBlur Mode - Update on Blur
+### `onBlur` — Update on Blur
 
-Updates only when fields lose focus (after user finishes editing).
+Updates only when fields lose focus (after the user finishes editing).
 
 ```tsx
 import { useFieldsWatch, useFormContext } from 'graneet-form';
@@ -321,51 +325,15 @@ function FormProgressIndicator() {
 
 ## Global Watching Warnings
 
-<div className="border-l-4 border-amber-500 bg-amber-50 p-4 my-4">
-  <div className="flex">
-    <div className="flex-shrink-0">
-      <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          fillRule="evenodd"
-          d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
-          clipRule="evenodd"
-        />
-      </svg>
-    </div>
-    <div className="ml-3">
-      <h3 className="text-sm font-medium text-amber-800">Performance Impact</h3>
-      <div className="mt-2 text-sm text-amber-700">
-        <p>
-          Global watching (`useFieldsWatch(form, undefined)`) causes components to re-render on every form change. Use
-          sparingly and only when necessary.
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
+<Callout type="warn" title="Performance impact">
+  Global watching (`useFieldsWatch(form, undefined)`) causes the component to re-render on every form change. Use it
+  sparingly and only when you genuinely need every field.
+</Callout>
 
-<div className="border-l-4 border-blue-500 bg-blue-50 p-4 my-4">
-  <div className="flex">
-    <div className="flex-shrink-0">
-      <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          fillRule="evenodd"
-          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
-          clipRule="evenodd"
-        />
-      </svg>
-    </div>
-    <div className="ml-3">
-      <h3 className="text-sm font-medium text-blue-800">Best Practice</h3>
-      <div className="mt-2 text-sm text-blue-700">
-        <p>
-          Always prefer specific field watching over global watching. If you need many fields, consider splitting your
-          component or using multiple targeted watchers.
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
+<Callout type="info" title="Best practice">
+  Always prefer specific field watching over global watching. If you need many fields, consider splitting your component
+  or using multiple targeted watchers.
+</Callout>
 
 ## Migration from Other Form Libraries
 

@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "ignorePatterns": ["apps/docs/src/routeTree.gen.ts"],
+  "ignorePatterns": ["apps/docs/src/routeTree.gen.ts", "**/generate-changelog.mjs"],
   "plugins": [
     "eslint",
     "typescript",

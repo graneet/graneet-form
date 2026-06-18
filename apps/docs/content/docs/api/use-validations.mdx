@@ -3,6 +3,8 @@ title: useValidations
 description: Hook for watching form field validation states and errors
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
+
 # useValidations Hook
 
 The `useValidations` hook provides access to validation states and error messages for form fields. You can watch all field validations or subscribe to specific fields for granular validation monitoring.
@@ -56,7 +58,7 @@ function ValidationSummary() {
     <div className="validation-summary">
       <p>Valid fields: {getValidationCount('valid')}</p>
       <p>Invalid fields: {getValidationCount('invalid')}</p>
-      <p>Pending validations: {getValidationCount('pending')}</p>
+      <p>Not yet validated: {getValidationCount('undetermined')}</p>
     </div>
   );
 }
@@ -134,7 +136,7 @@ function ConditionalValidation() {
 
       {email?.status === 'valid' && <div className="success">✓ Email format is valid</div>}
 
-      {email?.status === 'pending' && <div className="pending">🔄 Checking email availability...</div>}
+      {email?.status === 'invalid' && <div className="error">{email.message}</div>}
     </div>
   );
 }
@@ -178,10 +180,8 @@ function LiveValidationField({ name }: { name: keyof UserForm }) {
         return '✓';
       case 'invalid':
         return '✗';
-      case 'pending':
-        return '⏳';
       default:
-        return '';
+        return ''; // 'undetermined' — not yet validated or async rules still running
     }
   };
 
@@ -199,8 +199,12 @@ function LiveValidationField({ name }: { name: keyof UserForm }) {
 
 - `'valid'` - Field passes all validation rules
 - `'invalid'` - Field fails one or more validation rules
-- `'pending'` - Async validation is in progress
-- `'undetermined'` - No validation has been performed yet
+- `'undetermined'` - Not yet validated, or an async/debounced rule is still running
+
+<Callout type="info">
+  There is no `'pending'` status. A field stays `'undetermined'` while async validation resolves, then settles to
+  `'valid'` or `'invalid'`.
+</Callout>
 
 ## Performance Notes
 

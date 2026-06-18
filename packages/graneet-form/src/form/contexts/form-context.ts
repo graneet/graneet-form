@@ -8,6 +8,23 @@ import type { FormValidations } from '../types/form-validations';
 import type { FormValues } from '../types/form-values';
 import type { WatchMode } from '../types/watch-mode';
 
+/** @internal Lifecycle callbacks passed from Field to the form internals. */
+export interface FieldCallbacks {
+  onReset: () => void;
+  onDirty: () => void;
+  onTouch: () => void;
+}
+
+/**
+ * Options for `setFormValues`.
+ */
+export interface SetFormValuesOptions {
+  /** If true, marks the updated fields as dirty (`isDirty = true`). Default: false. */
+  shouldDirty?: boolean;
+  /** If true, marks the updated fields as touched (`isTouched = true`). Default: false. */
+  shouldTouch?: boolean;
+}
+
 /**
  * Internal API for form implementation details.
  *
@@ -92,12 +109,14 @@ export interface FormInternal<T extends FieldValues> {
    *
    * @param name - Unique field name identifier
    * @param setValue - Function to update the field value and trigger re-renders
+   * @param callbacks - Lifecycle callbacks so the field can react to external state changes
    * @param defaultValue - Optional default value for the field
    * @returns Cleanup function to unregister the field
    */
   registerField: <K extends keyof T>(
     name: K,
     setValue: (value: T[K] | undefined) => void,
+    callbacks: FieldCallbacks,
     defaultValue?: T[K],
   ) => () => void;
 
@@ -201,21 +220,19 @@ export interface FormContextApi<T extends FieldValues> {
   /**
    * Updates multiple form field values at once.
    * @param newValues - Object containing the new values to set
+   * @param options - Optional flags to update field interaction state
    * @example
    * ```ts
    * const { setFormValues } = useForm();
    *
    * // Update multiple fields
-   * setFormValues({
-   *   name: 'Jane Doe',
-   *   email: 'jane@example.com'
-   * });
+   * setFormValues({ name: 'Jane Doe', email: 'jane@example.com' });
    *
-   * // Partial updates are also supported
-   * setFormValues({ name: 'John Smith' });
+   * // Mark updated fields as dirty and touched
+   * setFormValues({ name: 'John Smith' }, { shouldDirty: true, shouldTouch: true });
    * ```
    */
-  setFormValues: (newValues: Partial<T>) => void;
+  setFormValues: (newValues: Partial<T>, options?: SetFormValuesOptions) => void;
 
   /**
    * Resets all form fields to their default values and triggers a re-render.

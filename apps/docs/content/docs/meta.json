@@ -4,10 +4,11 @@
     "index",
     "comparison",
     "quick-start",
+    "changelog",
     "---Form---",
-    "form/watching-form-values",
-    "form/form-validation",
     "form/field-management",
+    "form/form-validation",
+    "form/watching-form-values",
     "form/performance-optimization",
     "form/complex-typescript",
     "---Wizard---",
@@ -26,7 +27,7 @@
     "api/use-step-status",
     "api/use-wizard-context",
     "---Components & Types---",
-    "api/components.mdx",
-    "api/types.mdx"
+    "api/components",
+    "api/types"
   ]
 }

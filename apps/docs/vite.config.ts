@@ -8,7 +8,7 @@ import { nitro } from 'nitro/vite';
 export default defineConfig({
   build: {
     rolldownOptions: {
-      external: ['ts-morph'],
+      external: ['ts-morph', 'fumadocs-typescript'],
     },
   },
   plugins: [
@@ -35,6 +35,6 @@ export default defineConfig({
     port: 3000,
   },
   ssr: {
-    external: ['ts-morph'],
+    external: ['ts-morph', 'fumadocs-typescript'],
   },
 });

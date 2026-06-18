@@ -25,10 +25,11 @@ This hook takes no parameters and must be used within a wizard context.
 
 ## Status Values
 
+`useStepStatus` returns a `ValidationStatus` — the same three values used elsewhere in the library:
+
 - `'valid'` - All fields in the current step are valid
 - `'invalid'` - One or more fields in the current step are invalid
-- `'pending'` - Async validation is in progress
-- `'undetermined'` - No validation has been performed yet
+- `'undetermined'` - Not yet validated, or an async/debounced rule is still running
 
 ## Examples
 
@@ -40,7 +41,6 @@ function NextButton() {
   const { goNext, isLastStep } = useWizardContext();
 
   const getButtonText = () => {
-    if (stepStatus === 'pending') return 'Validating...';
     if (isLastStep) return 'Finish';
     return 'Next';
   };
@@ -51,10 +51,8 @@ function NextButton() {
         return 'btn-primary';
       case 'invalid':
         return 'btn-disabled';
-      case 'pending':
-        return 'btn-loading';
       default:
-        return 'btn-default';
+        return 'btn-default'; // 'undetermined'
     }
   };
 
@@ -78,12 +76,8 @@ function StepStatusIndicator() {
         return '✅';
       case 'invalid':
         return '❌';
-      case 'pending':
-        return '⏳';
-      case 'undetermined':
-        return '⚪';
       default:
-        return '❓';
+        return '⚪'; // 'undetermined'
     }
   };
 
@@ -93,12 +87,8 @@ function StepStatusIndicator() {
         return 'Step completed successfully';
       case 'invalid':
         return 'Please fix the errors below';
-      case 'pending':
-        return 'Validating your input...';
-      case 'undetermined':
-        return 'Fill out the required fields';
       default:
-        return 'Unknown status';
+        return 'Fill out the required fields'; // 'undetermined'
     }
   };
 
@@ -139,7 +129,6 @@ function WizardProgressBar() {
                 <span className={`current-status ${currentStepStatus}`}>
                   {currentStepStatus === 'valid' && '✓'}
                   {currentStepStatus === 'invalid' && '!'}
-                  {currentStepStatus === 'pending' && '⋯'}
                   {currentStepStatus === 'undetermined' && index + 1}
                 </span>
               )}
@@ -164,10 +153,6 @@ function StepHelpText() {
   const getHelpText = () => {
     if (stepStatus === 'invalid') {
       return 'Please correct the errors highlighted in red before continuing.';
-    }
-
-    if (stepStatus === 'pending') {
-      return "We're validating your information. This may take a moment.";
     }
 
     if (stepStatus === 'valid') {
@@ -234,7 +219,7 @@ function FormActions() {
 
   return (
     <div className="form-actions">
-      <button onClick={goPrevious} disabled={stepStatus === 'pending'} className="btn-secondary">
+      <button onClick={goPrevious} className="btn-secondary">
         {isFirstStep ? 'Cancel' : 'Previous'}
       </button>
 
@@ -256,7 +241,6 @@ function FormActions() {
         disabled={stepStatus !== 'valid'}
         className={stepStatus === 'valid' ? 'btn-primary' : 'btn-disabled'}
       >
-        {stepStatus === 'pending' && <span className="spinner" />}
         {isLastStep ? 'Complete' : 'Continue'}
       </button>
     </div>
