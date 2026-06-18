@@ -1,11 +1,11 @@
 [build]
-  command = "pnpm build:docs"
-  publish = "apps/docs/.output/public"
+command = "pnpm build:docs"
+publish = "apps/docs/.output/public"
 
 [build.environment]
-  NODE_VERSION = "24"
-  PNPM_VERSION = "10"
+NODE_VERSION = "24"
+PNPM_VERSION = "10"
 
 [functions]
-  directory = "apps/docs/.netlify/functions-internal"
-  node_bundler = "esbuild"
+directory = "apps/docs/.netlify/functions-internal"
+node_bundler = "esbuild"
