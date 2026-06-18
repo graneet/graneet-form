@@ -28,8 +28,11 @@ const specificValidations = useValidations(form, ['email', 'password']);
 
 ## Returns
 
-- When `names` is `undefined`: `PartialRecord<keyof T, ValidationState | undefined>` - Partial record of all field validation states
-- When `names` is an array: `FormValidations<T, K>` - Record containing validation states for specified fields
+- When `names` is `undefined`: `PartialRecord<keyof T, ValidationState | undefined>` - Partial record of all field validation states, keyed by field path
+- When `names` is an array: `FormValidations<T, K>` - Nested object of validation states for the specified fields
+
+`names` accepts nested [field paths](/docs/form/nested-paths). When watching a scoped list, the result is a
+**reconstructed nested object** (mirroring `useFieldsWatch`); watching a parent path covers all of its descendants.
 
 ## ValidationState Type
 

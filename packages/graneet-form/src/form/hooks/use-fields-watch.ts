@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import type { FieldPath } from '../../shared/types/field-path';
 import type { FieldValues } from '../../shared/types/field-value';
-import type { Prettify } from '../../shared/types/prettify';
 import type { FormContextApi } from '../contexts/form-context';
 import type { FormValues } from '../types/form-values';
 import type { WatchMode } from '../types/watch-mode';
@@ -48,16 +48,19 @@ export function useFieldsWatch<T extends FieldValues = Record<string, unknown>>(
  *
  *  // Watch specific fields with onBlur
  *  const { foo } = useFormWatch<FormValues>(form, ['foo'], { mode: 'onBlur' });
+ *
+ *  // Watch a nested path (objects only)
+ *  const { user } = useFormWatch<FormValues>(form, ['user.address.city']);
  * ```
  */
-export function useFieldsWatch<T extends FieldValues = Record<string, unknown>, K extends keyof T = keyof T>(
+export function useFieldsWatch<T extends FieldValues = Record<string, unknown>, K extends FieldPath<T> = FieldPath<T>>(
   form: FormContextApi<T>,
   names: K[],
   options?: UseFormWatchOptions,
-): Prettify<FormValues<T, K>>;
+): FormValues<T, K>;
 
 // oxlint-disable-next-line typescript/explicit-module-boundary-types
-export function useFieldsWatch<T extends FieldValues, K extends keyof T>(
+export function useFieldsWatch<T extends FieldValues, K extends FieldPath<T>>(
   form: FormContextApi<T>,
   names: K[] | undefined,
   options: UseFormWatchOptions = {},

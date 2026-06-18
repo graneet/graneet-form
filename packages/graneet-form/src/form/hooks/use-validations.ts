@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
+import type { FieldPath } from '../../shared/types/field-path';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
-import type { Prettify } from '../../shared/types/prettify';
 import type { ValidationState } from '../../shared/types/validation';
 import type { FormContextApi } from '../contexts/form-context';
 import type { FormValidations } from '../types/form-validations';
@@ -24,10 +24,10 @@ function useGlobalValidationInternal<T extends FieldValues>(
   return currentValidations;
 }
 
-function useValidationsInternal<T extends FieldValues, K extends keyof T>(
+function useValidationsInternal<T extends FieldValues, K extends FieldPath<T>>(
   form: FormContextApi<T>,
   names: K[],
-): Prettify<FormValidations<T, K>> {
+): FormValidations<T, K> {
   const {
     formInternal: { addValidationStatusSubscriber, removeValidationStatusSubscriber },
   } = form;
@@ -83,13 +83,13 @@ export function useValidations<T extends FieldValues>(
  *   }, [foo, bar])
  * ```
  */
-export function useValidations<T extends FieldValues, K extends keyof T>(
+export function useValidations<T extends FieldValues, K extends FieldPath<T>>(
   form: FormContextApi<T>,
   names: K[],
 ): FormValidations<T, K>;
 
 // oxlint-disable-next-line typescript/explicit-module-boundary-types
-export function useValidations<T extends FieldValues, K extends keyof T>(
+export function useValidations<T extends FieldValues, K extends FieldPath<T>>(
   form: FormContextApi<T>,
   names: K[] | undefined,
 ) {

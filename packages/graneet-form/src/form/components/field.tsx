@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { AnyRecord } from '../../shared/types/any-record';
+import type { FieldPath, FieldPathValue } from '../../shared/types/field-path';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { ValidationState } from '../../shared/types/validation';
 import { useFormContext } from '../contexts/form-context';
@@ -8,12 +9,12 @@ import { RuleContext } from '../contexts/rule-context';
 import { useFieldValidation } from '../hooks/use-field-validation';
 import { useRules } from '../hooks/use-rules';
 
-export interface FieldRenderProps<T extends FieldValues, K extends keyof T> {
+export interface FieldRenderProps<T extends FieldValues, K extends FieldPath<T>> {
   name: K;
-  value: T[K] | undefined;
+  value: FieldPathValue<T, K> | undefined;
   onFocus: () => void;
   onBlur: () => void;
-  onChange: (e: T[K] | undefined) => void;
+  onChange: (e: FieldPathValue<T, K> | undefined) => void;
 }
 
 export interface FieldRenderState {
@@ -30,9 +31,9 @@ export interface FieldRenderState {
   validationStatus: ValidationState;
 }
 
-export interface FieldProps<T extends FieldValues, K extends keyof T> {
+export interface FieldProps<T extends FieldValues, K extends FieldPath<T>> {
   /**
-   * The name of the field.
+   * The name of the field. Supports nested object paths, e.g. `"user.address.city"`.
    */
   name: K;
 
@@ -48,7 +49,7 @@ export interface FieldProps<T extends FieldValues, K extends keyof T> {
 
   data?: AnyRecord;
 
-  defaultValue?: T[K];
+  defaultValue?: FieldPathValue<T, K>;
 }
 
 /**
@@ -68,7 +69,7 @@ export interface FieldProps<T extends FieldValues, K extends keyof T> {
  * </Field>
  * ```
  */
-export function Field<T extends FieldValues, K extends keyof T>({
+export function Field<T extends FieldValues, K extends FieldPath<T>>({
   name,
   children = null,
   render,
@@ -78,7 +79,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
   const form = useFormContext<T>();
   const { ruleContext, rules, debouncedRules } = useRules();
 
-  const [value, setValue] = useState<T[K] | undefined>();
+  const [value, setValue] = useState<FieldPathValue<T, K> | undefined>();
   const [isTouched, setIsTouched] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const validationStatus = useFieldValidation(rules, debouncedRules, value);
@@ -112,7 +113,7 @@ export function Field<T extends FieldValues, K extends keyof T>({
   }, [name, form.formInternal, validationStatus]);
 
   const onChange = useCallback(
-    (newValue: T[K] | undefined): void => {
+    (newValue: FieldPathValue<T, K> | undefined): void => {
       form.formInternal.onFieldChange(name, newValue, hasFocusRef.current);
       setIsDirty(true);
     },

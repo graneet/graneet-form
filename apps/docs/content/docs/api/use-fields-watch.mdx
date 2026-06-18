@@ -37,6 +37,9 @@ const valuesOnBlur = useFieldsWatch(form, ['name'], { mode: 'onBlur' });
 - When `names` is `undefined`: `Partial<T>` - Partial object containing all form values
 - When `names` is an array: `FormValues<T, K>` - Object containing only the specified field values
 
+`names` accepts nested [field paths](/docs/form/nested-paths) (e.g. `'user.address.city'`). The result is always a
+**reconstructed nested object**, and watching a parent path (`'user'`) re-renders whenever any descendant changes.
+
 ## Examples
 
 ### Watch All Fields
@@ -78,6 +81,23 @@ function NameDisplay() {
       )}
     </div>
   );
+}
+```
+
+### Watch Nested Paths
+
+```tsx
+interface ProfileForm {
+  user: { name: string; address: { city: string } };
+}
+
+function CitySummary() {
+  const form = useFormContext<ProfileForm>();
+
+  // Re-renders on any change under `user`; receives the rebuilt subtree
+  const { user } = useFieldsWatch(form, ['user']);
+
+  return <p>{user?.address?.city}</p>;
 }
 ```
 

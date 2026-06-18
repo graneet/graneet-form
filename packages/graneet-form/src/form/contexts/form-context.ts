@@ -1,6 +1,8 @@
 import { createContext, use } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { AnyRecord } from '../../shared/types/any-record';
+import type { DeepPartial } from '../../shared/types/deep-partial';
+import type { FieldPath, FieldPathValue } from '../../shared/types/field-path';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
 import type { ValidationState } from '../../shared/types/validation';
@@ -45,7 +47,7 @@ export interface FormInternal<T extends FieldValues> {
    * // Returns: { name: 'John', email: 'john@example.com' }
    * ```
    */
-  getFormValuesForNames: <K extends keyof T>(names: K[]) => FormValues<T, K>;
+  getFormValuesForNames: <K extends FieldPath<T>>(names: K[]) => FormValues<T, K>;
 
   /**
    * Retrieves validation statuses for all registered form fields.
@@ -63,7 +65,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param names - Array of field names to get validation statuses for
    * @returns Object containing validation statuses for the specified fields
    */
-  getFormErrorsForNames: <K extends keyof T>(names: K[]) => Record<K, ValidationState | undefined>;
+  getFormErrorsForNames: <K extends FieldPath<T>>(names: K[]) => FormValidations<T, K>;
 
   /**
    * Registers a subscriber to watch changes in all form field values.
@@ -78,7 +80,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param type - Watch mode determining when updates are triggered
    * @param names - Array of field names to watch
    */
-  addValueSubscriber: <K extends keyof T>(
+  addValueSubscriber: <K extends FieldPath<T>>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
     type: WatchMode,
     names: K[],
@@ -97,7 +99,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param publish - React state setter callback to update with new validation statuses
    * @param names - Array of field names to watch for validation changes
    */
-  addValidationStatusSubscriber: <K extends keyof T>(
+  addValidationStatusSubscriber: <K extends FieldPath<T>>(
     publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
     names: K[],
   ) => void;
@@ -113,11 +115,11 @@ export interface FormInternal<T extends FieldValues> {
    * @param defaultValue - Optional default value for the field
    * @returns Cleanup function to unregister the field
    */
-  registerField: <K extends keyof T>(
+  registerField: <K extends FieldPath<T>>(
     name: K,
-    setValue: (value: T[K] | undefined) => void,
+    setValue: (value: FieldPathValue<T, K> | undefined) => void,
     callbacks: FieldCallbacks,
-    defaultValue?: T[K],
+    defaultValue?: FieldPathValue<T, K>,
   ) => () => void;
 
   /**
@@ -133,7 +135,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param type - The same watch mode that was used to register
    * @param names - The same field names that were used to register
    */
-  removeValueSubscriber: <K extends keyof T>(
+  removeValueSubscriber: <K extends FieldPath<T>>(
     publish: Dispatch<SetStateAction<FormValues<T, K>>>,
     type: WatchMode,
     names: K[],
@@ -152,7 +154,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param publish - The same callback function that was used to register
    * @param names - The field names that were being watched
    */
-  removeValidationStatusSubscriber: <K extends keyof T>(
+  removeValidationStatusSubscriber: <K extends FieldPath<T>>(
     publish: Dispatch<SetStateAction<FormValidations<T, K>>>,
     names: K[],
   ) => void;
@@ -163,7 +165,7 @@ export interface FormInternal<T extends FieldValues> {
    * @param value - New value for the field
    * @param hasFocus - Whether the field currently has user focus
    */
-  onFieldChange: <K extends keyof T>(name: K, value: T[K] | undefined, hasFocus: boolean) => void;
+  onFieldChange: <K extends FieldPath<T>>(name: K, value: FieldPathValue<T, K> | undefined, hasFocus: boolean) => void;
 
   /**
    * Handles field blur events when user leaves a field.
@@ -171,14 +173,14 @@ export interface FormInternal<T extends FieldValues> {
    * @param data - Optional additional data to pass to blur handlers
    * @returns Promise that resolves when blur handling is complete
    */
-  onFieldBlur: (name: keyof T, data: AnyRecord | undefined) => Promise<void>;
+  onFieldBlur: (name: FieldPath<T>, data: AnyRecord | undefined) => Promise<void>;
 
   /**
    * Updates the validation status for a specific field.
    * @param name - Name of the field to update
    * @param validationStatus - New validation status to set
    */
-  updateValidationStatus: (name: keyof T, validationStatus: ValidationState) => void;
+  updateValidationStatus: (name: FieldPath<T>, validationStatus: ValidationState) => void;
 
   /**
    * Retrieves the form submission handler callback if one has been set.
@@ -230,9 +232,12 @@ export interface FormContextApi<T extends FieldValues> {
    *
    * // Mark updated fields as dirty and touched
    * setFormValues({ name: 'John Smith' }, { shouldDirty: true, shouldTouch: true });
+   *
+   * // Nested paths can be updated partially
+   * setFormValues({ user: { address: { city: 'Paris' } } });
    * ```
    */
-  setFormValues: (newValues: Partial<T>, options?: SetFormValuesOptions) => void;
+  setFormValues: (newValues: DeepPartial<T>, options?: SetFormValuesOptions) => void;
 
   /**
    * Resets all form fields to their default values and triggers a re-render.
