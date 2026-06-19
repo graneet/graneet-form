@@ -1,5 +1,5 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import type { FieldPathByValue } from './field-path';
+import type { FieldPath, FieldPathByValue } from './field-path';
 
 describe('FieldPathByValue<T, V>', () => {
   it('selects flat and nested paths whose value is assignable to V', () => {
@@ -54,5 +54,17 @@ describe('FieldPathByValue<T, V>', () => {
 
     expectTypeOf<FieldPathByValue<T, string>>().toEqualTypeOf<'a.b.c'>();
     expectTypeOf<FieldPathByValue<T, number>>().toEqualTypeOf<'a.b.d'>();
+  });
+
+  it('stays a pure subset of FieldPath (the Extract wrapper is display-only, not filtering)', () => {
+    // `FieldPathByValue` wraps the mapped type in `Extract<FieldPath<T> & string, …>` purely so
+    // error messages expand to the union of valid paths instead of the alias name. `Extract` is a
+    // no-op on the value here (the mapped type is already a subset of `FieldPath<T>`), so every
+    // resolved path must remain a valid `FieldPath<T>`. This guards against the wrapper ever
+    // narrowing or widening the result.
+    type T = { name: string; age: number; user: { email: string } };
+
+    expectTypeOf<FieldPathByValue<T, string>>().toExtend<FieldPath<T>>();
+    expectTypeOf<FieldPathByValue<T, number>>().toExtend<FieldPath<T>>();
   });
 });

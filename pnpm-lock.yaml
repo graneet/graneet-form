@@ -165,8 +165,8 @@ importers:
   examples/simple-form:
     dependencies:
       graneet-form:
-        specifier: workspace:*
-        version: link:../../packages/graneet-form
+        specifier: 3.1.0
+        version: 3.1.0(react@19.2.7)
       react:
         specifier: 19.2.7
         version: 19.2.7

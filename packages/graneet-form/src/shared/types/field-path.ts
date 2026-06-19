@@ -58,7 +58,20 @@ export type PathTail<P extends string, H extends string> = P extends `${H}.${inf
  * @example
  * // T = { name: string; age: number; user: { email: string } }
  * FieldPathByValue<T, string | null | undefined> // 'name' | 'user.email'
+ *
+ * @remarks
+ * The body is intentionally wrapped in `Extract<…>` rather than being just the indexed mapped
+ * type. Both forms resolve to the exact same union, but the `Extract` form changes how TypeScript
+ * *labels* the result in error messages: a bare mapped type stays attached to this alias, so a
+ * typo like `name="recipient1"` reports the unhelpful
+ * `not assignable to type 'FieldPathByValue<MyFormValues, string>'`, whereas the distributive
+ * `Extract` discards the alias and TypeScript prints the expanded union of valid paths
+ * (`not assignable to type '"recipient" | "street" | "contact.name"'`), which is far more
+ * discoverable. Do NOT "simplify" this back to the plain mapped type — it would regress the DX.
  */
-export type FieldPathByValue<T, V> = {
-  [P in FieldPath<T> & string]: FieldPathValue<T, P> extends V ? P : never;
-}[FieldPath<T> & string];
+export type FieldPathByValue<T, V> = Extract<
+  FieldPath<T> & string,
+  {
+    [P in FieldPath<T> & string]: FieldPathValue<T, P> extends V ? P : never;
+  }[FieldPath<T> & string]
+>;
