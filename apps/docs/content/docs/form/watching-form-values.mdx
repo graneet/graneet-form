@@ -61,6 +61,22 @@ function FormSummary() {
 }
 ```
 
+## Watching Nested Paths
+
+`useFieldsWatch` accepts nested [field paths](/docs/form/nested-paths). Watching a parent path re-renders whenever any
+descendant changes, and the result is a reconstructed nested object.
+
+```tsx
+function CitySummary() {
+  const form = useFormContext<{ user: { address: { city: string } } }>();
+
+  // Notified on any change under `user` (e.g. user.address.city)
+  const { user } = useFieldsWatch(form, ['user']);
+
+  return <p>{user?.address?.city}</p>;
+}
+```
+
 ## Watching Specific Fields vs All Fields
 
 ### Watching Specific Fields (Recommended)

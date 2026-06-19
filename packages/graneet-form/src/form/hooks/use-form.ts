@@ -1,10 +1,14 @@
 import { useCallback, useMemo, useRef } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { AnyRecord } from '../../shared/types/any-record';
+import type { DeepPartial } from '../../shared/types/deep-partial';
+import type { FieldPath, FieldPathValue } from '../../shared/types/field-path';
 import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
 import type { ValidationState } from '../../shared/types/validation';
 import { useCallbackRef } from '../../shared/util/use-callback-ref';
+import { createPathHelpers, flattenToPaths } from '../../shared/util/path';
+import type { PathHelpers } from '../../shared/util/path';
 import type { FieldCallbacks, FormContextApi, FormInternal, SetFormValuesOptions } from '../contexts/form-context';
 import type { FormValidations } from '../types/form-validations';
 import type { FormValues } from '../types/form-values';
@@ -46,9 +50,9 @@ export interface UseFormOptions<T extends FieldValues> {
    * });
    * ```
    */
-  onUpdateAfterBlur?: <K extends keyof T>(
+  onUpdateAfterBlur?: <K extends FieldPath<T>>(
     name: K,
-    value: T[K] | undefined,
+    value: FieldPathValue<T, K> | undefined,
     data: AnyRecord,
     formPartial: Pick<FormContextApi<T>, 'getFormValues' | 'setFormValues' | 'resetForm'>,
   ) => Promise<void> | void;
@@ -80,7 +84,7 @@ export interface UseFormOptions<T extends FieldValues> {
    * });
    * ```
    */
-  defaultValues?: Partial<T> | (() => Partial<T>);
+  defaultValues?: DeepPartial<T> | (() => DeepPartial<T>);
 }
 
 /**
@@ -165,29 +169,39 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     values: {},
   });
 
-  const resolvedDefaultValues = useMemo((): Partial<T> => {
+  // Path helpers carry a parsed-path memo cache scoped to this form. Held in a ref so the cache
+  // Lives for the form's lifetime and never leaks across unrelated form instances.
+  const pathHelpersRef = useRef<PathHelpers | null>(null);
+  pathHelpersRef.current ??= createPathHelpers();
+  const { buildNestedForPrefix, isPathRelated, parsePath, setAtPath, unsetAtPath } = pathHelpersRef.current;
+
+  const resolvedDefaultValues = useMemo((): DeepPartial<T> => {
     if (typeof defaultValues === 'function') {
+      // oxlint-disable-next-line typescript/no-unsafe-return DeepPartial recursion is resolved as any by the linter
       return defaultValues();
     }
-    return defaultValues ?? {};
+    return defaultValues ?? ({} as DeepPartial<T>);
   }, [defaultValues]);
 
   // -- FORM STATE --
-  interface FieldState<K extends keyof T> {
-    name: K;
-    value: T[K] | undefined;
+  // Field state is stored FLAT, keyed by the full dotted path string (e.g. "user.address.city").
+  // Nested objects only exist transiently when reconstructing values for consumers.
+  interface FieldState {
+    name: string;
+    value: unknown;
     validation: ValidationState;
     isRegistered: boolean;
   }
-  const formStateRef = useRef<{ [K in keyof T]?: FieldState<K> }>(
+  const formStateRef = useRef<Record<string, FieldState>>(
     (() => {
-      const acc: { [K in keyof T]?: FieldState<K> } = {};
-      for (const key of Object.keys(resolvedDefaultValues) as (keyof T)[]) {
+      const acc: Record<string, FieldState> = {};
+      const flatDefaults = flattenToPaths(resolvedDefaultValues as Record<string, unknown>);
+      for (const key of Object.keys(flatDefaults)) {
         acc[key] = {
           isRegistered: false,
           name: key,
           validation: VALIDATION_STATE_UNDETERMINED,
-          value: resolvedDefaultValues[key],
+          value: flatDefaults[key],
         };
       }
       return acc;
@@ -198,23 +212,25 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
    * We can have multiple fields on update at the same time because of usage of effect, we trigger an on change event
    * before triggering an on blur event.
    */
-  const focusedFieldNamesRef = useRef(new Set<keyof T>());
+  const focusedFieldNamesRef = useRef(new Set<string>());
 
-  const fieldCallbacksRef = useRef<Partial<Record<keyof T, FieldCallbacks>>>({});
+  const fieldCallbacksRef = useRef<Record<string, FieldCallbacks>>({});
+
+  // Each field's own `setValue`, keyed by its exact path. Notified directly in O(1) on value change,
+  // Bypassing the generic `scoped` registry (which is reserved for explicit useFieldsWatch watchers).
+  const fieldSettersRef = useRef<Record<string, (value: unknown) => void>>({});
 
   const handleFormSubmitRef = useRef<(formValues: T) => (void | Promise<void>) | undefined>(undefined);
 
   // -- SUBSCRIPTION --
 
+  // Scoped subscribers are keyed by the watched path string. Their payload is a nested object
+  // Reconstructed on the fly, so it is typed loosely here and refined at each public boundary.
   type FormValueSubscribersRef = Record<
     WatchMode,
     {
       global: Set<Dispatch<SetStateAction<Partial<T>>>>;
-      scoped: PartialRecord<
-        keyof T,
-        // oxlint-disable-next-line typescript/no-explicit-any
-        Set<Dispatch<SetStateAction<FormValues<T, any>>>>
-      >;
+      scoped: Record<string, Set<Dispatch<SetStateAction<Record<string, unknown>>>>>;
     }
   >;
   const formValuesSubscribersRef = useRef<FormValueSubscribersRef>({
@@ -232,7 +248,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     WatchMode,
     {
       global: Set<Dispatch<SetStateAction<PartialRecord<keyof T, ValidationState | undefined>>>>;
-      scoped: PartialRecord<keyof T, Set<Dispatch<SetStateAction<FormValidations<T, keyof T>>>>>;
+      scoped: Record<string, Set<Dispatch<SetStateAction<Record<string, unknown>>>>>;
     }
   >;
   const formErrorsSubscribersRef = useRef<FormErrorSubscribersRef>({
@@ -255,50 +271,125 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
   // -- EXPORTS --
 
-  const getFormValues = useCallback<FormContextApi<T>['getFormValues']>(() => {
-    const acc: Partial<T> = {};
-    for (const name of Object.keys(formStateRef.current) as (keyof T)[]) {
-      if (formStateRef.current[name]?.isRegistered) {
-        acc[name] = formStateRef.current[name]?.value;
+  /** Flat `[path, value]` entries for every registered field. Basis for nested reconstruction. */
+  const getRegisteredValueEntries = useCallback((): [string, unknown][] => {
+    const entries: [string, unknown][] = [];
+    for (const name of Object.keys(formStateRef.current)) {
+      const field = formStateRef.current[name];
+      if (field?.isRegistered) {
+        entries.push([name, field.value]);
       }
     }
-    return acc;
+    return entries;
   }, []);
 
+  /** Flat `[path, validation]` entries for every registered field. */
+  const getRegisteredValidationEntries = useCallback((): [string, ValidationState][] => {
+    const entries: [string, ValidationState][] = [];
+    for (const name of Object.keys(formStateRef.current)) {
+      const field = formStateRef.current[name];
+      if (field?.isRegistered) {
+        entries.push([name, field.validation]);
+      }
+    }
+    return entries;
+  }, []);
+
+  const getFormValues = useCallback<FormContextApi<T>['getFormValues']>(() => {
+    let acc: Partial<T> = {};
+    for (const [name, value] of getRegisteredValueEntries()) {
+      acc = setAtPath(acc, name, value);
+    }
+    return acc;
+  }, [getRegisteredValueEntries, setAtPath]);
+
   const getFormValuesForNames = useCallback<FormInternal<T>['getFormValuesForNames']>(
-    <K extends keyof T>(names: K[]): FormValues<T, K> => {
-      const acc = {} as FormValues<T, K>;
+    <K extends FieldPath<T>>(names: K[]): FormValues<T, K> => {
+      let acc = {} as FormValues<T, K>;
+      const entries = getRegisteredValueEntries();
       for (const name of names) {
-        if (formStateRef.current[name]?.isRegistered) {
-          acc[name] = formStateRef.current[name]?.value;
+        const subtree = buildNestedForPrefix(name as string, entries);
+        if (subtree !== undefined) {
+          acc = setAtPath(acc, name as string, subtree);
         }
       }
       return acc;
     },
-    [],
+    [getRegisteredValueEntries, buildNestedForPrefix, setAtPath],
   );
 
   const getFormErrors = useCallback<FormInternal<T>['getFormErrors']>((): PartialRecord<keyof T, ValidationState> => {
     const acc: PartialRecord<keyof T, ValidationState> = {};
-    for (const name of Object.keys(formStateRef.current) as (keyof T)[]) {
-      if (formStateRef.current[name]?.isRegistered) {
-        acc[name] = formStateRef.current[name]?.validation;
-      }
+    for (const [name, validation] of getRegisteredValidationEntries()) {
+      // Global errors stay a flat map keyed by the field path (typed loosely as keyof T).
+      acc[name as keyof T] = validation;
     }
     return acc;
-  }, []);
+  }, [getRegisteredValidationEntries]);
 
   const getFormErrorsForNames = useCallback<FormInternal<T>['getFormErrorsForNames']>(
-    <K extends keyof T>(names: K[]): Record<K, ValidationState | undefined> => {
-      const acc = {} as Record<K, ValidationState | undefined>;
+    <K extends FieldPath<T>>(names: K[]): FormValidations<T, K> => {
+      let acc = {} as FormValidations<T, K>;
+      const entries = getRegisteredValidationEntries();
       for (const name of names) {
-        if (formStateRef.current[name]?.isRegistered) {
-          acc[name] = formStateRef.current[name]?.validation;
+        const subtree = buildNestedForPrefix(name as string, entries);
+        if (subtree !== undefined) {
+          acc = setAtPath(acc, name as string, subtree);
         }
       }
       return acc;
     },
-    [],
+    [getRegisteredValidationEntries, buildNestedForPrefix, setAtPath],
+  );
+
+  /**
+   * Notify every scoped subscriber whose watched path is in an ancestor/descendant/equal
+   * relationship with the changed field, by applying ONLY the changed leaf as an incremental
+   * patch to the previously published object — never rebuilding the whole subtree.
+   *
+   * `scoped` holds only explicit useFieldsWatch watchers (few), and a single field change touches
+   * exactly one leaf, so this is O(watchers · pathDepth) instead of O(watchers · fieldCount).
+   * @internal
+   */
+  const notifyScopedSubscribers = useCallback(
+    (
+      scoped: Record<string, Set<Dispatch<SetStateAction<Record<string, unknown>>>>>,
+      name: string,
+      isRegistered: boolean,
+      value: unknown,
+      getEntries: () => [string, unknown][],
+    ): void => {
+      const watchedPaths = Object.keys(scoped);
+      if (watchedPaths.length === 0) {
+        return;
+      }
+      const nameSegmentsLength = parsePath(name).length;
+      for (const watchedPath of watchedPaths) {
+        const subscribers = scoped[watchedPath];
+        if (!subscribers || subscribers.size === 0 || !isPathRelated(watchedPath, name)) {
+          continue;
+        }
+
+        if (nameSegmentsLength >= parsePath(watchedPath).length) {
+          // Common case — the changed field is equal-or-descendant of the watched path (exact-field
+          // Or subtree watch). Patch just its leaf: set when registered, remove (pruning now-empty
+          // Ancestors) when unregistered, so the published object stays consistent without a rebuild.
+          for (const publish of subscribers) {
+            publish((previous) => (isRegistered ? setAtPath(previous, name, value) : unsetAtPath(previous, name)));
+          }
+        } else {
+          // Rare case — the changed field is a strict ancestor of the watched path (a field holding
+          // An object, watched below its own leaf). Reconstruct just this one watcher's subtree.
+          const subtree = buildNestedForPrefix(watchedPath, getEntries());
+          for (const publish of subscribers) {
+            publish((previous) =>
+              subtree === undefined ? unsetAtPath(previous, watchedPath) : setAtPath(previous, watchedPath, subtree),
+            );
+          }
+        }
+      }
+    },
+    [buildNestedForPrefix, isPathRelated, parsePath, setAtPath, unsetAtPath],
   );
 
   /**
@@ -308,24 +399,23 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
    * @param watchMode Subscriber type
    */
   const updateValueSubscribers = useCallback(
-    (name: keyof T, watchMode: WatchMode): void => {
-      // Update watcher for this field name
-      if (formValuesSubscribersRef.current[watchMode].scoped[name]) {
-        for (const publish of formValuesSubscribersRef.current[watchMode].scoped[name] || []) {
-          /*
-           * Publish is a function given by react hook `useState`:
-           * `const [example, setExample] = useState(() => {})` It's `setExample`
-           *
-           * With the hook we can have the previous values like setExample((previousValues) => ... )
-           * Here, only value of the field updated must be change, so we get the previous object
-           * and we change value with key [name] with the new value
-           */
-          publish((previous) => ({
-            ...previous,
-            [name]: formStateRef.current[name]?.isRegistered ? formStateRef.current[name]?.value : undefined,
-          }));
-        }
+    (name: string, watchMode: WatchMode): void => {
+      const field = formStateRef.current[name];
+      const isRegistered = Boolean(field?.isRegistered);
+
+      // Notify in O(1) the field registered exactly on `name`. Its self-watcher previously lived in
+      // `scoped` on the 'onChange' mode, so we reproduce that trigger here.
+      if (watchMode === 'onChange') {
+        fieldSettersRef.current[name]?.(isRegistered ? field?.value : undefined);
       }
+
+      notifyScopedSubscribers(
+        formValuesSubscribersRef.current[watchMode].scoped,
+        name,
+        isRegistered,
+        isRegistered ? field?.value : undefined,
+        getRegisteredValueEntries,
+      );
 
       if (formValuesSubscribersRef.current[watchMode].global.size > 0) {
         /*
@@ -342,7 +432,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         }, 0);
       }
     },
-    [getFormValues],
+    [getFormValues, getRegisteredValueEntries, notifyScopedSubscribers],
   );
 
   /**
@@ -352,29 +442,17 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
    * @param watchMode Subscriber type
    */
   const updateErrorSubscribers = useCallback(
-    (name: keyof T, watchMode: WatchMode): void => {
-      // Update watcher for this field name
-      if (formErrorsSubscribersRef.current[watchMode].scoped[name]) {
-        for (const publish of formErrorsSubscribersRef.current[watchMode].scoped[name] || []) {
-          /*
-           * Publish is a function given by react hook useState:
-           * `const [example, setExample] = useState(() => {})` It's `setExample`
-           *
-           * With the hook we can have the previous values like setExample((previousValues) => ... )
-           * Here, only value of the field updated must be change, so we get the previous object
-           * and we change value with key [name] with the new value
-           */
-          publish((previous) => {
-            const previousCopy = { ...previous };
-            if (!formStateRef.current[name]?.isRegistered) {
-              delete previousCopy[name];
-            } else {
-              previousCopy[name] = formStateRef.current[name]?.validation;
-            }
-            return previousCopy;
-          });
-        }
-      }
+    (name: string, watchMode: WatchMode): void => {
+      // Same incremental hierarchical matching as values, patching the single changed validation leaf.
+      const field = formStateRef.current[name];
+      const isRegistered = Boolean(field?.isRegistered);
+      notifyScopedSubscribers(
+        formErrorsSubscribersRef.current[watchMode].scoped,
+        name,
+        isRegistered,
+        isRegistered ? field?.validation : undefined,
+        getRegisteredValidationEntries,
+      );
       if (formErrorsSubscribersRef.current[watchMode].global.size > 0) {
         /*
           If there is a global subscriber and a lot of fields are render, avoid spam of refresh on this subscriber
@@ -390,16 +468,16 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         }, 0);
       }
     },
-    [getFormErrors],
+    [getFormErrors, getRegisteredValidationEntries, notifyScopedSubscribers],
   );
 
   /**
    * Update all values subscribers types watching a field don't matter watch mode.
    * @internal
-   * @param name Field name
+   * @param name Field path
    */
   const updateValueForAllTypeOfSubscribers = useCallback(
-    (name: keyof T): void => {
+    (name: string): void => {
       updateValueSubscribers(name, 'onChange');
       updateValueSubscribers(name, 'onBlur');
     },
@@ -409,10 +487,10 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   /**
    * Update all errors subscribers types watching a field don't matter watch mode.
    * @internal
-   * @param name Field name
+   * @param name Field path
    */
   const updateErrorForAllTypeOfSubscribers = useCallback(
-    (name: keyof T): void => {
+    (name: string): void => {
       updateErrorSubscribers(name, 'onChange');
       updateErrorSubscribers(name, 'onBlur');
     },
@@ -428,16 +506,12 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const addValueSubscriber = useCallback<FormInternal<T>['addValueSubscriber']>(
-    <K extends keyof T>(
-      publish: Dispatch<SetStateAction<FormValues<T, K>>>,
-      watchMode: WatchMode,
-      names: (keyof T)[],
-    ) => {
+    <K extends FieldPath<T>>(publish: Dispatch<SetStateAction<FormValues<T, K>>>, watchMode: WatchMode, names: K[]) => {
+      const { scoped } = formValuesSubscribersRef.current[watchMode];
       for (const name of names) {
-        if (!formValuesSubscribersRef.current[watchMode].scoped[name]) {
-          formValuesSubscribersRef.current[watchMode].scoped[name] = new Set();
-        }
-        formValuesSubscribersRef.current[watchMode].scoped[name]?.add(publish);
+        const path = name as string;
+        scoped[path] ??= new Set();
+        scoped[path]?.add(publish as Dispatch<SetStateAction<Record<string, unknown>>>);
       }
       publish(getFormValuesForNames(names));
     },
@@ -460,14 +534,14 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const removeValueSubscriber = useCallback<FormInternal<T>['removeValueSubscriber']>(
-    <K extends keyof T>(
+    <K extends FieldPath<T>>(
       publish: Dispatch<SetStateAction<FormValues<T, K>>>,
       watchMode: WatchMode,
       names: K[],
     ): void => {
       for (const name of names) {
-        formValuesSubscribersRef.current[watchMode].scoped[name]?.delete(
-          publish as Dispatch<SetStateAction<FormValues<T, keyof T>>>,
+        formValuesSubscribersRef.current[watchMode].scoped[name as string]?.delete(
+          publish as Dispatch<SetStateAction<Record<string, unknown>>>,
         );
       }
     },
@@ -475,17 +549,13 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const addValidationStatusSubscriber = useCallback<FormInternal<T>['addValidationStatusSubscriber']>(
-    <K extends keyof T>(publish: Dispatch<SetStateAction<FormValidations<T, K>>>, names: K[]): void => {
+    <K extends FieldPath<T>>(publish: Dispatch<SetStateAction<FormValidations<T, K>>>, names: K[]): void => {
+      const { scoped } = formErrorsSubscribersRef.current.onChange;
       for (const name of names) {
+        const path = name as string;
         // Initialize Set if there is no watcher for the field
-        if (!formErrorsSubscribersRef.current.onChange.scoped[name]) {
-          formErrorsSubscribersRef.current.onChange.scoped[name] = new Set();
-        }
-
-        formErrorsSubscribersRef.current.onChange.scoped[
-          name
-          // oxlint-disable-next-line typescript/no-explicit-any typescript/no-unsafe-argument
-        ]?.add(publish as any);
+        scoped[path] ??= new Set();
+        scoped[path]?.add(publish as Dispatch<SetStateAction<Record<string, unknown>>>);
         publish(getFormErrorsForNames(names));
       }
     },
@@ -493,52 +563,45 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const registerField = useCallback<FormInternal<T>['registerField']>(
-    <K extends keyof T>(
+    <K extends FieldPath<T>>(
       name: K,
-      setValue: (value: T[K] | undefined) => void,
+      setValue: (value: FieldPathValue<T, K> | undefined) => void,
       callbacks: FieldCallbacks,
-      defaultValue?: T[K],
+      defaultValue?: FieldPathValue<T, K>,
     ): (() => void) => {
-      const previousValueStored = formStateRef.current[name]?.value;
-      if (formStateRef.current[name]?.isRegistered) {
-        throw new Error(`Attempting to register field "${String(name)}" a second time`);
+      const path = name as string;
+      const previousValueStored = formStateRef.current[path]?.value;
+      if (formStateRef.current[path]?.isRegistered) {
+        throw new Error(`Attempting to register field "${path}" a second time`);
       }
 
-      formStateRef.current[name] = {
+      formStateRef.current[path] = {
         isRegistered: true,
-        name,
+        name: path,
         validation: VALIDATION_STATE_UNDETERMINED,
         value: previousValueStored ?? defaultValue,
       };
 
-      fieldCallbacksRef.current[name] = callbacks;
+      fieldCallbacksRef.current[path] = callbacks;
 
-      const watcher = (publish: SetStateAction<FormValues<T, K>>) => {
-        // FIXME publish({} as FormValues<T, K>)
-        const values = typeof publish === 'function' ? publish({} as FormValues<T, K>) : publish;
-        setValue(values?.[name]);
-      };
-
-      /*
-     Add subscriber has to be setValue saving array. Here, the publisher needs only the first value
-     (and the only one) returned in values, so we created a function to do the mapping
-     */
-      addValueSubscriber<K>(watcher, 'onChange', [name]);
-      updateValueForAllTypeOfSubscribers(name);
+      // The field receives its value directly through its own `setValue`, keyed by its exact path.
+      // `updateValueForAllTypeOfSubscribers` below initializes it and notifies explicit watchers.
+      fieldSettersRef.current[path] = setValue as (value: unknown) => void;
+      updateValueForAllTypeOfSubscribers(path);
 
       return () => {
-        if (!formStateRef.current[name]) {
-          throw new Error(`Field ${String(name)} is not registered`);
+        if (!formStateRef.current[path]) {
+          throw new Error(`Field ${path} is not registered`);
         }
 
-        formStateRef.current[name].isRegistered = false;
-        delete fieldCallbacksRef.current[name];
-        removeValueSubscriber<K>(watcher, 'onChange', [name]);
-        updateValueForAllTypeOfSubscribers(name);
-        updateErrorForAllTypeOfSubscribers(name);
+        formStateRef.current[path].isRegistered = false;
+        delete fieldCallbacksRef.current[path];
+        delete fieldSettersRef.current[path];
+        updateValueForAllTypeOfSubscribers(path);
+        updateErrorForAllTypeOfSubscribers(path);
       };
     },
-    [addValueSubscriber, updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers, removeValueSubscriber],
+    [updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers],
   );
 
   const removeGlobalValidationStatusSubscriber = useCallback<FormInternal<T>['removeGlobalValidationStatusSubscriber']>(
@@ -549,10 +612,10 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const removeValidationStatusSubscriber = useCallback<FormInternal<T>['removeValidationStatusSubscriber']>(
-    <K extends keyof T>(publish: Dispatch<SetStateAction<FormValidations<T, K>>>, names: K[]): void => {
+    <K extends FieldPath<T>>(publish: Dispatch<SetStateAction<FormValidations<T, K>>>, names: K[]): void => {
       for (const name of names) {
-        formErrorsSubscribersRef.current.onChange.scoped[name]?.delete(
-          publish as Dispatch<SetStateAction<FormValidations<T, keyof T>>>,
+        formErrorsSubscribersRef.current.onChange.scoped[name as string]?.delete(
+          publish as Dispatch<SetStateAction<Record<string, unknown>>>,
         );
       }
     },
@@ -560,27 +623,31 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const setFormValues = useCallback<FormContextApi<T>['setFormValues']>(
-    (newValues: Partial<T>, options?: SetFormValuesOptions) => {
-      for (const name of Object.keys(newValues) as (keyof T)[]) {
+    (newValues: DeepPartial<T>, options?: SetFormValuesOptions) => {
+      // Flatten the nested input into leaf path keys, so each affected leaf is reconciled
+      // Individually (a coarse `{ user: {...} }` set fans out to every registered descendant).
+      const flatValues = flattenToPaths(newValues as Record<string, unknown>);
+      for (const path of Object.keys(flatValues)) {
+        const value = flatValues[path];
         // If the field is already stored, only update the value
-        if (formStateRef.current[name]) {
-          formStateRef.current[name].value = newValues[name];
+        if (formStateRef.current[path]) {
+          formStateRef.current[path].value = value;
         } else {
           // Else, save a new line in the context for the given name. When the field is registered later, he will have access to the value
-          formStateRef.current[name] = {
+          formStateRef.current[path] = {
             isRegistered: false,
-            name,
+            name: path,
             validation: VALIDATION_STATE_UNDETERMINED,
-            value: newValues[name],
+            value,
           };
         }
-        updateValueForAllTypeOfSubscribers(name);
+        updateValueForAllTypeOfSubscribers(path);
 
         if (options?.shouldDirty) {
-          fieldCallbacksRef.current[name]?.onDirty();
+          fieldCallbacksRef.current[path]?.onDirty();
         }
         if (options?.shouldTouch) {
-          fieldCallbacksRef.current[name]?.onTouch();
+          fieldCallbacksRef.current[path]?.onTouch();
         }
       }
     },
@@ -588,21 +655,22 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   );
 
   const onFieldChange = useCallback<FormInternal<T>['onFieldChange']>(
-    <K extends keyof T>(name: K, value: T[K] | undefined, hasFocus: boolean): void => {
-      if (!formStateRef.current[name]) {
-        throw new Error(`Field "${String(name)}" is not registered`);
+    <K extends FieldPath<T>>(name: K, value: FieldPathValue<T, K> | undefined, hasFocus: boolean): void => {
+      const path = name as string;
+      if (!formStateRef.current[path]) {
+        throw new Error(`Field "${path}" is not registered`);
       }
 
-      if (formStateRef.current[name]?.value === value) {
+      if (formStateRef.current[path]?.value === value) {
         return;
       }
       // Keep field name to know on blur if the field has been updated by user input
       if (hasFocus) {
-        focusedFieldNamesRef.current.add(name);
+        focusedFieldNamesRef.current.add(path);
       }
       // Update value in store
-      formStateRef.current[name].value = value;
-      updateValueSubscribers(name, 'onChange');
+      formStateRef.current[path].value = value;
+      updateValueSubscribers(path, 'onChange');
     },
     [updateValueSubscribers],
   );
@@ -612,39 +680,41 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       if (formStateRef.current[fieldName]) {
         formStateRef.current[fieldName].value = undefined;
         updateValueForAllTypeOfSubscribers(fieldName);
-        fieldCallbacksRef.current[fieldName as keyof T]?.onReset();
+        fieldCallbacksRef.current[fieldName]?.onReset();
       }
     }
   }, [updateValueForAllTypeOfSubscribers]);
 
   const onFieldBlur = useCallback<FormInternal<T>['onFieldBlur']>(
-    async (name: keyof T, data: AnyRecord = {}): Promise<void> => {
-      updateValueSubscribers(name, 'onBlur');
+    async (name: FieldPath<T>, data: AnyRecord = {}): Promise<void> => {
+      const path = name as string;
+      updateValueSubscribers(path, 'onBlur');
 
-      if (!formStateRef.current[name]) {
-        throw new Error(`Field "${String(name)}" is not registered`);
+      if (!formStateRef.current[path]) {
+        throw new Error(`Field "${path}" is not registered`);
       }
 
-      if (focusedFieldNamesRef.current.has(name) && formStateRef.current[name].validation.status === 'valid') {
-        await onUpdateAfterBlurRef(name, formStateRef.current[name].value, data, {
+      if (focusedFieldNamesRef.current.has(path) && formStateRef.current[path].validation.status === 'valid') {
+        await onUpdateAfterBlurRef(name, formStateRef.current[path].value as FieldPathValue<T, FieldPath<T>>, data, {
           getFormValues,
           resetForm,
           setFormValues,
         });
       }
-      focusedFieldNamesRef.current.delete(name);
+      focusedFieldNamesRef.current.delete(path);
     },
     [updateValueSubscribers, onUpdateAfterBlurRef, getFormValues, setFormValues, resetForm],
   );
 
   const updateValidationStatus = useCallback<FormInternal<T>['updateValidationStatus']>(
-    (name: keyof T, validationStatus: ValidationState): void => {
-      if (!formStateRef.current[name]) {
-        throw new Error(`Field "${String(name)}" is not registered`);
+    (name: FieldPath<T>, validationStatus: ValidationState): void => {
+      const path = name as string;
+      if (!formStateRef.current[path]) {
+        throw new Error(`Field "${path}" is not registered`);
       }
 
-      formStateRef.current[name].validation = validationStatus;
-      updateErrorSubscribers(name, 'onChange');
+      formStateRef.current[path].validation = validationStatus;
+      updateErrorSubscribers(path, 'onChange');
     },
     [updateErrorSubscribers],
   );

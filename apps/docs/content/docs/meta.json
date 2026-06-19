@@ -7,6 +7,7 @@
     "changelog",
     "---Form---",
     "form/field-management",
+    "form/nested-paths",
     "form/form-validation",
     "form/watching-form-values",
     "form/performance-optimization",

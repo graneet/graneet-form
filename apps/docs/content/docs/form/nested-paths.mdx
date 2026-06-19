@@ -1,0 +1,131 @@
+---
+title: Nested Object Paths
+description: Target nested object properties with dotted field names like "user.address.city"
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# Nested Object Paths
+
+Field names can target nested object properties using **dotted paths**, similar to react-hook-form's
+`register("user.address.city")`. The value type at each path is inferred automatically.
+
+<Callout type="info">
+  Nested paths work on **objects only**. Array index paths such as `items.0.price` are not supported — an array is
+  treated as a single leaf value stored under its key.
+</Callout>
+
+## Basic Usage
+
+Given a nested form model, point a `Field` at any leaf with a dotted name:
+
+```tsx
+interface ProfileForm {
+  email: string;
+  user: {
+    name: string;
+    address: {
+      city: string;
+      zip: number;
+    };
+  };
+}
+
+function ProfileFields() {
+  return (
+    <>
+      <Field<ProfileForm, 'user.address.city'>
+        name="user.address.city"
+        render={({ value, onChange, onBlur, onFocus }) => (
+          // `value` is inferred as `string | undefined`
+          <input value={value ?? ''} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} onFocus={onFocus} />
+        )}
+      />
+
+      <Field<ProfileForm, 'user.address.zip'>
+        name="user.address.zip"
+        render={({ value, onChange }) => (
+          // `value` is inferred as `number | undefined`
+          <input type="number" value={value ?? ''} onChange={(e) => onChange(e.target.valueAsNumber)} />
+        )}
+      />
+    </>
+  );
+}
+```
+
+The field name is constrained to [`FieldPath<T>`](/docs/api/types#fieldpath) and the rendered `value` / `onChange`
+are typed via [`FieldPathValue<T, K>`](/docs/api/types#fieldpathvalue).
+
+## Reading values: `getFormValues`
+
+`getFormValues()` reconstructs a **nested object** matching your form model:
+
+```tsx
+const values = form.getFormValues();
+// {
+//   email: 'a@b.c',
+//   user: { name: 'Alice', address: { city: 'Paris', zip: 75001 } },
+// }
+```
+
+## Writing values: `setFormValues`
+
+`setFormValues(...)` accepts a **partial nested object** (`DeepPartial<T>`), so you can update a single deep leaf
+without providing its siblings:
+
+```tsx
+form.setFormValues({
+  user: { address: { city: 'Lyon' } },
+});
+```
+
+<Callout type="warn">
+  `setFormValues` is **additive**: it updates the leaves present in the input and leaves the others untouched. It does
+  not clear omitted leaves.
+</Callout>
+
+## Hierarchical watching
+
+This is the key behaviour for nested paths: **watching a parent path notifies on any descendant change**, and the
+watcher receives the rebuilt subtree.
+
+```tsx
+function CitySummary() {
+  const form = useFormContext<ProfileForm>();
+
+  // Re-renders whenever ANY field under `user` changes
+  // (e.g. `user.address.city` or `user.name`)
+  const { user } = useFieldsWatch(form, ['user']);
+
+  return <p>{user?.address?.city}</p>;
+}
+```
+
+You can also watch an exact leaf — the result is still a reconstructed nested object:
+
+```tsx
+const watched = useFieldsWatch(form, ['user.address.city']);
+const city = watched.user?.address?.city; // string | undefined
+```
+
+The same applies to [`useValidations`](/docs/api/use-validations): watching `['user']` returns a nested object of
+validation statuses for every registered field under `user`.
+
+## How it works
+
+Internally, field state is stored **flat**, keyed by the full path string (e.g. `"user.address.city"`). Nested objects
+are reconstructed only at the read/write boundaries (`getFormValues`, `setFormValues`, watchers). This keeps the
+subscription model fast while exposing an ergonomic nested API.
+
+Because [`FieldPath<T>`](/docs/api/types#fieldpath) is a **superset** of `keyof T`, existing flat forms keep working and
+type-checking unchanged — nested paths are purely additive.
+
+## Limitations
+
+- **Arrays**: array index paths (`items.0.price`) are not supported. Manage arrays as a single leaf value (see
+  [Array Fields](/docs/form/field-management#array-fields-multiple-values)).
+- **Object-valued leaves**: a field whose value is itself a plain object cannot coexist with nested paths under the same
+  key. For example, you cannot register both `"meta"` (as a whole object) and `"meta.locale"` (as a nested path) — the
+  object would be split into its leaves.
+- **Additive writes**: `setFormValues` never deletes omitted leaves.

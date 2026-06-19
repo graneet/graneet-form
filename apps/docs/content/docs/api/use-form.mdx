@@ -83,21 +83,28 @@ const form = useForm<UserForm>({
 
 ### getFormValues()
 
-Retrieves all current form field values.
+Retrieves all current form field values. Nested objects are reconstructed.
 
 ```tsx
 const currentValues = form.getFormValues();
 // Returns: { name: 'John', email: 'john@example.com' }
+// With nested paths: { user: { address: { city: 'Paris' } } }
 ```
 
 ### setFormValues(newValues)
 
-Updates multiple form field values at once.
+Updates multiple form field values at once. Accepts a partial nested object (`DeepPartial<T>`), so deep leaves can be
+updated without their siblings. See [Nested Object Paths](/docs/form/nested-paths).
 
 ```tsx
 form.setFormValues({
   name: 'Jane Doe',
   email: 'jane@example.com',
+});
+
+// Partial nested update
+form.setFormValues({
+  user: { address: { city: 'Lyon' } },
 });
 ```
 

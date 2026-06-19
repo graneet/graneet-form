@@ -27,6 +27,35 @@ Individual field value type:
 
 <AutoTypeTable path="../../packages/graneet-form/src/shared/types/field-value.ts" name="FieldValue" />
 
+## Path Types
+
+### FieldPath
+
+Union of all valid field names for a form model `T` — every top-level key **plus** every nested object path
+(objects only, no array indices). Used to constrain `name` on `Field`, `useFieldsWatch`, `useValidations`, etc.
+
+```tsx
+interface ProfileForm {
+  email: string;
+  user: { name: string; address: { city: string } };
+}
+
+type Paths = FieldPath<ProfileForm>;
+// 'email' | 'user' | 'user.name' | 'user.address' | 'user.address.city'
+```
+
+`FieldPath<T>` is a superset of `keyof T`, so existing flat field names keep type-checking. See
+[Nested Object Paths](/docs/form/nested-paths).
+
+### FieldPathValue
+
+Resolves the value type located at a given path within `T`:
+
+```tsx
+type City = FieldPathValue<ProfileForm, 'user.address.city'>; // string
+type Address = FieldPathValue<ProfileForm, 'user.address'>; // { city: string }
+```
+
 ## Validation Types
 
 ### ValidationState
@@ -54,6 +83,13 @@ Type for objects with any structure:
 Type for partial records with specific keys:
 
 <AutoTypeTable path="../../packages/graneet-form/src/shared/types/partial-record.ts" name="PartialRecord" />
+
+### DeepPartial
+
+Recursively makes all properties optional (stopping at arrays, `Date`, and functions). This is the input type accepted
+by `setFormValues`, so nested objects can be updated partially:
+
+<AutoTypeTable path="../../packages/graneet-form/src/shared/types/deep-partial.ts" name="DeepPartial" />
 
 ## Usage Examples
 
@@ -114,13 +150,18 @@ const validateEmail = (value: string): boolean => {
 ```tsx
 // Get values with proper typing
 const formValues = form.getFormValues();
-// formValues is typed as Partial<UserRegistrationForm>
+// formValues is typed as Partial<UserRegistrationForm> (nested objects reconstructed)
 
 // Set values with type safety
 form.setFormValues({
   firstName: 'John', // ✅ Valid
   email: 'john@example.com', // ✅ Valid
   // invalidField: 'value' // ❌ TypeScript error
+});
+
+// Nested objects can be updated partially (DeepPartial)
+form.setFormValues({
+  preferences: { newsletter: true },
 });
 ```
 
@@ -158,9 +199,9 @@ Most Graneet Form types are generic and constrained to ensure type safety:
 // T extends FieldValues ensures form data is a valid object
 useForm<T extends FieldValues>()
 
-// K extends keyof T ensures field names are valid keys
-Field<T extends FieldValues, K extends keyof T>
+// K extends FieldPath<T> ensures field names are valid keys or nested paths
+Field<T extends FieldValues, K extends FieldPath<T>>
 
 // Validation functions receive properly typed values
-Rule<T extends FieldValues, K extends keyof T>
+Rule<T extends FieldValues, K extends FieldPath<T>>
 ```

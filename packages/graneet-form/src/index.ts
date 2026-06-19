@@ -14,6 +14,8 @@ export { useValidations } from './form/hooks/use-validations';
 export type { FormValidations } from './form/types/form-validations';
 export type { FormValues } from './form/types/form-values';
 export type { AnyRecord } from './shared/types/any-record';
+export type { DeepPartial } from './shared/types/deep-partial';
+export type { FieldPath, FieldPathByValue, FieldPathValue } from './shared/types/field-path';
 export type { FieldValue, FieldValues } from './shared/types/field-value';
 export { mapValidationStatusesToOutcome } from './shared/util/validation.util';
 export type { StepProps } from './wizard/components/step';

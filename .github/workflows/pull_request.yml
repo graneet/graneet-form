@@ -25,3 +25,16 @@ jobs:
 
       - name: Build
         run: pnpm --filter "graneet-form" build
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+
+      - name: Install
+        uses: ./.github/composite-actions/install
+
+      - name: Test
+        run: pnpm --filter "graneet-form" test

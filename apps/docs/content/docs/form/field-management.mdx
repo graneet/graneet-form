@@ -52,14 +52,17 @@ function FieldLifecycleExample() {
 ### Field Props Interface
 
 ```tsx
-interface FieldProps<T extends FieldValues, K extends keyof T> {
-  name: K; // Field name (required)
+interface FieldProps<T extends FieldValues, K extends FieldPath<T>> {
+  name: K; // Field name — supports nested paths like "user.address.city"
   children?: ReactNode; // Rules and other child components
   render: RenderFunction; // Render function for the input
   data?: AnyRecord; // Additional data passed to onBlur
-  defaultValue?: T[K]; // Default value for this field
+  defaultValue?: FieldPathValue<T, K>; // Default value for this field
 }
 ```
+
+`name` accepts any [`FieldPath<T>`](/docs/api/types#fieldpath) — every top-level key plus any nested object path. See
+[Nested Object Paths](/docs/form/nested-paths) for details.
 
 ### Render Function Props
 
@@ -68,10 +71,10 @@ The render function receives two parameters:
 **fieldProps:**
 
 ```tsx
-interface FieldRenderProps<T, K extends keyof T> {
+interface FieldRenderProps<T, K extends FieldPath<T>> {
   name: K; // Field name
-  value: T[K] | undefined; // Current field value
-  onChange(value: T[K]): void; // Value change handler
+  value: FieldPathValue<T, K> | undefined; // Current field value
+  onChange(value: FieldPathValue<T, K>): void; // Value change handler
   onFocus(): void; // Focus handler
   onBlur(): void; // Blur handler
 }
@@ -398,6 +401,9 @@ function TagsField() {
 ```
 
 ### Nested Object Fields
+
+> The example below manages a whole object under a single field. If you prefer to bind each nested property to its own
+> input, use [dotted field names](/docs/form/nested-paths) (e.g. `name="address.city"`) instead.
 
 ```tsx
 interface FormData {
