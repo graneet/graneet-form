@@ -18,6 +18,8 @@ Field names can now target nested object properties using dotted paths (objects 
 
 `FieldPath<T>` is a superset of `keyof T`, so existing flat forms keep working and type-checking unchanged. Internally, field state is still stored flat (keyed by the full path string); nesting happens only at the read/write boundaries.
 
-**New exported types**: `FieldPath`, `FieldPathValue`, `DeepPartial`.
+**New exported types**: `FieldPath`, `FieldPathValue`, `FieldPathByValue`, `DeepPartial`.
+
+`FieldPathByValue<T, V>` is the union of dotted paths in `T` whose resolved value is assignable to `V` — useful for typed field components that should only accept paths of a given value type (e.g. a text field restricted to `string | null | undefined` paths).
 
 **Limitations**: array index paths (`items.0.price`) are not supported; a field whose value is itself a plain object cannot coexist with nested paths under the same key; `setFormValues` is additive (it does not clear omitted leaves).

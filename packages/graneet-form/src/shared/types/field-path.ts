@@ -49,3 +49,16 @@ export type PathHead<P extends string> = P extends `${infer Head}.${string}` ? H
 
 /** Remaining path under head `H` for members of `P` that have one (e.g. `P='user.city', H='user'` → `'city'`). */
 export type PathTail<P extends string, H extends string> = P extends `${H}.${infer Rest}` ? Rest : never;
+
+/**
+ * Union of dotted field paths in `T` whose resolved value is assignable to `V`.
+ * Use it to constrain typed field components to paths of a given value type, e.g. a text field
+ * that only accepts `string | null | undefined` paths.
+ *
+ * @example
+ * // T = { name: string; age: number; user: { email: string } }
+ * FieldPathByValue<T, string | null | undefined> // 'name' | 'user.email'
+ */
+export type FieldPathByValue<T, V> = {
+  [P in FieldPath<T> & string]: FieldPathValue<T, P> extends V ? P : never;
+}[FieldPath<T> & string];
