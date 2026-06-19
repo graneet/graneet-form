@@ -7,7 +7,8 @@ import type { FieldValues } from '../../shared/types/field-value';
 import type { PartialRecord } from '../../shared/types/partial-record';
 import type { ValidationState } from '../../shared/types/validation';
 import { useCallbackRef } from '../../shared/util/use-callback-ref';
-import { buildNestedForPrefix, flattenToPaths, getAtPath, isPathRelated, setAtPath } from '../../shared/util/path';
+import { createPathHelpers, flattenToPaths } from '../../shared/util/path';
+import type { PathHelpers } from '../../shared/util/path';
 import type { FieldCallbacks, FormContextApi, FormInternal, SetFormValuesOptions } from '../contexts/form-context';
 import type { FormValidations } from '../types/form-validations';
 import type { FormValues } from '../types/form-values';
@@ -168,6 +169,12 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
     values: {},
   });
 
+  // Path helpers carry a parsed-path memo cache scoped to this form. Held in a ref so the cache
+  // Lives for the form's lifetime and never leaks across unrelated form instances.
+  const pathHelpersRef = useRef<PathHelpers | null>(null);
+  pathHelpersRef.current ??= createPathHelpers();
+  const { buildNestedForPrefix, isPathRelated, parsePath, setAtPath, unsetAtPath } = pathHelpersRef.current;
+
   const resolvedDefaultValues = useMemo((): DeepPartial<T> => {
     if (typeof defaultValues === 'function') {
       // oxlint-disable-next-line typescript/no-unsafe-return DeepPartial recursion is resolved as any by the linter
@@ -208,6 +215,10 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
   const focusedFieldNamesRef = useRef(new Set<string>());
 
   const fieldCallbacksRef = useRef<Record<string, FieldCallbacks>>({});
+
+  // Each field's own `setValue`, keyed by its exact path. Notified directly in O(1) on value change,
+  // Bypassing the generic `scoped` registry (which is reserved for explicit useFieldsWatch watchers).
+  const fieldSettersRef = useRef<Record<string, (value: unknown) => void>>({});
 
   const handleFormSubmitRef = useRef<(formValues: T) => (void | Promise<void>) | undefined>(undefined);
 
@@ -290,7 +301,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       acc = setAtPath(acc, name, value);
     }
     return acc;
-  }, [getRegisteredValueEntries]);
+  }, [getRegisteredValueEntries, setAtPath]);
 
   const getFormValuesForNames = useCallback<FormInternal<T>['getFormValuesForNames']>(
     <K extends FieldPath<T>>(names: K[]): FormValues<T, K> => {
@@ -304,7 +315,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       }
       return acc;
     },
-    [getRegisteredValueEntries],
+    [getRegisteredValueEntries, buildNestedForPrefix, setAtPath],
   );
 
   const getFormErrors = useCallback<FormInternal<T>['getFormErrors']>((): PartialRecord<keyof T, ValidationState> => {
@@ -328,7 +339,57 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
       }
       return acc;
     },
-    [getRegisteredValidationEntries],
+    [getRegisteredValidationEntries, buildNestedForPrefix, setAtPath],
+  );
+
+  /**
+   * Notify every scoped subscriber whose watched path is in an ancestor/descendant/equal
+   * relationship with the changed field, by applying ONLY the changed leaf as an incremental
+   * patch to the previously published object — never rebuilding the whole subtree.
+   *
+   * `scoped` holds only explicit useFieldsWatch watchers (few), and a single field change touches
+   * exactly one leaf, so this is O(watchers · pathDepth) instead of O(watchers · fieldCount).
+   * @internal
+   */
+  const notifyScopedSubscribers = useCallback(
+    (
+      scoped: Record<string, Set<Dispatch<SetStateAction<Record<string, unknown>>>>>,
+      name: string,
+      isRegistered: boolean,
+      value: unknown,
+      getEntries: () => [string, unknown][],
+    ): void => {
+      const watchedPaths = Object.keys(scoped);
+      if (watchedPaths.length === 0) {
+        return;
+      }
+      const nameSegmentsLength = parsePath(name).length;
+      for (const watchedPath of watchedPaths) {
+        const subscribers = scoped[watchedPath];
+        if (!subscribers || subscribers.size === 0 || !isPathRelated(watchedPath, name)) {
+          continue;
+        }
+
+        if (nameSegmentsLength >= parsePath(watchedPath).length) {
+          // Common case — the changed field is equal-or-descendant of the watched path (exact-field
+          // Or subtree watch). Patch just its leaf: set when registered, remove (pruning now-empty
+          // Ancestors) when unregistered, so the published object stays consistent without a rebuild.
+          for (const publish of subscribers) {
+            publish((previous) => (isRegistered ? setAtPath(previous, name, value) : unsetAtPath(previous, name)));
+          }
+        } else {
+          // Rare case — the changed field is a strict ancestor of the watched path (a field holding
+          // An object, watched below its own leaf). Reconstruct just this one watcher's subtree.
+          const subtree = buildNestedForPrefix(watchedPath, getEntries());
+          for (const publish of subscribers) {
+            publish((previous) =>
+              subtree === undefined ? unsetAtPath(previous, watchedPath) : setAtPath(previous, watchedPath, subtree),
+            );
+          }
+        }
+      }
+    },
+    [buildNestedForPrefix, isPathRelated, parsePath, setAtPath, unsetAtPath],
   );
 
   /**
@@ -339,25 +400,22 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
    */
   const updateValueSubscribers = useCallback(
     (name: string, watchMode: WatchMode): void => {
-      // Notify every scoped subscriber whose watched path is in an ancestor/descendant/equal
-      // Relationship with the changed path, publishing the full reconstructed subtree it watches.
-      const { scoped } = formValuesSubscribersRef.current[watchMode];
-      const watchedPaths = Object.keys(scoped);
-      if (watchedPaths.length > 0) {
-        const entries = getRegisteredValueEntries();
-        for (const watchedPath of watchedPaths) {
-          const subscribers = scoped[watchedPath];
-          if (!subscribers || subscribers.size === 0 || !isPathRelated(watchedPath, name)) {
-            continue;
-          }
-          // Always rebuild the WHOLE watched subtree (not patch a single leaf), so an unregistered
-          // Descendant disappears from the published object instead of lingering as a ghost key.
-          const subtree = buildNestedForPrefix(watchedPath, entries);
-          for (const publish of subscribers) {
-            publish((previous) => setAtPath(previous, watchedPath, subtree));
-          }
-        }
+      const field = formStateRef.current[name];
+      const isRegistered = Boolean(field?.isRegistered);
+
+      // Notify in O(1) the field registered exactly on `name`. Its self-watcher previously lived in
+      // `scoped` on the 'onChange' mode, so we reproduce that trigger here.
+      if (watchMode === 'onChange') {
+        fieldSettersRef.current[name]?.(isRegistered ? field?.value : undefined);
       }
+
+      notifyScopedSubscribers(
+        formValuesSubscribersRef.current[watchMode].scoped,
+        name,
+        isRegistered,
+        isRegistered ? field?.value : undefined,
+        getRegisteredValueEntries,
+      );
 
       if (formValuesSubscribersRef.current[watchMode].global.size > 0) {
         /*
@@ -374,7 +432,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         }, 0);
       }
     },
-    [getFormValues, getRegisteredValueEntries],
+    [getFormValues, getRegisteredValueEntries, notifyScopedSubscribers],
   );
 
   /**
@@ -385,22 +443,16 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
    */
   const updateErrorSubscribers = useCallback(
     (name: string, watchMode: WatchMode): void => {
-      // Same hierarchical matching as values: rebuild the validation subtree for each related watcher.
-      const { scoped } = formErrorsSubscribersRef.current[watchMode];
-      const watchedPaths = Object.keys(scoped);
-      if (watchedPaths.length > 0) {
-        const entries = getRegisteredValidationEntries();
-        for (const watchedPath of watchedPaths) {
-          const subscribers = scoped[watchedPath];
-          if (!subscribers || subscribers.size === 0 || !isPathRelated(watchedPath, name)) {
-            continue;
-          }
-          const subtree = buildNestedForPrefix(watchedPath, entries);
-          for (const publish of subscribers) {
-            publish((previous) => setAtPath(previous, watchedPath, subtree));
-          }
-        }
-      }
+      // Same incremental hierarchical matching as values, patching the single changed validation leaf.
+      const field = formStateRef.current[name];
+      const isRegistered = Boolean(field?.isRegistered);
+      notifyScopedSubscribers(
+        formErrorsSubscribersRef.current[watchMode].scoped,
+        name,
+        isRegistered,
+        isRegistered ? field?.validation : undefined,
+        getRegisteredValidationEntries,
+      );
       if (formErrorsSubscribersRef.current[watchMode].global.size > 0) {
         /*
           If there is a global subscriber and a lot of fields are render, avoid spam of refresh on this subscriber
@@ -416,7 +468,7 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
         }, 0);
       }
     },
-    [getFormErrors, getRegisteredValidationEntries],
+    [getFormErrors, getRegisteredValidationEntries, notifyScopedSubscribers],
   );
 
   /**
@@ -532,18 +584,9 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
       fieldCallbacksRef.current[path] = callbacks;
 
-      // The field watches its own exact leaf path, so the reconstructed subtree it receives is
-      // Exactly its scalar value. `getAtPath` drills the nested object down to that leaf.
-      const watcher = (publish: SetStateAction<Record<string, unknown>>) => {
-        const values = typeof publish === 'function' ? publish({}) : publish;
-        setValue(getAtPath(values, path) as FieldPathValue<T, K> | undefined);
-      };
-
-      /*
-     Add subscriber has to be setValue saving array. Here, the publisher needs only the first value
-     (and the only one) returned in values, so we created a function to do the mapping
-     */
-      addValueSubscriber<K>(watcher as Dispatch<SetStateAction<FormValues<T, K>>>, 'onChange', [name]);
+      // The field receives its value directly through its own `setValue`, keyed by its exact path.
+      // `updateValueForAllTypeOfSubscribers` below initializes it and notifies explicit watchers.
+      fieldSettersRef.current[path] = setValue as (value: unknown) => void;
       updateValueForAllTypeOfSubscribers(path);
 
       return () => {
@@ -553,12 +596,12 @@ export function useForm<T extends FieldValues = Record<string, Record<string, un
 
         formStateRef.current[path].isRegistered = false;
         delete fieldCallbacksRef.current[path];
-        removeValueSubscriber<K>(watcher as Dispatch<SetStateAction<FormValues<T, K>>>, 'onChange', [name]);
+        delete fieldSettersRef.current[path];
         updateValueForAllTypeOfSubscribers(path);
         updateErrorForAllTypeOfSubscribers(path);
       };
     },
-    [addValueSubscriber, updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers, removeValueSubscriber],
+    [updateValueForAllTypeOfSubscribers, updateErrorForAllTypeOfSubscribers],
   );
 
   const removeGlobalValidationStatusSubscriber = useCallback<FormInternal<T>['removeGlobalValidationStatusSubscriber']>(
